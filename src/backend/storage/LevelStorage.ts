@@ -1,13 +1,14 @@
-import level from 'level';
+import { Level } from 'level';
 import { StorageProvider, BatchOp } from './StorageProvider';
 
 export class LevelStorage implements StorageProvider {
-  private db?: level.LevelDB;
+  // minimal typing to satisfy test env
+  private db?: any;
   constructor(private location: string) {}
 
   async open(): Promise<void> {
-    // @ts-expect-error level types are relaxed; minimal stub here
-    this.db = level(this.location, { valueEncoding: 'buffer' });
+    // @ts-ignore level types are relaxed; minimal stub here
+    this.db = new Level(this.location, { valueEncoding: 'buffer' });
   }
 
   async close(): Promise<void> {
@@ -39,10 +40,9 @@ export class LevelStorage implements StorageProvider {
   }
 
   async scanPrefix(prefix: string, onItem: (key: string, value: Buffer) => void): Promise<void> {
-    // @ts-expect-error minimal iteration stub
+    // @ts-ignore minimal iteration stub
     for await (const [key, value] of this.db!.iterator({ gte: prefix, lt: prefix + '\uFFFF' })) {
       onItem(String(key), value as Buffer);
     }
   }
 }
-

@@ -9,3 +9,7 @@ Runbooks:
 - package-manager: Use Yarn for Node tasks; avoid npm — when editing package.json/scripts, installing deps, or writing CI/docs that run Node commands.
 - readme-maintenance: Keep README accurate with docs-first structure and Yarn workflow — when changing docs structure, scripts, or onboarding steps.
 - dependency-management: Manage dependencies with Yarn; never hand-edit versions — when adding/upgrading/removing packages or resolving advisories.
+ - commit-messages: Write clean Conventional Commit messages — when composing multi-line messages or amending bad ones.
+- dev-user-switcher: Quickly switch API user in dev via badge or storage — when testing FE against multiple accounts.
+- dev-seed-leveldb: Seed LevelDB with demo keys to visualize inventory — when bootstrapping dev data or demoing fallback.
+- graphql-inventory-summary: Maintain schema/resolver and test strategy — when updating the inventory summary endpoint.

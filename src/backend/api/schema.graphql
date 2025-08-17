@@ -1,4 +1,18 @@
-type Query {
-  ok: String!
+scalar BigInt
+
+enum Rarity { COMMON UNCOMMON RARE EPIC LEGENDARY MYTHIC }
+
+type CountByRarity { rarity: Rarity!, count: BigInt! }
+type CountByType   { typeId: ID!, count: BigInt! }
+
+type InventorySummary {
+  totalStacks: Int!
+  totalItems: BigInt!
+  byRarity: [CountByRarity!]!
+  byType: [CountByType!]!
 }
 
+type Query {
+  inventorySummary: InventorySummary!
+  configHash: String!
+}

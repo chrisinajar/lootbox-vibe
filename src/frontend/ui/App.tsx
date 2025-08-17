@@ -1,5 +1,6 @@
 import React from 'react';
-import { OkProbe } from '../main';
+import { InventoryOverview } from '../main';
+import { UserSwitcherBadge } from './UserSwitcherBadge';
 
 const App: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const App: React.FC = () => {
       </header>
       <main className="space-y-4">
         <div className="rounded border border-slate-800 p-4 bg-slate-900/40">
-          <OkProbe />
+          <InventoryOverview />
         </div>
         <div>
           <button className="rounded bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium">
@@ -17,9 +18,9 @@ const App: React.FC = () => {
           </button>
         </div>
       </main>
+      <UserSwitcherBadge />
     </div>
   );
 };
 
 export default App;
-

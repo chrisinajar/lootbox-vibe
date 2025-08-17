@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 
 export interface LoadedConfig {
@@ -12,9 +12,9 @@ export interface LoadedConfig {
 }
 
 export class ConfigLoader {
-  private ajv: Ajv;
+  private ajv: Ajv2020;
   constructor(private configDir = path.resolve(process.cwd(), 'config')) {
-    this.ajv = new Ajv({ allErrors: true, strict: true });
+    this.ajv = new Ajv2020({ allErrors: true, strict: true });
     addFormats(this.ajv);
   }
 
@@ -75,4 +75,3 @@ export class ConfigLoader {
     return { boxes, unlocks, modifiers, idle };
   }
 }
-
