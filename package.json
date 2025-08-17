@@ -1,0 +1,104 @@
+{
+  "name": "lootbox",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lootbox simulator monorepo: backend, frontend, and config.",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,magenta \"yarn dev:api\" \"vite\"",
+    "dev:api": "tsx watch --tsconfig tsconfig.backend.json src/backend/index.ts",
+    "build:backend": "tsc -p tsconfig.backend.json",
+    "start:backend": "node dist/src/backend/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "test": "jest --passWithNoTests",
+    "config:types": "json2ts --bannerComment \"/* auto-generated from /config/schema */\" -i config/schema/*.json -o src/backend/config/types.d.ts",
+    "config:check": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/config-check.ts",
+    "lint:md": "npx -y markdownlint-cli \"**/*.md\" --ignore node_modules",
+    "lint:links": "npx -y markdown-link-check -q docs/**/*.md",
+    "verify": "yarn lint:md && yarn lint:links",
+    "prepare": "husky install",
+    "agent:runbook:new": "node scripts/agent-runbook-new.js"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,md,css,json}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.json"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.8",
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/express4": "^1.1.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "chokidar": "^3.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "graphql": "^16.9.0",
+    "graphql-scalars": "^1.22.5",
+    "level": "^8.0.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/client-preset": "^4.3.3",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.5.5",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^8.4.0",
+    "@typescript-eslint/parser": "^8.4.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "framer-motion": "^11.3.31",
+    "husky": "^9.1.4",
+    "jest": "^29.7.0",
+    "json-schema-to-typescript": "^15.0.1",
+    "lint-staged": "^15.2.10",
+    "postcss": "^8.4.41",
+    "prettier": "^3.3.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "supertest": "^7.0.0",
+    "tailwindcss": "^3.4.10",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.1",
+    "tsx": "^4.16.2"
+  }
+}

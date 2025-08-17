@@ -1,0 +1,10 @@
+{
+  "id": "box.cardboard",
+  "name": "Cardboard box",
+  "entries": [
+    { "itemId": "item.apple", "weight": 70 },
+    { "itemId": "item.banana", "weight": 25 },
+    { "itemId": "item.golden-ticket", "weight": 5 }
+  ]
+}
+

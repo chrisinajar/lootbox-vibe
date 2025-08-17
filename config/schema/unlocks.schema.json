@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/unlocks.schema.json",
+  "title": "Unlocks schema",
+  "type": "object",
+  "definitions": {
+    "unlock": {
+      "type": "object",
+      "required": ["id", "name", "requires"],
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "requires": {
+          "type": "object",
+          "properties": {
+            "boxesOpened": {"type": "number", "minimum": 0}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
+
