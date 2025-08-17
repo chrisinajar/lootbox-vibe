@@ -3,13 +3,14 @@ import { ConfigLoader } from '../config';
 import { keys } from '../storage/keys';
 import { u64 } from '../storage/codec';
 import { Rng, DefaultRng } from './Rng';
+import { UnlockService } from './UnlockService';
 import { prepareStackOps } from './txnHelpers';
 
 export type OpenBoxesInput = { boxId: string; count: number; requestId: string };
 
 export class OpenBoxesService {
   private config: ReturnType<ConfigLoader['load']>;
-  constructor(private storage: StorageProvider, loader = new ConfigLoader(), private rng: Rng = new DefaultRng()) {
+  constructor(private storage: StorageProvider, loader = new ConfigLoader(), private rng: Rng = new DefaultRng(), private unlocks = new UnlockService(storage, new ConfigLoader())) {
     this.config = loader.load();
   }
 
@@ -66,12 +67,17 @@ export class OpenBoxesService {
     // pstat increment
     const statKey = `pstat:${uid}.lifetimeBoxesOpened`;
     const prev = u64.decodeBE(await this.storage.get(statKey));
-    ops.push({ type: 'put', key: statKey, value: u64.encodeBE(prev + BigInt(input.count)) });
+    const nextOpened = prev + BigInt(input.count);
+    ops.push({ type: 'put', key: statKey, value: u64.encodeBE(nextOpened) });
+
+    // unlocks: milestone + rng
+    const unlock = await this.unlocks.prepareUnlockOps(uid, nextOpened, input.boxId);
+    ops.push(...unlock.ops);
 
     const result = {
       stacks: Array.from(rolls.entries()).map(([stackId, r]) => ({ stackId, typeId: r.itemId, rarity: r.rarity, count: r.count })),
       currencies: [{ currency: 'KEYS', amount: -BigInt(input.count) }],
-      unlocks: [],
+      unlocks: unlock.unlocked,
     };
     const persistable = {
       stacks: result.stacks,
