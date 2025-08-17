@@ -27,3 +27,13 @@ temp/
 .env
 .env.*
 !.env.example
+
+# Local databases (LevelDB)
+data/leveldb/
+**/MANIFEST-*
+**/CURRENT
+**/LOCK
+**/*.ldb
+**/*.sst
+**/LOG
+**/LOG.old
