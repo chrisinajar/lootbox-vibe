@@ -1,0 +1,6 @@
+mutation Salvage($input: SalvageInput!) {
+  salvage(input: $input) {
+    scrapped { stackId typeId rarity count }
+    currencies { currency amount }
+  }
+}

@@ -1,8 +1,8 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: 'http://localhost:4000',
-  documents: 'src/frontend/**/*.{ts,tsx}',
+  schema: 'src/backend/api/schema.graphql',
+  documents: ['src/frontend/**/*.graphql', 'src/frontend/**/*.{ts,tsx}'],
   generates: {
     'src/frontend/graphql/': {
       preset: 'client',
@@ -14,4 +14,3 @@ const config: CodegenConfig = {
 };
 
 export default config;
-

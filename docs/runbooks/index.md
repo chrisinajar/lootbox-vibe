@@ -13,3 +13,4 @@ Runbooks:
 - dev-user-switcher: Quickly switch API user in dev via badge or storage — when testing FE against multiple accounts.
 - dev-seed-leveldb: Seed LevelDB with demo keys to visualize inventory — when bootstrapping dev data or demoing fallback.
 - graphql-inventory-summary: Maintain schema/resolver and test strategy — when updating the inventory summary endpoint.
+- graphql-codegen-hooks: Enforce typed docs/hooks, no inline gql — when adding/updating frontend GraphQL.

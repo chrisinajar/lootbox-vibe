@@ -1,0 +1,8 @@
+query InventorySummary {
+  inventorySummary {
+    totalStacks
+    totalItems
+    byRarity { rarity count }
+    byType { typeId count }
+  }
+}

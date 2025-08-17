@@ -1,0 +1,7 @@
+mutation OpenBoxes($input: OpenBoxesInput!) {
+  openBoxes(input: $input) {
+    stacks { stackId typeId rarity count }
+    currencies { currency amount }
+    unlocks
+  }
+}
