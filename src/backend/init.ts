@@ -13,6 +13,7 @@ import { InventorySummaryService } from './services/InventorySummaryService';
 import { ConfigService } from './services/ConfigService';
 import { buildContext } from './api/context';
 import { OpenBoxesService } from './services/OpenBoxesService';
+import { SalvageService } from './services/SalvageService';
 
 type InitOptions = {
   port?: number;
@@ -36,6 +37,7 @@ export async function initializeServer(options: InitOptions = {}) {
   const summariesRepo = new SummariesRepo(storage);
   const summarySvc = new InventorySummaryService(summariesRepo);
   const openSvc = new OpenBoxesService(storage);
+  const salvageSvc = new SalvageService(storage);
 
   const configSvc = new ConfigService();
 
@@ -57,6 +59,10 @@ export async function initializeServer(options: InitOptions = {}) {
       openBoxes: async (_: any, { input }: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';
         return await openSvc.open(uid, input);
+      },
+      salvage: async (_: any, { input }: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        return await salvageSvc.salvage(uid, input);
       },
     },
   } as const;
