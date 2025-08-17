@@ -4,7 +4,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache, useQuery, HttpLink, from, 
 import { setContext } from '@apollo/client/link/context';
 import App from './ui/App';
 import './index.css';
-import { InventorySummaryDocument, OpenBoxesDocument, SalvageDocument } from './graphql';
+import { InventorySummaryDocument, OpenBoxesDocument, SalvageDocument } from './graphql/graphql';
 import { v4 as uuidv4 } from 'uuid';
 
 export function getTestUserId(): string | undefined {
