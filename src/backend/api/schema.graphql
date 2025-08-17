@@ -16,3 +16,11 @@ type Query {
   inventorySummary: InventorySummary!
   configHash: String!
 }
+
+input OpenBoxesInput { boxId: ID!, count: Int!, requestId: ID! }
+
+type RewardStack { stackId: ID!, typeId: ID!, rarity: Rarity!, count: Int! }
+type RewardCurrency { currency: ID!, amount: BigInt! }
+type Rewards { stacks: [RewardStack!]!, currencies: [RewardCurrency!]!, unlocks: [ID!]! }
+
+type Mutation { openBoxes(input: OpenBoxesInput!): Rewards! }

@@ -54,6 +54,13 @@ async function seed({ uid, writeSums }: SeedOpts) {
   }
 
   await db.batch(ops);
+  // seed currencies
+  const keysKey = `cur:${uid}:KEYS`;
+  const scrapKey = `cur:${uid}:SCRAP`;
+  await db.batch([
+    { type: 'put', key: keysKey, value: u64be(100n) },
+    { type: 'put', key: scrapKey, value: u64be(0n) },
+  ]);
   // Logging summary
   const totalStacks = stacks.length;
   const totalItems = stacks.reduce((a, s) => a + s.count, 0);
@@ -95,6 +102,7 @@ async function seed({ uid, writeSums }: SeedOpts) {
   console.log(`By type:   ${byTypeSummary}`);
   // eslint-disable-next-line no-console
   console.log(`Keys written: inv=${invCount}, idx:rarity=${idxRarityCount}, idx:type=${idxTypeCount}, sum=${sumCount}`);
+  console.log(`Currencies: KEYS=100, SCRAP=0`);
   // eslint-disable-next-line no-console
   console.log('Tip: in browser console:');
   // eslint-disable-next-line no-console

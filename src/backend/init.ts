@@ -12,6 +12,7 @@ import { SummariesRepo } from './services/SummariesRepo';
 import { InventorySummaryService } from './services/InventorySummaryService';
 import { ConfigService } from './services/ConfigService';
 import { buildContext } from './api/context';
+import { OpenBoxesService } from './services/OpenBoxesService';
 
 type InitOptions = {
   port?: number;
@@ -34,6 +35,7 @@ export async function initializeServer(options: InitOptions = {}) {
   await storage.open();
   const summariesRepo = new SummariesRepo(storage);
   const summarySvc = new InventorySummaryService(summariesRepo);
+  const openSvc = new OpenBoxesService(storage);
 
   const configSvc = new ConfigService();
 
@@ -49,6 +51,12 @@ export async function initializeServer(options: InitOptions = {}) {
           return configSvc.computeHash();
         }
         return 'disabled';
+      },
+    },
+    Mutation: {
+      openBoxes: async (_: any, { input }: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        return await openSvc.open(uid, input);
       },
     },
   } as const;
