@@ -1,5 +1,5 @@
 {
-  "$schema": "https://lootboxsim/schemas/modifiers.dynamic.v1.json",
+  "$schema": "https://lootboxsim/schemas/modifiers.dynamic.json",
   "version": 1,
   "modifiers": [
     {

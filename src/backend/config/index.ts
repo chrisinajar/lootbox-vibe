@@ -26,108 +26,103 @@ export class ConfigLoader {
 
     // Load schemas
     const schemas = {
-      // v1 pack
-      boxesV1: readJson(path.join(schemaDir, 'boxes.v1.schema.json')),
-      boxV1: readJson(path.join(schemaDir, 'box.v1.schema.json')),
-      modifiersStaticV1: readJson(path.join(schemaDir, 'modifiers.static.v1.schema.json')),
-      modifiersDynamicV1: readJson(path.join(schemaDir, 'modifiers.dynamic.v1.schema.json')),
-      unlocksV1: readJson(path.join(schemaDir, 'unlocks.v1.schema.json')),
-      idleV1: readJson(path.join(schemaDir, 'idle.v1.schema.json')),
-      itemsV1: readJson(path.join(schemaDir, 'items.v1.schema.json')),
-      economyV1: readJson(path.join(schemaDir, 'economy.v1.schema.json')),
+      // evolving pack
+      boxes: readJson(path.join(schemaDir, 'boxes.schema.json')),
+      box: readJson(path.join(schemaDir, 'box.schema.json')),
+      modifiersStatic: readJson(path.join(schemaDir, 'modifiers.static.schema.json')),
+      modifiersDynamic: readJson(path.join(schemaDir, 'modifiers.dynamic.schema.json')),
+      unlocks: readJson(path.join(schemaDir, 'unlocks.schema.json')),
+      idle: readJson(path.join(schemaDir, 'idle.schema.json')),
+      items: readJson(path.join(schemaDir, 'items.schema.json')),
+      economy: readJson(path.join(schemaDir, 'economy.schema.json')),
     } as const;
 
     const validators = {
-      // v1 pack
-      boxesV1: this.ajv.compile(schemas.boxesV1),
-      boxV1: this.ajv.compile(schemas.boxV1),
-      modifiersStaticV1: this.ajv.compile(schemas.modifiersStaticV1),
-      modifiersDynamicV1: this.ajv.compile(schemas.modifiersDynamicV1),
-      unlocksV1: this.ajv.compile(schemas.unlocksV1),
-      idleV1: this.ajv.compile(schemas.idleV1),
-      itemsV1: this.ajv.compile(schemas.itemsV1),
-      economyV1: this.ajv.compile(schemas.economyV1),
+      boxes: this.ajv.compile(schemas.boxes),
+      box: this.ajv.compile(schemas.box),
+      modifiersStatic: this.ajv.compile(schemas.modifiersStatic),
+      modifiersDynamic: this.ajv.compile(schemas.modifiersDynamic),
+      unlocks: this.ajv.compile(schemas.unlocks),
+      idle: this.ajv.compile(schemas.idle),
+      items: this.ajv.compile(schemas.items),
+      economy: this.ajv.compile(schemas.economy),
     } as const;
 
     // Load data
     // Detect v1 content pack files
-    const v1BoxesPath = path.join(this.configDir, 'boxes.json');
-    const v1BoxesDir = path.join(this.configDir, 'boxes');
-    const v1UnlocksPath = path.join(this.configDir, 'unlocks.json');
-    const v1EconomyPath = path.join(this.configDir, 'economy.json');
-    const v1IdlePath = path.join(this.configDir, 'idle.json');
-    const v1StaticModsPath = path.join(this.configDir, 'modifiers.static.json');
-    const v1DynamicModsPath = path.join(this.configDir, 'modifiers.dynamic.json');
-    const v1ItemsPath = path.join(this.configDir, 'items.catalog.json');
+    const boxesPath = path.join(this.configDir, 'boxes.json');
+    const boxesDir = path.join(this.configDir, 'boxes');
+    const unlocksPath = path.join(this.configDir, 'unlocks.json');
+    const economyPath = path.join(this.configDir, 'economy.json');
+    const idlePath = path.join(this.configDir, 'idle.json');
+    const staticModsPath = path.join(this.configDir, 'modifiers.static.json');
+    const dynamicModsPath = path.join(this.configDir, 'modifiers.dynamic.json');
+    const itemsPath = path.join(this.configDir, 'items.catalog.json');
 
-    const hasV1 = (fs.existsSync(v1BoxesPath) || fs.existsSync(v1BoxesDir)) && fs.existsSync(v1UnlocksPath);
+    const hasConfig = (fs.existsSync(boxesPath) || fs.existsSync(boxesDir)) && fs.existsSync(unlocksPath);
 
-    if (hasV1) {
-      type BoxesV1 = { version: number; boxes: unknown[] };
-      type UnlocksV1 = { version: number } & Record<string, unknown>;
-      type EconomyV1 = { version: number } & Record<string, unknown>;
-      type IdleV1 = { version: number } & Record<string, unknown>;
-      type ModsStaticV1 = { version: number; modifiers: unknown[] };
-      type ModsDynamicV1 = { version: number; modifiers: unknown[] };
-      type ItemsV1 = { version: number; items: unknown[] };
+    if (hasConfig) {
+      type BoxesMany = { version: number; boxes: unknown[] };
+      type Unlocks = { version: number } & Record<string, unknown>;
+      type Economy = { version: number } & Record<string, unknown>;
+      type Idle = { version: number } & Record<string, unknown>;
+      type ModsStatic = { version: number; modifiers: unknown[] };
+      type ModsDynamic = { version: number; modifiers: unknown[] };
+      type Items = { version: number; items: unknown[] };
 
-      const boxesBlob: unknown = fs.existsSync(v1BoxesPath) ? readJson(v1BoxesPath) : undefined;
-      const unlocksBlob: unknown = readJson(v1UnlocksPath);
-      const economyBlob: unknown = fs.existsSync(v1EconomyPath) ? readJson(v1EconomyPath) : {};
-      const idleBlob: unknown = fs.existsSync(v1IdlePath) ? readJson(v1IdlePath) : {};
-      const staticModsBlob: unknown = fs.existsSync(v1StaticModsPath)
-        ? readJson(v1StaticModsPath)
+      const boxesBlob: unknown = fs.existsSync(boxesPath) ? readJson(boxesPath) : undefined;
+      const unlocksBlob: unknown = readJson(unlocksPath);
+      const economyBlob: unknown = fs.existsSync(economyPath) ? readJson(economyPath) : {};
+      const idleBlob: unknown = fs.existsSync(idlePath) ? readJson(idlePath) : {};
+      const staticModsBlob: unknown = fs.existsSync(staticModsPath)
+        ? readJson(staticModsPath)
         : { version: 1, modifiers: [] };
-      const dynamicModsBlob: unknown = fs.existsSync(v1DynamicModsPath)
-        ? readJson(v1DynamicModsPath)
+      const dynamicModsBlob: unknown = fs.existsSync(dynamicModsPath)
+        ? readJson(dynamicModsPath)
         : { version: 1, modifiers: [] };
-      const itemsBlob: unknown = fs.existsSync(v1ItemsPath)
-        ? readJson(v1ItemsPath)
+      const itemsBlob: unknown = fs.existsSync(itemsPath)
+        ? readJson(itemsPath)
         : { version: 1, items: [] };
 
       let boxes: unknown[] = [];
       let boxesVersion: number | undefined;
       if (boxesBlob) {
-        if (!validators.boxesV1(boxesBlob))
-          throw new Error('Invalid boxes v1: ' + JSON.stringify(validators.boxesV1.errors));
-        const bb = boxesBlob as { version: number; boxes: unknown[] };
+        if (!validators.boxes(boxesBlob))
+          throw new Error('Invalid boxes: ' + JSON.stringify(validators.boxes.errors));
+        const bb = boxesBlob as BoxesMany;
         boxes = bb.boxes;
         boxesVersion = bb.version;
       } else {
         // folder form
-        const files = fs.existsSync(v1BoxesDir)
-          ? fs.readdirSync(v1BoxesDir).filter((f) => f.endsWith('.json'))
+        const files = fs.existsSync(boxesDir)
+          ? fs.readdirSync(boxesDir).filter((f) => f.endsWith('.json'))
           : [];
         for (const f of files) {
-          const obj = readJson(path.join(v1BoxesDir, f));
-          if (!validators.boxV1(obj)) throw new Error('Invalid box in config/boxes: ' + f);
+          const obj = readJson(path.join(boxesDir, f));
+          if (!validators.box(obj)) throw new Error('Invalid box in config/boxes: ' + f);
           boxes.push(obj);
         }
         if (boxes.length === 0) throw new Error('No boxes config found');
       }
-      if (!validators.unlocksV1(unlocksBlob))
-        throw new Error('Invalid unlocks v1: ' + JSON.stringify(validators.unlocksV1.errors));
-      if (!validators.economyV1(economyBlob))
-        throw new Error('Invalid economy v1: ' + JSON.stringify(validators.economyV1.errors));
-      if (!validators.idleV1(idleBlob))
-        throw new Error('Invalid idle v1: ' + JSON.stringify(validators.idleV1.errors));
-      if (!validators.modifiersStaticV1(staticModsBlob))
-        throw new Error(
-          'Invalid static modifiers v1: ' + JSON.stringify(validators.modifiersStaticV1.errors),
-        );
-      if (!validators.modifiersDynamicV1(dynamicModsBlob))
-        throw new Error(
-          'Invalid dynamic modifiers v1: ' + JSON.stringify(validators.modifiersDynamicV1.errors),
-        );
-      if (!validators.itemsV1(itemsBlob))
-        throw new Error('Invalid items v1: ' + JSON.stringify(validators.itemsV1.errors));
+      if (!validators.unlocks(unlocksBlob))
+        throw new Error('Invalid unlocks: ' + JSON.stringify(validators.unlocks.errors));
+      if (!validators.economy(economyBlob))
+        throw new Error('Invalid economy: ' + JSON.stringify(validators.economy.errors));
+      if (!validators.idle(idleBlob))
+        throw new Error('Invalid idle: ' + JSON.stringify(validators.idle.errors));
+      if (!validators.modifiersStatic(staticModsBlob))
+        throw new Error('Invalid static modifiers: ' + JSON.stringify(validators.modifiersStatic.errors));
+      if (!validators.modifiersDynamic(dynamicModsBlob))
+        throw new Error('Invalid dynamic modifiers: ' + JSON.stringify(validators.modifiersDynamic.errors));
+      if (!validators.items(itemsBlob))
+        throw new Error('Invalid items: ' + JSON.stringify(validators.items.errors));
 
-      const u = unlocksBlob as UnlocksV1;
-      const e = economyBlob as EconomyV1;
-      const i = idleBlob as IdleV1;
-      const ms = staticModsBlob as ModsStaticV1;
-      const md = dynamicModsBlob as ModsDynamicV1;
-      const it = itemsBlob as ItemsV1;
+      const u = unlocksBlob as Unlocks;
+      const e = economyBlob as Economy;
+      const i = idleBlob as Idle;
+      const ms = staticModsBlob as ModsStatic;
+      const md = dynamicModsBlob as ModsDynamic;
+      const it = itemsBlob as Items;
 
       const versionNums = [
         boxesVersion,

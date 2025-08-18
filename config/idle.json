@@ -1,5 +1,5 @@
 {
-  "$schema": "https://lootboxsim/schemas/idle.v1.json",
+  "$schema": "https://lootboxsim/schemas/idle.json",
   "version": 1,
   "catchUp": {
     "enabled": false,

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://lootboxsim/schemas/unlocks.v1.json",
+  "$schema": "https://lootboxsim/schemas/unlocks.json",
   "version": 1,
   "milestones": [
     {

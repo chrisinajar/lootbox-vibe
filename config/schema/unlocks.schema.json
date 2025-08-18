@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lootboxsim/schemas/unlocks.v1.json",
+  "$id": "https://lootboxsim/schemas/unlocks.json",
   "title": "Unlocks v1",
   "type": "object",
   "properties": {

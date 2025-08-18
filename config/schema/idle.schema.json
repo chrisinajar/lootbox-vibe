@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lootboxsim/schemas/idle.v1.json",
+  "$id": "https://lootboxsim/schemas/idle.json",
   "title": "Idle v1",
   "type": "object",
   "properties": {

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lootboxsim/schemas/modifiers.dynamic.v1.json",
+  "$id": "https://lootboxsim/schemas/modifiers.dynamic.json",
   "title": "Dynamic modifiers v1",
   "type": "object",
   "properties": {

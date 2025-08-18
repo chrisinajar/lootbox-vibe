@@ -1,5 +1,5 @@
 {
-  "$schema": "https://lootboxsim/schemas/modifiers.static.v1.json",
+  "$schema": "https://lootboxsim/schemas/modifiers.static.json",
   "version": 1,
   "modifiers": [
     { "id": "m_shiny", "name": "Shiny", "category": "COSMETIC" },

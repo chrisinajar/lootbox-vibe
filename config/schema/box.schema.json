@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lootboxsim/schemas/box.v1.json",
+  "$id": "https://lootboxsim/schemas/box.json",
   "title": "Single box v1",
   "type": "object",
   "required": ["id", "name", "tier", "keyCost", "dropTable"],
@@ -62,4 +62,3 @@
   },
   "additionalProperties": false
 }
-

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://lootboxsim/schemas/economy.v1.json",
+  "$schema": "https://lootboxsim/schemas/economy.json",
   "version": 1,
   "currencies": [
     { "id": "KEYS", "display": "Keys", "precision": 0 },

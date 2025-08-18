@@ -5,17 +5,17 @@
 
 ## Summary
 
-Config JSON Schemas in `config/schema/*.schema.json` are the source of truth. TypeScript types are generated from these schemas into `src/backend/config/types.d.ts` via `yarn config:types`. Never edit generated outputs or pipe generators to overwrite the schema files.
+We maintain a single, evolving set of JSON Schemas in `config/schema/*.schema.json` — no versioned copies. Treat schemas like source code: when new content doesn’t fit, either fix the incoming data or evolve the schema (add optional fields, refine enums, document semantics). TypeScript types are generated from these schemas into `src/backend/config/types.d.ts` via `yarn config:types`. Never edit generated outputs or pipe generators to overwrite the schema files.
 
 ## Triggers
 
 - Adding a new config domain (e.g., `economy`).
-- Updating existing schemas (boxes/modifiers/unlocks/idle/items).
+- Updating existing schemas (boxes/box, modifiers static/dynamic, unlocks, idle, items, economy).
 - Failing tests mentioning JSON.parse on schema files or stray TypeScript content in `config/schema`.
 
 ## Do this
 
-- Edit schemas under `config/schema/*.schema.json` only.
+- Edit schemas under `config/schema/*.schema.json` only (no v1/v2 forks). Prefer backwards‑compatible changes when possible; otherwise, coordinate data migrations.
 - Generate TS types from schemas:
   - `yarn config:types`
 - Validate repo configs:
@@ -31,7 +31,7 @@ Config JSON Schemas in `config/schema/*.schema.json` are the source of truth. Ty
 ## Gotchas
 
 - If you see a schema file containing TS (e.g., `/* auto-generated ... */` or `export interface ...`), it was overwritten. Restore the JSON Schema from Git and re-run `yarn config:types` to regenerate types instead.
-- Ensure `scripts/config-check.ts` includes any newly added schema (e.g., `economy`) so CI fails fast when files drift or shape is wrong.
+- Ensure `scripts/config-check.ts` validates all domains (box per-file, modifiers static/dynamic, unlocks, idle, economy, items) so CI fails fast when files drift.
 
 ## Related
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lootboxsim/schemas/boxes.v1.json",
+  "$id": "https://lootboxsim/schemas/boxes.json",
   "title": "Boxes v1",
   "type": "object",
   "properties": {

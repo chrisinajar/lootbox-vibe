@@ -1,5 +1,5 @@
 {
-  "$schema": "https://lootboxsim/schemas/items.v1.json",
+  "$schema": "https://lootboxsim/schemas/items.json",
   "version": 1,
   "items": [
     {

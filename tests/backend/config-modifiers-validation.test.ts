@@ -13,7 +13,7 @@ describe('Modifiers schema validation', () => {
     const schemaDir = path.resolve(process.cwd(), 'config/schema');
     const ajv = new Ajv2020({ allErrors: true, strict: true });
     addFormats(ajv);
-    const schema = readJson(path.join(schemaDir, 'modifiers.static.v1.schema.json'));
+    const schema = readJson(path.join(schemaDir, 'modifiers.static.schema.json'));
     const validate = ajv.compile(schema);
 
     const good = { version: 1, modifiers: [{ id: 'm.cos', name: 'Cos', category: 'COSMETIC' }] };

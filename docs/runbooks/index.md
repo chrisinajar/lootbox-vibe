@@ -16,7 +16,7 @@ Runbooks:
 - dev-seed-leveldb: Seed LevelDB with demo keys to visualize inventory — when bootstrapping dev data or demoing fallback.
 - graphql-inventory-summary: Maintain schema/resolver and test strategy — when updating the inventory summary endpoint.
 - graphql-codegen-hooks: Enforce typed docs/hooks, no inline gql — when adding/updating frontend GraphQL.
-- config-schema-sources: Prevent editing generated artifacts; clarify schema vs. generated types — when adding/updating config schemas or seeing schema files overwritten.
+- config-schema-sources: Single evolving schema; fix incoming data or evolve schema (no versioned forks) — when adding/updating config domains or schema fields.
 - graphql-codegen-execution: Deterministic, sandbox-friendly codegen — when codegen errors mention concurrency or blocked workers.
 - config-check: Validate JSON config using Ajv 2020 — when adding config domains or fixing schema validation errors.
 - docs-verify: Keep markdown linters/link checks green — when verify breaks on style or network.

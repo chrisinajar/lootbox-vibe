@@ -14,24 +14,26 @@ const readJson = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 function main() {
   const schemas = {
-    boxes: readJson(path.join(schemaDir, 'boxes.schema.json')),
+    box: readJson(path.join(schemaDir, 'box.schema.json')),
     items: readJson(path.join(schemaDir, 'items.schema.json')),
-    modifiers: readJson(path.join(schemaDir, 'modifiers.schema.json')),
+    modifiersStatic: readJson(path.join(schemaDir, 'modifiers.static.schema.json')),
+    modifiersDynamic: readJson(path.join(schemaDir, 'modifiers.dynamic.schema.json')),
     unlocks: readJson(path.join(schemaDir, 'unlocks.schema.json')),
-    idle: readJson(path.join(schemaDir, 'flavor.schema.json')),
+    idle: readJson(path.join(schemaDir, 'idle.schema.json')),
     economy: readJson(path.join(schemaDir, 'economy.schema.json')),
   } as const;
 
   const validators = {
-    box: ajv.compile(schemas.boxes.definitions.box),
+    box: ajv.compile(schemas.box),
     items: ajv.compile(schemas.items),
-    modifiers: ajv.compile(schemas.modifiers),
-    unlock: ajv.compile(schemas.unlocks.definitions.unlock),
+    modifiersStatic: ajv.compile(schemas.modifiersStatic),
+    modifiersDynamic: ajv.compile(schemas.modifiersDynamic),
+    unlocks: ajv.compile(schemas.unlocks),
     idle: ajv.compile(schemas.idle),
     economy: ajv.compile(schemas.economy),
   } as const;
 
-  // Validate boxes
+  // Validate boxes (per-file)
   const boxesDir = path.join(configDir, 'boxes');
   for (const f of fs.readdirSync(boxesDir).filter((f) => f.endsWith('.json'))) {
     const data = readJson(path.join(boxesDir, f));
@@ -41,36 +43,37 @@ function main() {
   }
 
   // Validate modifiers
-  const modifiersDir = path.join(configDir, 'modifiers');
-  const mods = {
-    static: readJson(path.join(modifiersDir, 'static.json')),
-    dynamic: readJson(path.join(modifiersDir, 'dynamic.json')),
-  };
-  if (!validators.modifiers(mods)) {
-    throw new Error(`Invalid modifiers: ${ajv.errorsText(validators.modifiers.errors)}`);
+  const modsStatic = readJson(path.join(configDir, 'modifiers.static.json'));
+  if (!validators.modifiersStatic(modsStatic)) {
+    throw new Error(`Invalid modifiers.static: ${ajv.errorsText(validators.modifiersStatic.errors)}`);
+  }
+  const modsDynamic = readJson(path.join(configDir, 'modifiers.dynamic.json'));
+  if (!validators.modifiersDynamic(modsDynamic)) {
+    throw new Error(`Invalid modifiers.dynamic: ${ajv.errorsText(validators.modifiersDynamic.errors)}`);
   }
 
-  // Validate unlocks
-  const unlocksDir = path.join(configDir, 'unlocks');
-  for (const f of fs.readdirSync(unlocksDir).filter((f) => f.endsWith('.json'))) {
-    const data = readJson(path.join(unlocksDir, f));
-    if (!validators.unlock(data)) {
-      throw new Error(`Invalid unlock ${f}: ${ajv.errorsText(validators.unlock.errors)}`);
-    }
+  // Validate unlocks (single file)
+  const unlocks = readJson(path.join(configDir, 'unlocks.json'));
+  if (!validators.unlocks(unlocks)) {
+    throw new Error(`Invalid unlocks: ${ajv.errorsText(validators.unlocks.errors)}`);
   }
 
   // Validate idle
-  const idleDir = path.join(configDir, 'idle');
-  const idle = readJson(path.join(idleDir, 'flavor.json'));
+  const idle = readJson(path.join(configDir, 'idle.json'));
   if (!validators.idle(idle)) {
     throw new Error(`Invalid idle: ${ajv.errorsText(validators.idle.errors)}`);
   }
 
   // Validate economy
-  const economyDir = path.join(configDir, 'economy');
-  const economy = readJson(path.join(economyDir, 'economy.json'));
+  const economy = readJson(path.join(configDir, 'economy.json'));
   if (!validators.economy(economy)) {
     throw new Error(`Invalid economy: ${ajv.errorsText(validators.economy.errors)}`);
+  }
+
+  // Validate items catalog
+  const items = readJson(path.join(configDir, 'items.catalog.json'));
+  if (!validators.items(items)) {
+    throw new Error(`Invalid items: ${ajv.errorsText(validators.items.errors)}`);
   }
 
   // eslint-disable-next-line no-console
