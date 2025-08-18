@@ -61,10 +61,17 @@ body {
   background: var(--primary);
   transition: background-color 120ms ease;
 }
-.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
 .btn-accent {
   @apply rounded px-4 py-2 text-sm font-medium;
   background: var(--accent);
 }
-.chip { background: var(--chip-bg); }
-.panel { background: var(--panel-bg); border-color: var(--panel-border); }
+.chip {
+  background: var(--chip-bg);
+}
+.panel {
+  background: var(--panel-bg);
+  border-color: var(--panel-border);
+}

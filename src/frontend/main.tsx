@@ -140,18 +140,10 @@ export const OpenResultsPanel: React.FC = () => {
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
-        <button
-          disabled={busy}
-          onClick={doOpen}
-          className="btn-primary"
-        >
+        <button disabled={busy} onClick={doOpen} className="btn-primary">
           Open 10 boxes
         </button>
-        <button
-          disabled={busy}
-          onClick={doSalvageCommons}
-          className="btn-accent"
-        >
+        <button disabled={busy} onClick={doSalvageCommons} className="btn-accent">
           Salvage commons+
         </button>
       </div>

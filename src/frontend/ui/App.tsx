@@ -13,7 +13,8 @@ function useHashPath() {
   return path;
 }
 
-const ENABLE_DEV_UI = import.meta.env.VITE_ENABLE_DEV_UI === '1' || import.meta.env.MODE !== 'production';
+const ENABLE_DEV_UI =
+  import.meta.env.VITE_ENABLE_DEV_UI === '1' || import.meta.env.MODE !== 'production';
 
 const DevDashboard: React.FC = () => (
   <div className="min-h-dvh p-6">

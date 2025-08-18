@@ -32,7 +32,10 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     document.documentElement.setAttribute('data-theme', t);
   }, []);
 
-  const toggle = React.useCallback(() => setTheme(theme === 'dark' ? 'light' : 'dark'), [theme, setTheme]);
+  const toggle = React.useCallback(
+    () => setTheme(theme === 'dark' ? 'light' : 'dark'),
+    [theme, setTheme],
+  );
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -47,4 +50,3 @@ export function useTheme(): ThemeContextValue {
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
   return ctx;
 }
-
