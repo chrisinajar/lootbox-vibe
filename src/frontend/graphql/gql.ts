@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "query CollectionLog {\n  collectionLog {\n    items {\n      id\n      name\n      typeId\n      rarity\n      hint\n      hasCosmetic\n      hasMechanical\n      discovered\n    }\n    byRarity {\n      key\n      discovered\n      total\n    }\n    byType {\n      key\n      discovered\n      total\n    }\n  }\n}": typeof types.CollectionLogDocument,
     "query Currencies {\n  currencies {\n    currency\n    amount\n  }\n}": typeof types.CurrenciesDocument,
     "query InventoryList($filter: InventoryFilter, $limit: Int, $cursor: ID) {\n  inventoryList(filter: $filter, limit: $limit, cursor: $cursor) {\n    rows {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    nextCursor\n  }\n}": typeof types.InventoryListDocument,
     "query InventorySummary {\n  inventorySummary {\n    totalStacks\n    totalItems\n    byRarity {\n      rarity\n      count\n    }\n    byType {\n      typeId\n      count\n    }\n  }\n}": typeof types.InventorySummaryDocument,
@@ -22,6 +23,7 @@ type Documents = {
     "query UnlockedBoxes {\n  unlockedBoxes\n}": typeof types.UnlockedBoxesDocument,
 };
 const documents: Documents = {
+    "query CollectionLog {\n  collectionLog {\n    items {\n      id\n      name\n      typeId\n      rarity\n      hint\n      hasCosmetic\n      hasMechanical\n      discovered\n    }\n    byRarity {\n      key\n      discovered\n      total\n    }\n    byType {\n      key\n      discovered\n      total\n    }\n  }\n}": types.CollectionLogDocument,
     "query Currencies {\n  currencies {\n    currency\n    amount\n  }\n}": types.CurrenciesDocument,
     "query InventoryList($filter: InventoryFilter, $limit: Int, $cursor: ID) {\n  inventoryList(filter: $filter, limit: $limit, cursor: $cursor) {\n    rows {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    nextCursor\n  }\n}": types.InventoryListDocument,
     "query InventorySummary {\n  inventorySummary {\n    totalStacks\n    totalItems\n    byRarity {\n      rarity\n      count\n    }\n    byType {\n      typeId\n      count\n    }\n  }\n}": types.InventorySummaryDocument,
@@ -44,6 +46,10 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query CollectionLog {\n  collectionLog {\n    items {\n      id\n      name\n      typeId\n      rarity\n      hint\n      hasCosmetic\n      hasMechanical\n      discovered\n    }\n    byRarity {\n      key\n      discovered\n      total\n    }\n    byType {\n      key\n      discovered\n      total\n    }\n  }\n}"): (typeof documents)["query CollectionLog {\n  collectionLog {\n    items {\n      id\n      name\n      typeId\n      rarity\n      hint\n      hasCosmetic\n      hasMechanical\n      discovered\n    }\n    byRarity {\n      key\n      discovered\n      total\n    }\n    byType {\n      key\n      discovered\n      total\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

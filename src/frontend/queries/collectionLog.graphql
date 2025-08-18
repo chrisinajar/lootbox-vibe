@@ -1,0 +1,8 @@
+query CollectionLog {
+  collectionLog {
+    items { id name typeId rarity hint hasCosmetic hasMechanical discovered }
+    byRarity { key discovered total }
+    byType { key discovered total }
+  }
+}
+

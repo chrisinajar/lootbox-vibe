@@ -20,6 +20,7 @@ type Query {
   configHash: String!
   currencies: [CurrencyBalance!]!
   unlockedBoxes: [ID!]!
+  collectionLog: CollectionLog!
 }
 
 input OpenBoxesInput { boxId: ID!, count: Int!, requestId: ID! }
@@ -47,3 +48,17 @@ type PageItemStacks { rows: [ItemStack!]!, nextCursor: ID }
 
 # Currency balances
 type CurrencyBalance { currency: ID!, amount: BigInt! }
+
+# Collection log types
+type CollectionItem {
+  id: ID!
+  name: String!
+  typeId: ID!
+  rarity: Rarity!
+  hint: String
+  hasCosmetic: Boolean!
+  hasMechanical: Boolean!
+  discovered: Boolean!
+}
+type CountProgress { key: ID!, discovered: Int!, total: Int! }
+type CollectionLog { items: [CollectionItem!]!, byRarity: [CountProgress!]!, byType: [CountProgress!]! }

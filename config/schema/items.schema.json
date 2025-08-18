@@ -20,7 +20,8 @@
             "enum": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
           },
           "scrap": { "type": "integer", "minimum": 0 },
-          "allowedStaticMods": { "type": "array", "items": { "type": "string" } }
+          "allowedStaticMods": { "type": "array", "items": { "type": "string" } },
+          "hint": { "type": "string" }
         },
         "additionalProperties": false
       }

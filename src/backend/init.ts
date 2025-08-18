@@ -50,6 +50,7 @@ export async function initializeServer(options: InitOptions = {}) {
 
   const configSvc = new ConfigService();
   const currencySvc = new CurrencyService(storage);
+  const cfgLoader = new (require('./config').ConfigLoader)();
 
   const resolvers = {
     BigInt: BigIntResolver,
@@ -111,6 +112,82 @@ export async function initializeServer(options: InitOptions = {}) {
         );
         await telemetry.write(entry);
         return boxes;
+      },
+      collectionLog: async (_: any, __: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const started = Date.now();
+        const cfg = cfgLoader.load();
+        const items: any[] = Array.isArray(cfg.items) ? (cfg.items as any[]) : [];
+        const mods: any[] = Array.isArray((cfg as any).modifiers?.static)
+          ? ((cfg as any).modifiers.static as any[])
+          : [];
+        const cosmetic = new Set<string>(
+          mods.filter((m: any) => m.category === 'COSMETIC').map((m: any) => String(m.id)),
+        );
+        const mechanical = new Set<string>(
+          mods.filter((m: any) => m.category === 'MECHANICAL').map((m: any) => String(m.id)),
+        );
+        // discovered types by scanning idx:type once
+        const discoveredTypes = new Set<string>();
+        await storage.scanPrefix(`idx:type:${uid}:`, (k) => {
+          const parts = k.split(':');
+          const typeId = parts[3];
+          if (typeId) discoveredTypes.add(typeId);
+        });
+        const outItems = items.map((it: any) => {
+          const allow: string[] = Array.isArray(it.allowedStaticMods) ? it.allowedStaticMods : [];
+          const hasCos = allow.some((id) => cosmetic.has(String(id)));
+          const hasMech = allow.some((id) => mechanical.has(String(id)));
+          return {
+            id: String(it.id),
+            name: String(it.name),
+            typeId: String(it.typeId),
+            rarity: String(it.rarity),
+            hint: typeof it.hint === 'string' ? it.hint : null,
+            hasCosmetic: hasCos,
+            hasMechanical: hasMech,
+            discovered: discoveredTypes.has(String(it.typeId)),
+          };
+        });
+        // progress by rarity
+        const byRarityMap = new Map<string, { total: number; disc: number }>();
+        for (const it of outItems) {
+          const k = String(it.rarity);
+          const v = byRarityMap.get(k) ?? { total: 0, disc: 0 };
+          v.total += 1;
+          if (it.discovered) v.disc += 1;
+          byRarityMap.set(k, v);
+        }
+        const byTypeMap = new Map<string, { total: number; disc: number }>();
+        for (const it of outItems) {
+          const k = String(it.typeId);
+          const v = byTypeMap.get(k) ?? { total: 0, disc: 0 };
+          v.total += 1;
+          if (it.discovered) v.disc += 1;
+          byTypeMap.set(k, v);
+        }
+        const res = {
+          items: outItems,
+          byRarity: Array.from(byRarityMap.entries()).map(([key, v]) => ({
+            key,
+            discovered: v.disc,
+            total: v.total,
+          })),
+          byType: Array.from(byTypeMap.entries()).map(([key, v]) => ({
+            key,
+            discovered: v.disc,
+            total: v.total,
+          })),
+        };
+        const entry = telemetry.buildEntry(
+          'collectionLog',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          { n: outItems.length },
+        );
+        await telemetry.write(entry);
+        return res;
       },
       inventoryList: async (_: any, { filter, limit, cursor }: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';

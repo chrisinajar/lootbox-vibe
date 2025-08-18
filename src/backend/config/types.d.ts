@@ -137,6 +137,7 @@ export interface ItemsCatalogV1 {
     rarity: "COMMON" | "UNCOMMON" | "RARE" | "EPIC" | "LEGENDARY" | "MYTHIC";
     scrap: number;
     allowedStaticMods?: string[];
+    hint?: string;
   }[];
 }
 

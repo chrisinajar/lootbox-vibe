@@ -8,7 +8,8 @@
       "typeId": "trinket",
       "rarity": "COMMON",
       "scrap": 1,
-      "allowedStaticMods": ["m_useless", "m_meme_text", "m_shiny"]
+      "allowedStaticMods": ["m_useless", "m_meme_text", "m_shiny"],
+      "hint": "Looks spoon-like…"
     },
     {
       "id": "itm_bent_nail",
@@ -16,7 +17,8 @@
       "typeId": "material",
       "rarity": "COMMON",
       "scrap": 1,
-      "allowedStaticMods": ["m_shiny", "m_rainbow_text"]
+      "allowedStaticMods": ["m_shiny", "m_rainbow_text"],
+      "hint": "Kinda bent, kind of pointy."
     },
     {
       "id": "itm_cat_figurine",
@@ -24,7 +26,8 @@
       "typeId": "trinket",
       "rarity": "UNCOMMON",
       "scrap": 2,
-      "allowedStaticMods": ["m_confetti_burst", "m_glitter_border", "m_scrap_boost_1"]
+      "allowedStaticMods": ["m_confetti_burst", "m_glitter_border", "m_scrap_boost_1"],
+      "hint": "Charming. Possibly feline."
     },
     {
       "id": "itm_mini_anvil",
@@ -32,7 +35,8 @@
       "typeId": "trinket",
       "rarity": "RARE",
       "scrap": 5,
-      "allowedStaticMods": ["m_scrap_boost_3", "m_duplicate_self_1"]
+      "allowedStaticMods": ["m_scrap_boost_3", "m_duplicate_self_1"],
+      "hint": "Heavy for its size."
     },
     {
       "id": "itm_echoing_coin",
@@ -40,7 +44,8 @@
       "typeId": "trinket",
       "rarity": "EPIC",
       "scrap": 10,
-      "allowedStaticMods": ["m_tiny_chance_rare", "m_glitter_border"]
+      "allowedStaticMods": ["m_tiny_chance_rare", "m_glitter_border"],
+      "hint": "It rings in your pocket."
     },
 
     {
@@ -49,7 +54,8 @@
       "typeId": "trinket",
       "rarity": "COMMON",
       "scrap": 1,
-      "allowedStaticMods": ["m_shiny", "m_meme_text"]
+      "allowedStaticMods": ["m_shiny", "m_meme_text"],
+      "hint": "Smooth to the touch."
     },
     {
       "id": "itm_tiny_gear",
@@ -57,7 +63,8 @@
       "typeId": "material",
       "rarity": "UNCOMMON",
       "scrap": 2,
-      "allowedStaticMods": ["m_scrap_boost_1", "m_glitter_border"]
+      "allowedStaticMods": ["m_scrap_boost_1", "m_glitter_border"],
+      "hint": "Tiny but industrious."
     },
     {
       "id": "itm_clockwork_mouse",
@@ -65,7 +72,8 @@
       "typeId": "trinket",
       "rarity": "RARE",
       "scrap": 5,
-      "allowedStaticMods": ["m_scrap_boost_3", "m_key_boost_1"]
+      "allowedStaticMods": ["m_scrap_boost_3", "m_key_boost_1"],
+      "hint": "Whirs when nudged."
     },
     {
       "id": "itm_jester_hat",
@@ -73,7 +81,8 @@
       "typeId": "cosmetic",
       "rarity": "EPIC",
       "scrap": 10,
-      "allowedStaticMods": ["m_confetti_burst", "m_tiny_chance_rare"]
+      "allowedStaticMods": ["m_confetti_burst", "m_tiny_chance_rare"],
+      "hint": "Too jaunty to be serious."
     },
 
     {
@@ -82,7 +91,8 @@
       "typeId": "trinket",
       "rarity": "UNCOMMON",
       "scrap": 2,
-      "allowedStaticMods": ["m_shiny", "m_rainbow_text", "m_scrap_boost_3"]
+      "allowedStaticMods": ["m_shiny", "m_rainbow_text", "m_scrap_boost_3"],
+      "hint": "Decidedly spoon-like, but fancy."
     },
     {
       "id": "itm_pocket_portal",
@@ -90,7 +100,8 @@
       "typeId": "trinket",
       "rarity": "RARE",
       "scrap": 5,
-      "allowedStaticMods": ["m_key_boost_2", "m_duplicate_self_1"]
+      "allowedStaticMods": ["m_key_boost_2", "m_duplicate_self_1"],
+      "hint": "Folded space inside."
     },
     {
       "id": "itm_heroic_sticker",
@@ -98,7 +109,8 @@
       "typeId": "cosmetic",
       "rarity": "EPIC",
       "scrap": 10,
-      "allowedStaticMods": ["m_tiny_chance_rare", "m_glitter_border"]
+      "allowedStaticMods": ["m_tiny_chance_rare", "m_glitter_border"],
+      "hint": "Peels off heroically."
     },
 
     {
@@ -107,7 +119,8 @@
       "typeId": "trinket",
       "rarity": "EPIC",
       "scrap": 10,
-      "allowedStaticMods": ["m_confetti_burst", "m_rainbow_text"]
+      "allowedStaticMods": ["m_confetti_burst", "m_rainbow_text"],
+      "hint": "Hums at odd hours."
     }
   ]
 }

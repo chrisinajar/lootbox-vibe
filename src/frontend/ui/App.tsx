@@ -4,6 +4,7 @@ import { UserSwitcherBadge } from './UserSwitcherBadge';
 import { useTheme } from './theme/ThemeProvider';
 import { HomeMain } from './home/Home';
 import { InventoryView } from './inventory/Inventory';
+import { CollectionView } from './collection/Collection';
 
 function useHashPath() {
   const [path, setPath] = React.useState<string>(() => window.location.hash.slice(1) || '/');
@@ -72,6 +73,23 @@ const HomeShell: React.FC = () => {
 const App: React.FC = () => {
   const path = useHashPath();
   if (ENABLE_DEV_UI && path === '/dev') return <DevDashboard />;
+  if (path === '/collection')
+    return (
+      <div className="min-h-dvh p-6">
+        <header className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Collection Log</h1>
+            <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
+              Discover items and track completion by rarity.
+            </p>
+          </div>
+          <a href="/#/" className="btn-primary">
+            Back to Home
+          </a>
+        </header>
+        <CollectionView />
+      </div>
+    );
   if (path === '/inventory')
     return (
       <div className="min-h-dvh p-6">

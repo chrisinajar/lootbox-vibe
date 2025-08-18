@@ -28,6 +28,14 @@ function fmtRange(v: any): string {
 function h(n: number, text: string) {
   return `${'#'.repeat(n)} ${text}`;
 }
+function pushBlank(out: string[]) {
+  if (out.length === 0 || out[out.length - 1] !== '') out.push('');
+}
+function pushHeading(out: string[], level: number, text: string) {
+  pushBlank(out);
+  out.push(h(level, text));
+  pushBlank(out);
+}
 
 function main() {
   const root = process.cwd();
@@ -74,9 +82,10 @@ function main() {
   out.push('');
 
   // Economy
-  out.push(h(2, 'Economy'));
+  pushHeading(out, 2, 'Economy');
   if (Array.isArray(economy.currencies)) {
-    out.push(h(3, 'Currencies'));
+    pushHeading(out, 3, 'Currencies');
+    pushBlank(out);
     out.push('| id | display | precision |');
     out.push('|---|---|---:|');
     for (const c of economy.currencies)
@@ -84,19 +93,17 @@ function main() {
     out.push('');
   }
   if (economy.raritySalvage) {
-    out.push(h(3, 'Rarity Salvage'));
-    out.push('');
+    pushHeading(out, 3, 'Rarity Salvage');
     for (const [r, v] of Object.entries(economy.raritySalvage)) out.push(`- ${r}: ${v}`);
     out.push('');
   }
   if (economy.boxCosts) {
-    out.push(h(3, 'Box Costs'));
-    out.push('');
+    pushHeading(out, 3, 'Box Costs');
     for (const [b, v] of Object.entries(economy.boxCosts)) out.push(`- ${b}: ${v}`);
     out.push('');
   }
   if (Array.isArray(economy.exchanges)) {
-    out.push(h(3, 'Exchanges'));
+    pushHeading(out, 3, 'Exchanges');
     for (const ex of economy.exchanges) {
       out.push(
         `- ${ex.id}: ${ex.from} -> ${ex.to} at ${ex.rate?.from}:${ex.rate?.to} (daily cap to = ${ex.dailyCapTo ?? 0})`,
@@ -105,18 +112,18 @@ function main() {
     out.push('');
   }
   if (economy.batchOpenLimits) {
-    out.push(h(3, 'Batch Open Limits'));
+    pushHeading(out, 3, 'Batch Open Limits');
     out.push(`- maxPerRequest: ${economy.batchOpenLimits.maxPerRequest}`);
     out.push('');
   }
 
   // Boxes
-  out.push(h(2, 'Boxes'));
+  pushHeading(out, 2, 'Boxes');
   const boxesSorted = [...boxes].sort(
     (a, b) => (a.tier ?? 0) - (b.tier ?? 0) || String(a.name).localeCompare(String(b.name)),
   );
   for (const b of boxesSorted) {
-    out.push(h(3, `${b.name} (${b.id})`));
+    pushHeading(out, 3, `${b.name} (${b.id})`);
     out.push(`- tier: ${b.tier}`);
     out.push(`- keyCost: ${b.keyCost}`);
     if (typeof b.forbidSelfDrop === 'boolean') out.push(`- forbidSelfDrop: ${b.forbidSelfDrop}`);
@@ -124,8 +131,9 @@ function main() {
     const dt = b.dropTable;
     if (dt && Array.isArray(dt.entries)) {
       out.push('');
+      pushBlank(out);
       out.push('Entries:');
-      out.push('');
+      pushBlank(out);
       out.push('| type | weight | details |');
       out.push('|---|---:|---|');
       for (const e of dt.entries) {
@@ -143,9 +151,9 @@ function main() {
   }
 
   // Unlocks
-  out.push(h(2, 'Unlocks'));
+  pushHeading(out, 2, 'Unlocks');
   if (Array.isArray(unlocks.milestones)) {
-    out.push(h(3, 'Milestones'));
+    pushHeading(out, 3, 'Milestones');
     for (const m of unlocks.milestones) {
       out.push(`- ${m.id}:`);
       if (Array.isArray(m.requirements))
@@ -164,7 +172,7 @@ function main() {
     out.push('');
   }
   if (Array.isArray(unlocks.rngUnlocks)) {
-    out.push(h(3, 'RNG Unlocks'));
+    pushHeading(out, 3, 'RNG Unlocks');
     for (const r of unlocks.rngUnlocks) {
       out.push(`- ${r.id}: scope=${r.scope?.boxType ?? 'global'} baseChanceBp=${r.baseChanceBp}`);
       if (r.softPity)
@@ -178,16 +186,16 @@ function main() {
   }
 
   // Modifiers
-  out.push(h(2, 'Modifiers'));
+  pushHeading(out, 2, 'Modifiers');
   if (Array.isArray(modsStatic.modifiers)) {
-    out.push(h(3, 'Static'));
+    pushHeading(out, 3, 'Static');
     const byCat = new Map<string, any[]>();
     for (const m of modsStatic.modifiers) {
       const k = m.category ?? 'UNKNOWN';
       byCat.set(k, [...(byCat.get(k) ?? []), m]);
     }
     for (const [cat, list] of byCat.entries()) {
-      out.push(h(4, cat));
+      pushHeading(out, 4, cat);
       for (const m of list) {
         out.push(`- ${m.id} — ${m.name}${m.effect ? ` (effect: ${m.effect.type})` : ''}`);
       }
@@ -195,7 +203,7 @@ function main() {
     out.push('');
   }
   if (Array.isArray(modsDynamic.modifiers)) {
-    out.push(h(3, 'Dynamic'));
+    pushHeading(out, 3, 'Dynamic');
     for (const m of modsDynamic.modifiers) {
       out.push(`- ${m.id} — ${m.name}`);
       if (Array.isArray(m.appliesOn)) out.push(`  - appliesOn: ${m.appliesOn.join(', ')}`);
@@ -210,7 +218,7 @@ function main() {
 
   // Items
   if (Array.isArray(items.items)) {
-    out.push(h(2, 'Items Catalog'));
+    pushHeading(out, 2, 'Items Catalog');
     const byRarity = new Map<string, any[]>();
     for (const it of items.items)
       byRarity.set(it.rarity ?? 'UNKNOWN', [...(byRarity.get(it.rarity ?? 'UNKNOWN') ?? []), it]);
@@ -218,7 +226,8 @@ function main() {
     for (const rare of order) {
       const list = byRarity.get(rare) ?? [];
       if (list.length === 0) continue;
-      out.push(h(3, rare));
+      pushHeading(out, 3, rare);
+      pushBlank(out);
       out.push('| id | name | type | scrap | mods |');
       out.push('|---|---|---|---:|---|');
       for (const it of list) {
@@ -230,7 +239,7 @@ function main() {
   }
 
   // Idle flavor
-  out.push(h(2, 'Idle Flavor'));
+  pushHeading(out, 2, 'Idle Flavor');
   if (idle.catchUp) {
     out.push(`- catchUp.enabled: ${Boolean(idle.catchUp.enabled)}`);
     if (typeof idle.catchUp.capHours === 'number')
@@ -238,7 +247,7 @@ function main() {
     if (idle.catchUp.strategy) out.push(`- catchUp.strategy: ${idle.catchUp.strategy}`);
   }
   if (Array.isArray(idle.flavor)) {
-    out.push(h(3, 'Flavor lines'));
+    pushHeading(out, 3, 'Flavor lines');
     for (const s of idle.flavor) out.push(`- ${s}`);
   }
 
@@ -246,7 +255,9 @@ function main() {
   out.push('_End of generated content._');
 
   const outPath = path.join(root, 'docs', 'config-wiki.md');
-  fs.writeFileSync(outPath, out.join('\n'), 'utf8');
+  let body = out.join('\n');
+  if (!body.endsWith('\n')) body += '\n';
+  fs.writeFileSync(outPath, body, 'utf8');
   // eslint-disable-next-line no-console
   console.log(`Wrote ${outPath}`);
 }

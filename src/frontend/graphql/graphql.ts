@@ -21,6 +21,25 @@ export type ClaimIdleInput = {
   noop?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type CollectionItem = {
+  __typename?: 'CollectionItem';
+  discovered: Scalars['Boolean']['output'];
+  hasCosmetic: Scalars['Boolean']['output'];
+  hasMechanical: Scalars['Boolean']['output'];
+  hint?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  rarity: Rarity;
+  typeId: Scalars['ID']['output'];
+};
+
+export type CollectionLog = {
+  __typename?: 'CollectionLog';
+  byRarity: Array<CountProgress>;
+  byType: Array<CountProgress>;
+  items: Array<CollectionItem>;
+};
+
 export type CountByRarity = {
   __typename?: 'CountByRarity';
   count: Scalars['BigInt']['output'];
@@ -37,6 +56,13 @@ export type CountByType = {
   __typename?: 'CountByType';
   count: Scalars['BigInt']['output'];
   typeId: Scalars['ID']['output'];
+};
+
+export type CountProgress = {
+  __typename?: 'CountProgress';
+  discovered: Scalars['Int']['output'];
+  key: Scalars['ID']['output'];
+  total: Scalars['Int']['output'];
 };
 
 export type CurrencyBalance = {
@@ -112,6 +138,7 @@ export type PageItemStacks = {
 
 export type Query = {
   __typename?: 'Query';
+  collectionLog: CollectionLog;
   configHash: Scalars['String']['output'];
   currencies: Array<CurrencyBalance>;
   inventoryList: PageItemStacks;
@@ -168,6 +195,11 @@ export type SalvageResult = {
   scrapped: Array<RewardStack>;
 };
 
+export type CollectionLogQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CollectionLogQuery = { __typename?: 'Query', collectionLog: { __typename?: 'CollectionLog', items: Array<{ __typename?: 'CollectionItem', id: string, name: string, typeId: string, rarity: Rarity, hint?: string | null, hasCosmetic: boolean, hasMechanical: boolean, discovered: boolean }>, byRarity: Array<{ __typename?: 'CountProgress', key: string, discovered: number, total: number }>, byType: Array<{ __typename?: 'CountProgress', key: string, discovered: number, total: number }> } };
+
 export type CurrenciesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -207,6 +239,7 @@ export type UnlockedBoxesQueryVariables = Exact<{ [key: string]: never; }>;
 export type UnlockedBoxesQuery = { __typename?: 'Query', unlockedBoxes: Array<string> };
 
 
+export const CollectionLogDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionLog"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionLog"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"hint"}},{"kind":"Field","name":{"kind":"Name","value":"hasCosmetic"}},{"kind":"Field","name":{"kind":"Name","value":"hasMechanical"}},{"kind":"Field","name":{"kind":"Name","value":"discovered"}}]}},{"kind":"Field","name":{"kind":"Name","value":"byRarity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"discovered"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}},{"kind":"Field","name":{"kind":"Name","value":"byType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"discovered"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionLogQuery, CollectionLogQueryVariables>;
 export const CurrenciesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Currencies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currencies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]} as unknown as DocumentNode<CurrenciesQuery, CurrenciesQueryVariables>;
 export const InventoryListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InventoryList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"InventoryFilter"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inventoryList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"cursor"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rows"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stackId"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nextCursor"}}]}}]}}]} as unknown as DocumentNode<InventoryListQuery, InventoryListQueryVariables>;
 export const InventorySummaryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InventorySummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inventorySummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalStacks"}},{"kind":"Field","name":{"kind":"Name","value":"totalItems"}},{"kind":"Field","name":{"kind":"Name","value":"byRarity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"byType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]}}]} as unknown as DocumentNode<InventorySummaryQuery, InventorySummaryQueryVariables>;
