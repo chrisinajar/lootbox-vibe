@@ -15,6 +15,7 @@ import { ConfigService } from './services/ConfigService';
 import { buildContext } from './api/context';
 import { OpenBoxesService } from './services/OpenBoxesService';
 import { SalvageService } from './services/SalvageService';
+import { IdleSvc } from './services/IdleSvc';
 import { TelemetryService } from './services/TelemetryService';
 
 type InitOptions = {
@@ -41,6 +42,7 @@ export async function initializeServer(options: InitOptions = {}) {
   const listSvc = new InventoryListService(storage);
   const openSvc = new OpenBoxesService(storage);
   const salvageSvc = new SalvageService(storage);
+  const idleSvc = new IdleSvc();
   const elogPath = process.env.ELOG_PATH;
   const elogEnabled = process.env.ELOG_ENABLED !== '0' && Boolean(elogPath);
   const telemetry = new TelemetryService({ outPath: elogPath, enabled: elogEnabled });
@@ -104,6 +106,20 @@ export async function initializeServer(options: InitOptions = {}) {
         const res = await salvageSvc.salvage(uid, input);
         const entry = telemetry.buildEntry(
           'salvage',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          res,
+        );
+        await telemetry.write(entry);
+        return res;
+      },
+      claimIdle: async (_: any, { input }: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const started = Date.now();
+        const res = await idleSvc.claim(uid);
+        const entry = telemetry.buildEntry(
+          'claimIdle',
           uid,
           ctx?.reqId ?? 'n/a',
           Date.now() - started,

@@ -2,8 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme variables */
 :root {
+  /* default to light; ThemeProvider toggles data-theme */
+  --bg: #0b1220;
+  --text: #e6eaf2;
+  --muted-text: #b8c0cc;
+  --panel-bg: rgba(15, 23, 42, 0.4);
+  --panel-border: #1e293b;
+  --chip-bg: #0f172a;
+  --primary: #6366f1; /* indigo-500 */
+  --primary-hover: #818cf8;
+  --accent: #f59e0b; /* amber-500 */
+  --success: #10b981; /* emerald-500 */
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --text: #0b1220;
+  --muted-text: #334155;
+  --panel-bg: rgba(255, 255, 255, 0.8);
+  --panel-border: #e2e8f0;
+  --chip-bg: #f1f5f9;
+  --primary: #4f46e5;
+  --primary-hover: #6366f1;
+  --accent: #d97706;
+  --success: #059669;
+}
+
+:root[data-theme='dark'] {
   color-scheme: dark;
+  --bg: #0b1220; /* near slate-950 */
+  --text: #e6eaf2;
+  --muted-text: #b8c0cc;
+  --panel-bg: rgba(15, 23, 42, 0.4);
+  --panel-border: #1e293b;
+  --chip-bg: #0f172a;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --accent: #f59e0b;
+  --success: #10b981;
 }
 
 html,
@@ -11,3 +50,21 @@ body,
 #root {
   height: 100%;
 }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn-primary {
+  @apply rounded px-4 py-2 text-sm font-medium;
+  background: var(--primary);
+  transition: background-color 120ms ease;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-accent {
+  @apply rounded px-4 py-2 text-sm font-medium;
+  background: var(--accent);
+}
+.chip { background: var(--chip-bg); }
+.panel { background: var(--panel-bg); border-color: var(--panel-border); }

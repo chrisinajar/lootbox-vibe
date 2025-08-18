@@ -15,6 +15,7 @@ Always document new env vars in `.env.example` and reference them in relevant ru
 - Load env at entry points with `import 'dotenv/config'`.
 - Keep `.env` gitignored (see `.gitignore`).
 - Use env to gate telemetry (`ELOG_ENABLED`, `ELOG_PATH`) and other behavior.
+- Frontend (Vite) feature flags use `VITE_*` prefix and are inlined at build. Example: `VITE_ENABLE_DEV_UI=1` enables the Dev Dashboard route at `/#/dev` in non-prod.
 
 ## Gotchas
 
@@ -26,3 +27,4 @@ Always document new env vars in `.env.example` and reference them in relevant ru
 
 - file: `.env.example`
 - files: `src/backend/index.ts`, `scripts/seed-dev.ts`
+- frontend: `import.meta.env.VITE_ENABLE_DEV_UI`

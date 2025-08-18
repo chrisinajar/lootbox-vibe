@@ -33,6 +33,11 @@ type SalvageResult { scrapped: [RewardStack!]!, currencies: [RewardCurrency!]! }
 
 extend type Mutation { salvage(input: SalvageInput!): SalvageResult! }
 
+# Idle claim
+input ClaimIdleInput { noop: Boolean }
+type IdleReport { message: String!, boxesOpened: Int!, rewards: Rewards! }
+extend type Mutation { claimIdle(input: ClaimIdleInput): IdleReport! }
+
 # Inventory list types
 input InventoryFilter { rarity: Rarity, typeId: ID, sourceBoxId: ID, curatedTags: [ID!] }
 type ItemStack { stackId: ID!, typeId: ID!, rarity: Rarity!, count: Int! }

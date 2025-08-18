@@ -12,6 +12,7 @@ import {
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import App from './ui/App';
+import { ThemeProvider } from './ui/theme/ThemeProvider';
 import './index.css';
 import {
   InventorySummaryDocument,
@@ -52,7 +53,9 @@ const client = new ApolloClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
     </ApolloProvider>
   </React.StrictMode>,
 );
@@ -73,8 +76,8 @@ export const InventoryOverview: React.FC = () => {
   return (
     <div className="space-y-2">
       <div className="flex gap-4">
-        <div className="rounded bg-slate-800 px-3 py-2">Total stacks: {s.totalStacks}</div>
-        <div className="rounded bg-slate-800 px-3 py-2">Total items: {String(s.totalItems)}</div>
+        <div className="rounded px-3 py-2 chip">Total stacks: {s.totalStacks}</div>
+        <div className="rounded px-3 py-2 chip">Total items: {String(s.totalItems)}</div>
       </div>
       <div>
         <h3 className="font-medium mb-1">By rarity</h3>
@@ -82,7 +85,7 @@ export const InventoryOverview: React.FC = () => {
           {s.byRarity
             .filter((r: any) => BigInt(r.count) > 0n)
             .map((r: any) => (
-              <li key={r.rarity} className="rounded bg-slate-900 px-3 py-1">
+              <li key={r.rarity} className="rounded px-3 py-1 chip">
                 {r.rarity}: {String(r.count)}
               </li>
             ))}
@@ -92,7 +95,7 @@ export const InventoryOverview: React.FC = () => {
         <h3 className="font-medium mb-1">Top types</h3>
         <ul className="grid grid-cols-2 gap-2">
           {s.byType.slice(0, 10).map((t: any) => (
-            <li key={t.typeId} className="rounded bg-slate-900 px-3 py-1">
+            <li key={t.typeId} className="rounded px-3 py-1 chip">
               {t.typeId}: {String(t.count)}
             </li>
           ))}
@@ -140,14 +143,14 @@ export const OpenResultsPanel: React.FC = () => {
         <button
           disabled={busy}
           onClick={doOpen}
-          className="rounded bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium"
+          className="btn-primary"
         >
           Open 10 boxes
         </button>
         <button
           disabled={busy}
           onClick={doSalvageCommons}
-          className="rounded bg-amber-600 hover:bg-amber-500 px-4 py-2 text-sm font-medium"
+          className="btn-accent"
         >
           Salvage commons+
         </button>
@@ -159,7 +162,7 @@ export const OpenResultsPanel: React.FC = () => {
               <div className="font-medium">Stacks</div>
               <ul className="grid grid-cols-2 gap-1">
                 {last.stacks.map((s: any) => (
-                  <li key={s.stackId} className="rounded bg-slate-800 px-2 py-1">
+                  <li key={s.stackId} className="rounded px-2 py-1 chip">
                     {s.typeId} ({s.rarity}): +{s.count}
                   </li>
                 ))}
@@ -171,7 +174,7 @@ export const OpenResultsPanel: React.FC = () => {
               <div className="font-medium">Currencies</div>
               <ul className="flex gap-2">
                 {last.currencies.map((c: any, i: number) => (
-                  <li key={i} className="rounded bg-slate-800 px-2 py-1">
+                  <li key={i} className="rounded px-2 py-1 chip">
                     {c.currency}: {String(c.amount)}
                   </li>
                 ))}
@@ -179,7 +182,7 @@ export const OpenResultsPanel: React.FC = () => {
             </div>
           )}
           {last.unlocks && last.unlocks.length > 0 && (
-            <div className="text-emerald-400">Unlocked: {last.unlocks.join(', ')}</div>
+            <div style={{ color: 'var(--success)' }}>Unlocked: {last.unlocks.join(', ')}</div>
           )}
         </div>
       )}
