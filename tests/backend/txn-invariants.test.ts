@@ -5,7 +5,9 @@ import { describe, it, expect } from '@jest/globals';
 import { LevelStorage } from '../../src/backend/storage/LevelStorage';
 import { TransactionManager } from '../../src/backend/services/TransactionManager';
 
-function randInt(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function randInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 describe('Transaction invariants', () => {
   it('sum:* equals recompute(inv:*) after random deltas', async () => {
@@ -14,12 +16,16 @@ describe('Transaction invariants', () => {
     await db.open();
     const tm = new TransactionManager(db);
     const uid = 'u1';
-    const tiers = ['COMMON','UNCOMMON','RARE'] as const;
-    const types = ['Apple','Banana','Paperclip'] as const;
+    const tiers = ['COMMON', 'UNCOMMON', 'RARE'] as const;
+    const types = ['Apple', 'Banana', 'Paperclip'] as const;
 
-    const stacks: Array<{stackId: string; rarity: string; typeId: string}> = [];
+    const stacks: Array<{ stackId: string; rarity: string; typeId: string }> = [];
     for (let i = 0; i < 20; i++) {
-      stacks.push({ stackId: `S${i}`, rarity: tiers[i % tiers.length]!, typeId: types[i % types.length]! });
+      stacks.push({
+        stackId: `S${i}`,
+        rarity: tiers[i % tiers.length]!,
+        typeId: types[i % types.length]!,
+      });
     }
 
     // apply 100 random adjustments
@@ -27,7 +33,9 @@ describe('Transaction invariants', () => {
       const s = stacks[randInt(0, stacks.length - 1)]!;
       const delta = randInt(-2, 5); // small changes, may be negative
       try {
-        await tm.adjustStacks([{ uid, stackId: s.stackId, rarity: s.rarity, typeId: s.typeId, delta }]);
+        await tm.adjustStacks([
+          { uid, stackId: s.stackId, rarity: s.rarity, typeId: s.typeId, delta },
+        ]);
       } catch {
         // underflow is fine; skip
       }
@@ -43,14 +51,14 @@ describe('Transaction invariants', () => {
     for (const t of tiers) {
       await db.scanPrefix(`idx:rarity:${uid}:${t}:`, (k) => {
         const parts = k.split(':');
-        const sid = parts[parts.length-1];
+        const sid = parts[parts.length - 1];
         if (sid) stackRarity.set(sid, t);
       });
     }
     for (const ty of types) {
       await db.scanPrefix(`idx:type:${uid}:${ty}:`, (k) => {
         const parts = k.split(':');
-        const sid = parts[parts.length-1];
+        const sid = parts[parts.length - 1];
         if (sid) stackType.set(sid, ty);
       });
     }
@@ -71,13 +79,19 @@ describe('Transaction invariants', () => {
     const sumRarity = new Map<string, bigint>();
     for (const t of tiers) {
       const b = await db.get(`sum:rarity:${uid}:${t}`);
-      let val = 0n; if (b) { for (const by of b.values()) val = (val<<8n)|BigInt(by); }
+      let val = 0n;
+      if (b) {
+        for (const by of b.values()) val = (val << 8n) | BigInt(by);
+      }
       sumRarity.set(t, val);
     }
     const sumType = new Map<string, bigint>();
     for (const ty of types) {
       const b = await db.get(`sum:type:${uid}:${ty}`);
-      let val = 0n; if (b) { for (const by of b.values()) val = (val<<8n)|BigInt(by); }
+      let val = 0n;
+      if (b) {
+        for (const by of b.values()) val = (val << 8n) | BigInt(by);
+      }
       sumType.set(ty, val);
     }
 

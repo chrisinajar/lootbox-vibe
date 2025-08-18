@@ -21,8 +21,14 @@ describe('ConfigService validation', () => {
       fs.copyFileSync(path.join(schemaSrc, f), path.join(tmp, 'schema', f));
     }
     // Write invalid files: missing required fields / wrong shape
-    fs.writeFileSync(path.join(tmp, 'boxes', 'bad.json'), JSON.stringify({ id: 'box.bad', name: 'Bad box' }));
-    fs.writeFileSync(path.join(tmp, 'unlocks', 'bad.json'), JSON.stringify({ id: 'unlock.bad', name: 'Bad' }));
+    fs.writeFileSync(
+      path.join(tmp, 'boxes', 'bad.json'),
+      JSON.stringify({ id: 'box.bad', name: 'Bad box' }),
+    );
+    fs.writeFileSync(
+      path.join(tmp, 'unlocks', 'bad.json'),
+      JSON.stringify({ id: 'unlock.bad', name: 'Bad' }),
+    );
     fs.writeFileSync(path.join(tmp, 'modifiers', 'static.json'), JSON.stringify({ foo: 'bar' }));
     fs.writeFileSync(path.join(tmp, 'modifiers', 'dynamic.json'), JSON.stringify([]));
     fs.writeFileSync(path.join(tmp, 'idle', 'flavor.json'), JSON.stringify({ flavors: [] }));

@@ -33,4 +33,3 @@ describe('CurrencyService', () => {
     fs.rmSync(dir, { recursive: true, force: true });
   });
 });
-

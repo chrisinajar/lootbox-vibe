@@ -13,4 +13,3 @@ export interface StorageProvider {
   batch(ops: BatchOp[]): Promise<void>;
   scanPrefix(prefix: string, onItem: (key: string, value: Buffer) => void): Promise<void>;
 }
-

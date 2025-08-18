@@ -21,10 +21,10 @@
             },
             "additionalProperties": false
           }
-        }
+        },
+        "keyCost": { "type": "number", "minimum": 0 }
       },
       "additionalProperties": false
     }
   }
 }
-

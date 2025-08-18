@@ -35,7 +35,11 @@ export class LevelStorage implements StorageProvider {
 
   async batch(ops: BatchOp[]): Promise<void> {
     await this.db?.batch(
-      ops.map((op) => (op.type === 'put' ? { type: 'put', key: op.key, value: op.value } : { type: 'del', key: op.key })),
+      ops.map((op) =>
+        op.type === 'put'
+          ? { type: 'put', key: op.key, value: op.value }
+          : { type: 'del', key: op.key },
+      ),
     );
   }
 

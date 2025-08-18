@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/economy.schema.json",
+  "title": "Economy schema",
+  "type": "object",
+  "properties": {
+    "scrapPerRarity": {
+      "type": "object",
+      "properties": {
+        "COMMON": { "type": "number", "minimum": 0 },
+        "UNCOMMON": { "type": "number", "minimum": 0 },
+        "RARE": { "type": "number", "minimum": 0 },
+        "EPIC": { "type": "number", "minimum": 0 },
+        "LEGENDARY": { "type": "number", "minimum": 0 },
+        "MYTHIC": { "type": "number", "minimum": 0 }
+      },
+      "required": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["scrapPerRarity"],
+  "additionalProperties": false
+}

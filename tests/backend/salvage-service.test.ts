@@ -5,8 +5,20 @@ import { describe, it, expect } from '@jest/globals';
 import { LevelStorage } from '../../src/backend/storage/LevelStorage';
 import { SalvageService } from '../../src/backend/services/SalvageService';
 
-function u32be(n: number): Buffer { const b = Buffer.alloc(4); b.writeUInt32BE(n>>>0,0); return b; }
-function u64be(n: bigint): Buffer { const b = Buffer.alloc(8); let v=n; for(let i=7;i>=0;i--){ b[i]=Number(v&0xffn); v>>=8n;} return b; }
+function u32be(n: number): Buffer {
+  const b = Buffer.alloc(4);
+  b.writeUInt32BE(n >>> 0, 0);
+  return b;
+}
+function u64be(n: bigint): Buffer {
+  const b = Buffer.alloc(8);
+  let v = n;
+  for (let i = 7; i >= 0; i--) {
+    b[i] = Number(v & 0xffn);
+    v >>= 8n;
+  }
+  return b;
+}
 
 describe('SalvageService', () => {
   it('filters by maxRarity and typeIds and updates inv/idx/sum and credits SCRAP', async () => {
@@ -50,7 +62,10 @@ describe('SalvageService', () => {
     const bananaIdxR = await db.get(`idx:rarity:${uid}:COMMON:Banana_COMMON_base`);
     expect(bananaIdxR).toBeUndefined();
     const bananaSumR = await db.get(`sum:rarity:${uid}:COMMON`);
-    let v=0n; if (bananaSumR) { for (const by of (bananaSumR as Buffer).values()) v=(v<<8n)|BigInt(by); }
+    let v = 0n;
+    if (bananaSumR) {
+      for (const by of (bananaSumR as Buffer).values()) v = (v << 8n) | BigInt(by);
+    }
     expect(v).toBe(0n);
 
     // Paperclip (UNCOMMON) untouched (filtered out by type)

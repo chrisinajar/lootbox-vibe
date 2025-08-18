@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { initializeServer } from './init';
 
 initializeServer().catch((err) => {

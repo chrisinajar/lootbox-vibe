@@ -4,11 +4,11 @@ Describe the problem this PR solves and the outcome.
 
 ## Summary of changes
 
-- 
+-
 
 ## Affected areas
 
-- 
+-
 
 ## Checklist
 
@@ -16,4 +16,3 @@ Describe the problem this PR solves and the outcome.
 - [ ] Ran `yarn verify` (docs lint + link check)
 - [ ] Followed Conventional Commits for commits
 - [ ] Updated docs and relative links as needed
-

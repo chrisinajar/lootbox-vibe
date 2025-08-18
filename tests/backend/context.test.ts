@@ -5,7 +5,9 @@ import { describe, it, expect } from '@jest/globals';
 
 describe('Context extractor', () => {
   it('extracts uid from X-User-Id header', () => {
-    const req = { headers: { 'x-user-id': 'user-123', 'x-request-id': 'req-1' } } as unknown as Request;
+    const req = {
+      headers: { 'x-user-id': 'user-123', 'x-request-id': 'req-1' },
+    } as unknown as Request;
     const ctx = buildContext(req);
     expect(ctx.uid).toBe('user-123');
     expect(ctx.reqId).toBe('req-1');
@@ -20,10 +22,12 @@ describe('Context extractor', () => {
       },
     });
     await server.start();
-    const res: any = await server.executeOperation({ query: 'query{whoami}' }, { contextValue: { uid: 'user-A' } as any });
+    const res: any = await server.executeOperation(
+      { query: 'query{whoami}' },
+      { contextValue: { uid: 'user-A' } as any },
+    );
     const data = res.body?.singleResult?.data ?? res.data;
     expect(data.whoami).toBe('user-A');
     await server.stop();
   });
 });
-

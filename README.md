@@ -39,4 +39,3 @@ in `docs/` (product spec, architecture, and references). Implementation code wil
 ## License
 
 - License to be determined.
-

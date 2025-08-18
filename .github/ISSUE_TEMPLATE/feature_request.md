@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea or improvement
-title: "feat: <short title>"
+title: 'feat: <short title>'
 labels: enhancement
 assignees: ''
 ---
@@ -17,4 +17,3 @@ High‑level approach and any alternatives considered.
 ## References
 
 Link to relevant specs/architecture (`docs/` paths preferred) and prior art.
-

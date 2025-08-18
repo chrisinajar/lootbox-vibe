@@ -1,15 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ApolloClient, ApolloProvider, InMemoryCache, useQuery, HttpLink, from, useMutation, useApolloClient } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  useQuery,
+  HttpLink,
+  from,
+  useMutation,
+  useApolloClient,
+} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import App from './ui/App';
 import './index.css';
-import { InventorySummaryDocument, OpenBoxesDocument, SalvageDocument } from './graphql/graphql';
+import {
+  InventorySummaryDocument,
+  OpenBoxesDocument,
+  SalvageDocument,
+  Rarity,
+} from './graphql/graphql';
 import { v4 as uuidv4 } from 'uuid';
 
 export function getTestUserId(): string | undefined {
   try {
-    const ss = window.sessionStorage?.getItem('X-User-Id') || window.sessionStorage?.getItem('userId');
+    const ss =
+      window.sessionStorage?.getItem('X-User-Id') || window.sessionStorage?.getItem('userId');
     if (ss) return ss;
   } catch {}
   try {
@@ -64,11 +79,13 @@ export const InventoryOverview: React.FC = () => {
       <div>
         <h3 className="font-medium mb-1">By rarity</h3>
         <ul className="grid grid-cols-2 gap-2">
-          {s.byRarity.filter((r: any) => BigInt(r.count) > 0n).map((r: any) => (
-            <li key={r.rarity} className="rounded bg-slate-900 px-3 py-1">
-              {r.rarity}: {String(r.count)}
-            </li>
-          ))}
+          {s.byRarity
+            .filter((r: any) => BigInt(r.count) > 0n)
+            .map((r: any) => (
+              <li key={r.rarity} className="rounded bg-slate-900 px-3 py-1">
+                {r.rarity}: {String(r.count)}
+              </li>
+            ))}
         </ul>
       </div>
       <div>
@@ -96,7 +113,9 @@ export const OpenResultsPanel: React.FC = () => {
     setBusy(true);
     const requestId = uuidv4();
     try {
-      const res = await openBoxes({ variables: { input: { boxId: 'box.cardboard', count: 10, requestId } } });
+      const res = await openBoxes({
+        variables: { input: { boxId: 'box.cardboard', count: 10, requestId } },
+      });
       setLast(res.data?.openBoxes ?? null);
       await client.refetchQueries({ include: [InventorySummaryDocument] });
     } finally {
@@ -107,7 +126,7 @@ export const OpenResultsPanel: React.FC = () => {
   const doSalvageCommons = async () => {
     setBusy(true);
     try {
-      const res = await salvage({ variables: { input: { maxRarity: 'UNCOMMON' } } });
+      const res = await salvage({ variables: { input: { maxRarity: Rarity.Uncommon } } });
       setLast(res.data?.salvage ?? null);
       await client.refetchQueries({ include: [InventorySummaryDocument] });
     } finally {
@@ -118,8 +137,20 @@ export const OpenResultsPanel: React.FC = () => {
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
-        <button disabled={busy} onClick={doOpen} className="rounded bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium">Open 10 boxes</button>
-        <button disabled={busy} onClick={doSalvageCommons} className="rounded bg-amber-600 hover:bg-amber-500 px-4 py-2 text-sm font-medium">Salvage commons+</button>
+        <button
+          disabled={busy}
+          onClick={doOpen}
+          className="rounded bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium"
+        >
+          Open 10 boxes
+        </button>
+        <button
+          disabled={busy}
+          onClick={doSalvageCommons}
+          className="rounded bg-amber-600 hover:bg-amber-500 px-4 py-2 text-sm font-medium"
+        >
+          Salvage commons+
+        </button>
       </div>
       {last && (
         <div className="text-sm space-y-2">
@@ -128,7 +159,9 @@ export const OpenResultsPanel: React.FC = () => {
               <div className="font-medium">Stacks</div>
               <ul className="grid grid-cols-2 gap-1">
                 {last.stacks.map((s: any) => (
-                  <li key={s.stackId} className="rounded bg-slate-800 px-2 py-1">{s.typeId} ({s.rarity}): +{s.count}</li>
+                  <li key={s.stackId} className="rounded bg-slate-800 px-2 py-1">
+                    {s.typeId} ({s.rarity}): +{s.count}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -138,7 +171,9 @@ export const OpenResultsPanel: React.FC = () => {
               <div className="font-medium">Currencies</div>
               <ul className="flex gap-2">
                 {last.currencies.map((c: any, i: number) => (
-                  <li key={i} className="rounded bg-slate-800 px-2 py-1">{c.currency}: {String(c.amount)}</li>
+                  <li key={i} className="rounded bg-slate-800 px-2 py-1">
+                    {c.currency}: {String(c.amount)}
+                  </li>
                 ))}
               </ul>
             </div>

@@ -15,7 +15,9 @@ const setUid = (uid?: string) => {
 };
 
 export const UserSwitcherBadge: React.FC = () => {
-  const [uid, setUidState] = React.useState<string | undefined>(() => getTestUserId() || 'anonymous');
+  const [uid, setUidState] = React.useState<string | undefined>(
+    () => getTestUserId() || 'anonymous',
+  );
 
   const switchTo = (next?: string) => {
     setUid(next);
@@ -26,7 +28,8 @@ export const UserSwitcherBadge: React.FC = () => {
     <div className="fixed bottom-3 right-3 z-50 text-xs">
       <div className="rounded bg-slate-800/90 border border-slate-700 shadow px-3 py-2 backdrop-blur">
         <div className="mb-1">
-          <span className="opacity-70">User:</span> <span className="font-mono">{uid || 'anonymous'}</span>
+          <span className="opacity-70">User:</span>{' '}
+          <span className="font-mono">{uid || 'anonymous'}</span>
         </div>
         <div className="flex gap-2">
           <button
@@ -55,4 +58,3 @@ export const UserSwitcherBadge: React.FC = () => {
     </div>
   );
 };
-

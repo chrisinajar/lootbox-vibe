@@ -1,13 +1,22 @@
 import { StorageProvider } from '../storage/StorageProvider';
 import { keys } from '../storage/keys';
 import { u32, u64 } from '../storage/codec';
+import { ConfigLoader } from '../config';
 
 export type SalvageInput = { maxRarity: string; typeIds?: string[]; staticModIds?: string[] };
 
-const RARITY_ORDER = ['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY','MYTHIC'] as const;
+const RARITY_ORDER = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY', 'MYTHIC'] as const;
 
 export class SalvageService {
-  constructor(private storage: StorageProvider) {}
+  private economy: any;
+  constructor(
+    private storage: StorageProvider,
+    loader = new ConfigLoader(),
+  ) {
+    this.economy = loader.load().economy ?? {
+      scrapPerRarity: { COMMON: 1, UNCOMMON: 1, RARE: 1, EPIC: 1, LEGENDARY: 1, MYTHIC: 1 },
+    };
+  }
 
   private tiersUpTo(max: string): string[] {
     const idx = RARITY_ORDER.indexOf(max as any);
@@ -46,6 +55,9 @@ export class SalvageService {
     let totalScrap = 0n;
     const rarityDelta = new Map<string, bigint>();
     const typeDelta = new Map<string, bigint>();
+    const srcDelta = new Map<string, bigint>();
+    let totalItemsDelta = 0n;
+    let totalStacksDelta = 0n;
     const scrapped: Array<{ stackId: string; typeId: string; rarity: string; count: number }> = [];
 
     for (const stackId of allowedStacks) {
@@ -59,7 +71,10 @@ export class SalvageService {
       for (const t of RARITY_ORDER) {
         const idxRKey = keys.idxRarity(uid, t as any, stackId);
         const exists = await this.storage.get(idxRKey);
-        if (exists) { foundTier = t; break; }
+        if (exists) {
+          foundTier = t;
+          break;
+        }
       }
       // get typeId by scanning type indexes minimally (could parse stackId prefix in our current scheme)
       let foundType = '';
@@ -68,16 +83,30 @@ export class SalvageService {
         const parts = k.split(':');
         const typeId = parts[3];
         const sid = parts[4];
-        if (sid === stackId && typeId) { foundType = typeId; }
+        if (sid === stackId && typeId) {
+          foundType = typeId;
+        }
       });
 
       ops.push({ type: 'put', key: invKey, value: u32.encodeBE(0) });
       ops.push({ type: 'del', key: keys.idxRarity(uid, foundTier, stackId) });
       if (foundType) ops.push({ type: 'del', key: keys.idxType(uid, foundType, stackId) });
+      // source index/map cleanup + sum src delta
+      const srcMapKey = keys.srcMap(uid, stackId);
+      const srcBuf = await this.storage.get(srcMapKey);
+      const src = srcBuf ? srcBuf.toString('utf8') : undefined;
+      if (src) {
+        ops.push({ type: 'del', key: keys.idxSrc(uid, src, stackId) });
+        ops.push({ type: 'del', key: srcMapKey });
+        srcDelta.set(src, (srcDelta.get(src) ?? 0n) - BigInt(count));
+      }
       rarityDelta.set(foundTier, (rarityDelta.get(foundTier) ?? 0n) - BigInt(count));
       if (foundType) typeDelta.set(foundType, (typeDelta.get(foundType) ?? 0n) - BigInt(count));
-      totalScrap += BigInt(count); // 1:1 yield for now
+      const perUnit = Number(this.economy?.scrapPerRarity?.[foundTier] ?? 1);
+      totalScrap += BigInt(perUnit * count);
       scrapped.push({ stackId, typeId: foundType || 'Unknown', rarity: foundTier, count });
+      totalItemsDelta -= BigInt(count);
+      totalStacksDelta -= 1n;
     }
 
     // apply sum deltas
@@ -95,14 +124,48 @@ export class SalvageService {
       if (next < 0n) throw new Error('sum underflow');
       ops.push({ type: 'put', key, value: u64.encodeBE(next) });
     }
+    for (const [src, d] of srcDelta.entries()) {
+      const key = keys.sumSrc(uid, src);
+      const cur = u64.decodeBE(await this.storage.get(key));
+      const next = cur + d;
+      if (next < 0n) throw new Error('sum underflow');
+      ops.push({ type: 'put', key, value: u64.encodeBE(next) });
+    }
+    if (totalItemsDelta !== 0n) {
+      const k = keys.sumTotalItems(uid);
+      const buf = await this.storage.get(k);
+      if (buf || totalItemsDelta > 0n) {
+        const cur = u64.decodeBE(buf);
+        const next = cur + totalItemsDelta;
+        if (next < 0n) throw new Error('sum underflow');
+        ops.push({ type: 'put', key: k, value: u64.encodeBE(next) });
+      }
+    }
+    if (totalStacksDelta !== 0n) {
+      const k = keys.sumTotalStacks(uid);
+      const buf = await this.storage.get(k);
+      if (buf || totalStacksDelta > 0n) {
+        const cur = u64.decodeBE(buf);
+        const next = cur + totalStacksDelta;
+        if (next < 0n) throw new Error('sum underflow');
+        ops.push({ type: 'put', key: k, value: u64.encodeBE(next) });
+      }
+    }
+
+    // dynamic Greedy bonus: +1% per 100 lifetime opens, cap 100%
+    const lifetimeKey = `pstat:${uid}.lifetimeBoxesOpened`;
+    const lifetime = u64.decodeBE(await this.storage.get(lifetimeKey));
+    const greedySteps = Number(lifetime / 100n);
+    const greedyBonus = Math.min(greedySteps * 0.01, 1.0);
+    const totalWithGreedy = BigInt(Math.floor(Number(totalScrap) * (1 + greedyBonus)));
 
     // credit scrap
     const curKey = keys.cur(uid, 'SCRAP');
     const bal = u64.decodeBE(await this.storage.get(curKey));
-    ops.push({ type: 'put', key: curKey, value: u64.encodeBE(bal + totalScrap) });
+    ops.push({ type: 'put', key: curKey, value: u64.encodeBE(bal + totalWithGreedy) });
 
     await this.storage.batch(ops);
 
-    return { scrapped, currencies: [{ currency: 'SCRAP', amount: totalScrap }] };
+    return { scrapped, currencies: [{ currency: 'SCRAP', amount: totalWithGreedy }] };
   }
 }

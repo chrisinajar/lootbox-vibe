@@ -7,7 +7,13 @@ import { OpenBoxesService } from '../../src/backend/services/OpenBoxesService';
 import { SeededRng } from '../../src/backend/services/Rng';
 
 function u64be(n: bigint): Buffer {
-  const b = Buffer.alloc(8); let v = n; for (let i=7;i>=0;i--){ b[i]=Number(v&0xffn); v>>=8n; } return b;
+  const b = Buffer.alloc(8);
+  let v = n;
+  for (let i = 7; i >= 0; i--) {
+    b[i] = Number(v & 0xffn);
+    v >>= 8n;
+  }
+  return b;
 }
 
 describe('openBoxes idempotency', () => {
@@ -26,12 +32,16 @@ describe('openBoxes idempotency', () => {
     const r2 = await svc.open(uid, input);
     expect(r1.stacks).toEqual(r2.stacks);
     expect(r1.unlocks).toEqual(r2.unlocks);
-    expect(r1.currencies.map((c:any)=>({ ...c, amount: String(c.amount) })))
-      .toEqual(r2.currencies.map((c:any)=>({ ...c, amount: String(c.amount) })));
+    expect(r1.currencies.map((c: any) => ({ ...c, amount: String(c.amount) }))).toEqual(
+      r2.currencies.map((c: any) => ({ ...c, amount: String(c.amount) })),
+    );
 
     // KEYS reduced only once
     const keysAfter = await db.get(`cur:${uid}:KEYS`);
-    let bal = 0n; if (keysAfter) { for (const by of (keysAfter as Buffer).values()) bal = (bal<<8n)|BigInt(by); }
+    let bal = 0n;
+    if (keysAfter) {
+      for (const by of (keysAfter as Buffer).values()) bal = (bal << 8n) | BigInt(by);
+    }
     expect(bal).toBe(7n);
 
     await db.close();

@@ -17,4 +17,3 @@ describe('BigInt serialization', () => {
     await server.stop();
   });
 });
-

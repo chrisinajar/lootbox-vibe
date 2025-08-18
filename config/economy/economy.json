@@ -1,0 +1,10 @@
+{
+  "scrapPerRarity": {
+    "COMMON": 1,
+    "UNCOMMON": 2,
+    "RARE": 5,
+    "EPIC": 10,
+    "LEGENDARY": 15,
+    "MYTHIC": 25
+  }
+}

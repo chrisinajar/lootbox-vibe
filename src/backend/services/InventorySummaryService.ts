@@ -6,10 +6,11 @@ export class InventorySummaryService {
   constructor(private repo: SummariesRepo) {}
 
   async getSummary(uid: string) {
-    const [totals, byRarity, byType] = await Promise.all([
+    const [totals, byRarity, byType, bySource] = await Promise.all([
       this.repo.getTotals(uid),
       this.repo.getByRarity(uid),
       this.repo.getByType(uid),
+      this.repo.getBySource(uid),
     ]);
 
     // Normalize rarity list to include all tiers in order (zero if missing)
@@ -21,7 +22,7 @@ export class InventorySummaryService {
       totalItems: totals.totalItems,
       byRarity: rarityList,
       byType,
+      bySource,
     };
   }
 }
-

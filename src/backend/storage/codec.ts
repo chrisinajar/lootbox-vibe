@@ -27,4 +27,3 @@ export const u64 = {
     return v;
   },
 };
-

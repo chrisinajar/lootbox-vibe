@@ -34,4 +34,3 @@ the guidelines below to keep contributions consistent and easy to review.
 - If you discover a repeatable workflow or gotcha, add a runbook:
   - `yarn agent:runbook:new <id> "Title"`
   - Then add a brief entry to `docs/runbooks/index.md`.
-

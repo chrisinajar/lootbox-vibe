@@ -9,6 +9,7 @@ export interface LoadedConfig {
   modifiers?: { static?: unknown; dynamic?: unknown };
   unlocks?: unknown[];
   idle?: unknown;
+  economy?: unknown;
 }
 
 export class ConfigLoader {
@@ -27,8 +28,9 @@ export class ConfigLoader {
       boxes: readJson(path.join(schemaDir, 'boxes.schema.json')),
       modifiers: readJson(path.join(schemaDir, 'modifiers.schema.json')),
       unlocks: readJson(path.join(schemaDir, 'unlocks.schema.json')),
-      idle: readJson(path.join(schemaDir, 'idle.schema.json')),
+      idle: readJson(path.join(schemaDir, 'flavor.schema.json')),
       items: readJson(path.join(schemaDir, 'items.schema.json')),
+      economy: readJson(path.join(schemaDir, 'economy.schema.json')),
     } as const;
 
     const validators = {
@@ -37,6 +39,7 @@ export class ConfigLoader {
       unlock: this.ajv.compile(schemas.unlocks.definitions.unlock),
       idle: this.ajv.compile(schemas.idle),
       items: this.ajv.compile(schemas.items),
+      economy: this.ajv.compile(schemas.economy),
     } as const;
 
     // Load data
@@ -44,6 +47,7 @@ export class ConfigLoader {
     const unlocksDir = path.join(this.configDir, 'unlocks');
     const modifiersDir = path.join(this.configDir, 'modifiers');
     const idleDir = path.join(this.configDir, 'idle');
+    const economyDir = path.join(this.configDir, 'economy');
 
     const boxes = fs
       .readdirSync(boxesDir)
@@ -61,17 +65,24 @@ export class ConfigLoader {
     };
 
     const idle = readJson(path.join(idleDir, 'flavor.json'));
+    const economy = readJson(path.join(economyDir, 'economy.json'));
 
     // Validate
     for (const b of boxes) {
-      if (!validators.box(b)) throw new Error('Invalid box config: ' + JSON.stringify(validators.box.errors));
+      if (!validators.box(b))
+        throw new Error('Invalid box config: ' + JSON.stringify(validators.box.errors));
     }
     for (const u of unlocks) {
-      if (!validators.unlock(u)) throw new Error('Invalid unlock: ' + JSON.stringify(validators.unlock.errors));
+      if (!validators.unlock(u))
+        throw new Error('Invalid unlock: ' + JSON.stringify(validators.unlock.errors));
     }
-    if (!validators.modifiers(modifiers)) throw new Error('Invalid modifiers: ' + JSON.stringify(validators.modifiers.errors));
-    if (!validators.idle(idle)) throw new Error('Invalid idle config: ' + JSON.stringify(validators.idle.errors));
+    if (!validators.modifiers(modifiers))
+      throw new Error('Invalid modifiers: ' + JSON.stringify(validators.modifiers.errors));
+    if (!validators.idle(idle))
+      throw new Error('Invalid idle config: ' + JSON.stringify(validators.idle.errors));
+    if (!validators.economy(economy))
+      throw new Error('Invalid economy config: ' + JSON.stringify(validators.economy.errors));
 
-    return { boxes, unlocks, modifiers, idle };
+    return { boxes, unlocks, modifiers, idle, economy };
   }
 }

@@ -3,17 +3,19 @@
 **Audience:** Developers  
 **Author:** Technical Lead  
 **Date:** 2025-08-16  
-**Scope:** Baseline technical reference for Lootbox Simulator MVP implementation.  
+**Scope:** Baseline technical reference for Lootbox Simulator MVP implementation.
 
 ---
 
 ## 🧰 Tech Stack & Tooling
 
 ### Languages
+
 - **Backend:** Node.js + **TypeScript**
 - **Frontend:** React + **TypeScript**
 
 ### Frameworks / Libraries
+
 - **Frontend**
   - React (hooks, function components only)
   - Apollo Client (GraphQL)
@@ -31,6 +33,7 @@
   - Supertest (HTTP-level testing)
 
 ### Tooling
+
 - ESLint + Prettier (lint/format)
 - Jest + ts-jest (tests)
 - Husky + lint-staged (pre-commit hooks)
@@ -75,7 +78,7 @@
 /tests
   /unit                      → Jest unit tests
   /integration               → API & service integration tests
-````
+```
 
 ---
 
@@ -83,8 +86,8 @@
 
 ### Database
 
-* **Primary:** LevelDB (in-process, append-optimized, suitable for millions of keys)
-* **Fallback (optional):** SQLite in WAL mode (for dev/analytics)
+- **Primary:** LevelDB (in-process, append-optimized, suitable for millions of keys)
+- **Fallback (optional):** SQLite in WAL mode (for dev/analytics)
 
 ### Namespacing (per-user)
 
@@ -104,10 +107,10 @@ cur:{uid}:{currency}         → balance:u64
 
 ### Canonical Fingerprint (CFP)
 
-* Deterministic hash of: `baseItemId + rarity + sortedStaticMods + skin/setId`
-* Excludes volatile or dynamic properties
-* Hash function: xxHash128 or BLAKE3
-* Used as key for stacking and bulk operations
+- Deterministic hash of: `baseItemId + rarity + sortedStaticMods + skin/setId`
+- Excludes volatile or dynamic properties
+- Hash function: xxHash128 or BLAKE3
+- Used as key for stacking and bulk operations
 
 ---
 
@@ -115,10 +118,10 @@ cur:{uid}:{currency}         → balance:u64
 
 ### Philosophy
 
-* **All game config lives in version-controlled JSON** under `/config/`
-* Never seed/mutate DB for configuration
-* Validated at startup with **JSON Schema**
-* **Hot reload** in dev (via Chokidar); prod loads only at process start
+- **All game config lives in version-controlled JSON** under `/config/`
+- Never seed/mutate DB for configuration
+- Validated at startup with **JSON Schema**
+- **Hot reload** in dev (via Chokidar); prod loads only at process start
 
 ### Directory Layout
 
@@ -142,8 +145,16 @@ cur:{uid}:{currency}         → balance:u64
   "batch": { "min": 1, "max": 1 },
   "weights": [
     { "w": 50, "pick": { "type": "CURRENCY", "currency": "SCRAP", "min": 1, "max": 5 } },
-    { "w": 45, "pick": { "type": "ITEM", "itemId": "Banana", "rarity": "COMMON",
-                         "staticMods": ["Shiny?5%"], "dynamicMods": ["Greedy"] } },
+    {
+      "w": 45,
+      "pick": {
+        "type": "ITEM",
+        "itemId": "Banana",
+        "rarity": "COMMON",
+        "staticMods": ["Shiny?5%"],
+        "dynamicMods": ["Greedy"]
+      }
+    },
     { "w": 5, "pick": { "type": "ITEM", "itemId": "CardboardBox", "rarity": "COMMON" } }
   ]
 }
@@ -182,9 +193,12 @@ cur:{uid}:{currency}         → balance:u64
     { "id": "ScrapBoost5", "kind": "MULT", "stat": "SCRAP_YIELD", "value": 0.05 }
   ],
   "dynamic": [
-    { "id": "Greedy", "formula": "GREEDY_V1",
+    {
+      "id": "Greedy",
+      "formula": "GREEDY_V1",
       "displayTemplate": "Greedy +{percent}% (scales)",
-      "caps": { "maxPercent": 100 } }
+      "caps": { "maxPercent": 100 }
+    }
   ]
 }
 ```
@@ -195,8 +209,16 @@ cur:{uid}:{currency}         → balance:u64
 {
   "$schema": "./schema/flavor.schema.json",
   "entries": [
-    { "id": "cat", "w": 60, "text": "While you were gone, your cat opened {count} boxes and knocked over {cups} cups of water." },
-    { "id": "gremlins", "w": 40, "text": "Gremlins opened {count} boxes in your absence, but stole half the loot." }
+    {
+      "id": "cat",
+      "w": 60,
+      "text": "While you were gone, your cat opened {count} boxes and knocked over {cups} cups of water."
+    },
+    {
+      "id": "gremlins",
+      "w": 40,
+      "text": "Gremlins opened {count} boxes in your absence, but stole half the loot."
+    }
   ],
   "vars": {
     "cups": { "min": 3, "max": 17 }
@@ -208,57 +230,54 @@ cur:{uid}:{currency}         → balance:u64
 
 ## 🔄 Core Services
 
-* **StorageProvider**
+- **StorageProvider**
   LevelDB/SQLite abstraction, handles prefix scans + batch ops
 
-* **InventorySvc**
+- **InventorySvc**
   CFP stacking, expansion/condense, bulk salvage
 
-* **DropTableSvc**
+- **DropTableSvc**
   Config-driven RNG for loot rolls (server-side only)
 
-* **ModifierSvc**
+- **ModifierSvc**
+  - Static mods: rolled & frozen at creation, part of CFP
+  - Dynamic mods: evaluated at runtime via server formula
 
-  * Static mods: rolled & frozen at creation, part of CFP
-  * Dynamic mods: evaluated at runtime via server formula
-
-* **ProgressionSvc**
+- **ProgressionSvc**
   Unlock handling (milestone + RNG unlocks)
 
-* **CurrencySvc**
+- **CurrencySvc**
   Atomic balance updates, multi-currency batch ops
 
-* **ConfigService**
+- **ConfigService**
   Loads/validates JSON configs, hot reload in dev
 
-* **IdleSvc**
+- **IdleSvc**
   Deterministic login catch-up, flavored messages
 
 ---
 
 ## 🎲 Randomness & Idempotency
 
-* RNG: Node `crypto` PRNG
-* Seed includes: `{uid, serverTime, nonce}`
-* RNG never runs client-side
-* All mutations accept a `requestId` for dedupe
-* Outcomes stored short-term in DB for replay (`req:{uid}:{requestId}`)
+- RNG: Node `crypto` PRNG
+- Seed includes: `{uid, serverTime, nonce}`
+- RNG never runs client-side
+- All mutations accept a `requestId` for dedupe
+- Outcomes stored short-term in DB for replay (`req:{uid}:{requestId}`)
 
 ---
 
 ## ⚖️ Modifiers
 
-* **Static (MVP majority, \~80%)**
+- **Static (MVP majority, \~80%)**
+  - Rolled once at item creation
+  - Included in CFP, indexed
+  - Immutable
 
-  * Rolled once at item creation
-  * Included in CFP, indexed
-  * Immutable
-
-* **Dynamic (\~20% MVP)**
-
-  * Not part of CFP
-  * Evaluated at runtime
-  * Example: Greedy (+1% scrap per 100 boxes lifetime)
+- **Dynamic (\~20% MVP)**
+  - Not part of CFP
+  - Evaluated at runtime
+  - Example: Greedy (+1% scrap per 100 boxes lifetime)
 
 ### Evaluation Pipeline
 
@@ -270,18 +289,18 @@ Base Item → Static Mods → Dynamic Mods → Global Buffs (events)
 
 ## 🌀 Unlocks
 
-* **Milestone unlocks**: threshold-based progression
-* **RNG unlocks**: rare, surprise-based
-* Both defined as JSON configs under `/config/unlocks`
+- **Milestone unlocks**: threshold-based progression
+- **RNG unlocks**: rare, surprise-based
+- Both defined as JSON configs under `/config/unlocks`
 
 ---
 
 ## ⏳ Idle / Auto-Openers
 
-* Catch-up **on login only** (no server tick)
-* Inputs: `lastLogin`, `openerRate`, elapsed time
-* Cap: configurable max idle hours
-* Flavor messages from `/config/idle/flavor.json`
+- Catch-up **on login only** (no server tick)
+- Inputs: `lastLogin`, `openerRate`, elapsed time
+- Cap: configurable max idle hours
+- Flavor messages from `/config/idle/flavor.json`
 
 ---
 
@@ -289,12 +308,11 @@ Base Item → Static Mods → Dynamic Mods → Global Buffs (events)
 
 ### Tech
 
-* Apollo Server (Node.js + TS)
-* Schema-first (SDL in `/src/backend/api/schema.graphql`)
-* GraphQL Codegen generates:
-
-  * React hooks
-  * Resolver types
+- Apollo Server (Node.js + TS)
+- Schema-first (SDL in `/src/backend/api/schema.graphql`)
+- GraphQL Codegen generates:
+  - React hooks
+  - Resolver types
 
 ### Example Schema (excerpt)
 
@@ -320,52 +338,47 @@ type Mutation {
 
 ## 🧪 Testing
 
-* **Unit tests (Jest):**
+- **Unit tests (Jest):**
+  - All services (Inventory, DropTable, Modifiers, Currency)
+  - RNG mocked for determinism
+  - CFP hashing
 
-  * All services (Inventory, DropTable, Modifiers, Currency)
-  * RNG mocked for determinism
-  * CFP hashing
+- **Integration tests:**
+  - GraphQL API
+  - Player loop flows (open → salvage → unlock)
 
-* **Integration tests:**
+- **Property-based tests:**
+  - Drop table distributions
+  - Modifier formulas
 
-  * GraphQL API
-  * Player loop flows (open → salvage → unlock)
+- **Golden tests:**
+  - Static/dynamic modifier resolution
+  - Unlock milestones
 
-* **Property-based tests:**
-
-  * Drop table distributions
-  * Modifier formulas
-
-* **Golden tests:**
-
-  * Static/dynamic modifier resolution
-  * Unlock milestones
-
-* **Load tests:**
-
-  * Whale simulation: 100k CFPs, 10M items
+- **Load tests:**
+  - Whale simulation: 100k CFPs, 10M items
 
 ---
 
 ## 🔐 Security & Anti-Exploit
 
-* RNG strictly server-side
-* Mutations are idempotent via `requestId`
-* Currency/item ops atomic (LevelDB batches)
-* Input validation on all GraphQL inputs
-* Config JSON immutable in prod (reload on deploy only)
+- RNG strictly server-side
+- Mutations are idempotent via `requestId`
+- Currency/item ops atomic (LevelDB batches)
+- Input validation on all GraphQL inputs
+- Config JSON immutable in prod (reload on deploy only)
 
 ---
 
 ## 📌 Baseline Assumptions
 
-* All code in **TypeScript**
-* All new code covered by **Jest tests**
-* **ESLint + Prettier** enforced in CI
-* GraphQL schema is the **contract** between FE & BE
-* All config in `/config/` JSON (schema validated, version controlled)
-* FE uses **GraphQL Codegen** exclusively for hooks (no handwritten queries)
-* Dynamic modifiers implemented only as server formulas (no eval, no client logic)
-* Idle progression implemented only as deterministic login catch-up for MVP
+- All code in **TypeScript**
+- All new code covered by **Jest tests**
+- **ESLint + Prettier** enforced in CI
+- GraphQL schema is the **contract** between FE & BE
+- All config in `/config/` JSON (schema validated, version controlled)
+- FE uses **GraphQL Codegen** exclusively for hooks (no handwritten queries)
+- Dynamic modifiers implemented only as server formulas (no eval, no client logic)
+- Idle progression implemented only as deterministic login catch-up for MVP
 
 ---

@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a problem or regression
-title: "bug: <short title>"
+title: 'bug: <short title>'
 labels: bug
 assignees: ''
 ---
@@ -13,8 +13,9 @@ Describe the issue and expected behavior.
 ## Reproduction
 
 Steps to reproduce:
-1. 
-2. 
+
+1.
+2.
 
 ## Environment
 
@@ -24,4 +25,3 @@ Steps to reproduce:
 ## Additional context
 
 Links to relevant docs or specs (prefer relative links within `docs/`).
-

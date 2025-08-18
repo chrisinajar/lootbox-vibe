@@ -6,13 +6,20 @@
   "properties": {
     "static": {
       "type": "array",
-      "items": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string"}, "desc": {"type": "string"}}}
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": { "id": { "type": "string" }, "desc": { "type": "string" } }
+      }
     },
     "dynamic": {
       "type": "array",
-      "items": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string"}, "desc": {"type": "string"}}}
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": { "id": { "type": "string" }, "desc": { "type": "string" } }
+      }
     }
   },
   "additionalProperties": false
 }
-

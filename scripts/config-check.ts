@@ -1,13 +1,13 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 
 const projectRoot = process.cwd();
 const configDir = path.join(projectRoot, 'config');
 const schemaDir = path.join(configDir, 'schema');
 
-const ajv = new Ajv({ allErrors: true, strict: true });
+const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
 
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -18,7 +18,8 @@ function main() {
     items: readJson(path.join(schemaDir, 'items.schema.json')),
     modifiers: readJson(path.join(schemaDir, 'modifiers.schema.json')),
     unlocks: readJson(path.join(schemaDir, 'unlocks.schema.json')),
-    idle: readJson(path.join(schemaDir, 'idle.schema.json')),
+    idle: readJson(path.join(schemaDir, 'flavor.schema.json')),
+    economy: readJson(path.join(schemaDir, 'economy.schema.json')),
   } as const;
 
   const validators = {
@@ -27,6 +28,7 @@ function main() {
     modifiers: ajv.compile(schemas.modifiers),
     unlock: ajv.compile(schemas.unlocks.definitions.unlock),
     idle: ajv.compile(schemas.idle),
+    economy: ajv.compile(schemas.economy),
   } as const;
 
   // Validate boxes
@@ -64,9 +66,15 @@ function main() {
     throw new Error(`Invalid idle: ${ajv.errorsText(validators.idle.errors)}`);
   }
 
+  // Validate economy
+  const economyDir = path.join(configDir, 'economy');
+  const economy = readJson(path.join(economyDir, 'economy.json'));
+  if (!validators.economy(economy)) {
+    throw new Error(`Invalid economy: ${ajv.errorsText(validators.economy.errors)}`);
+  }
+
   // eslint-disable-next-line no-console
   console.log('Config validation passed');
 }
 
 main();
-

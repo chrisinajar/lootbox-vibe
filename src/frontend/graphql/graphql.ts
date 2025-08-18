@@ -23,6 +23,12 @@ export type CountByRarity = {
   rarity: Rarity;
 };
 
+export type CountBySource = {
+  __typename?: 'CountBySource';
+  count: Scalars['BigInt']['output'];
+  sourceBoxId: Scalars['ID']['output'];
+};
+
 export type CountByType = {
   __typename?: 'CountByType';
   count: Scalars['BigInt']['output'];
@@ -32,6 +38,7 @@ export type CountByType = {
 export type InventorySummary = {
   __typename?: 'InventorySummary';
   byRarity: Array<CountByRarity>;
+  bySource: Array<CountBySource>;
   byType: Array<CountByType>;
   totalItems: Scalars['BigInt']['output'];
   totalStacks: Scalars['Int']['output'];

@@ -9,4 +9,3 @@
   },
   "include": ["src/backend", "scripts", "tests/backend"]
 }
-

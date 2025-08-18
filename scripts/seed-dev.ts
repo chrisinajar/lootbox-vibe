@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import path from 'node:path';
 import { LevelStorage } from '../src/backend/storage/LevelStorage';
 
@@ -84,7 +85,9 @@ async function seed({ uid, writeSums }: SeedOpts) {
   const invCount = stacks.length;
   const idxRarityCount = stacks.length;
   const idxTypeCount = stacks.length;
-  const sumCount = writeSums ? new Set(stacks.map((s) => s.rarity)).size + new Set(stacks.map((s) => s.typeId)).size : 0;
+  const sumCount = writeSums
+    ? new Set(stacks.map((s) => s.rarity)).size + new Set(stacks.map((s) => s.typeId)).size
+    : 0;
 
   // eslint-disable-next-line no-console
   console.log('--- Seed Summary ---');
@@ -101,7 +104,9 @@ async function seed({ uid, writeSums }: SeedOpts) {
   // eslint-disable-next-line no-console
   console.log(`By type:   ${byTypeSummary}`);
   // eslint-disable-next-line no-console
-  console.log(`Keys written: inv=${invCount}, idx:rarity=${idxRarityCount}, idx:type=${idxTypeCount}, sum=${sumCount}`);
+  console.log(
+    `Keys written: inv=${invCount}, idx:rarity=${idxRarityCount}, idx:type=${idxTypeCount}, sum=${sumCount}`,
+  );
   console.log(`Currencies: KEYS=100, SCRAP=0`);
   // eslint-disable-next-line no-console
   console.log('Tip: in browser console:');

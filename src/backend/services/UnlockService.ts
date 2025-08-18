@@ -7,7 +7,11 @@ type Profile = { unlockedBoxIds: string[] };
 
 export class UnlockService {
   private unlocks: Array<{ id: string; requires?: { boxesOpened?: number } }> = [];
-  constructor(private storage: StorageProvider, loader = new ConfigLoader(), private rngRules: RngRule[] = []) {
+  constructor(
+    private storage: StorageProvider,
+    loader = new ConfigLoader(),
+    private rngRules: RngRule[] = [],
+  ) {
     const cfg = loader.load();
     this.unlocks = (cfg.unlocks as any[]) || [];
   }
@@ -23,7 +27,11 @@ export class UnlockService {
     }
   }
 
-  async prepareUnlockOps(uid: string, nextBoxesOpened: bigint, sourceBoxId?: string): Promise<{ ops: BatchOp[]; unlocked: string[] }>{
+  async prepareUnlockOps(
+    uid: string,
+    nextBoxesOpened: bigint,
+    sourceBoxId?: string,
+  ): Promise<{ ops: BatchOp[]; unlocked: string[] }> {
     const ops: BatchOp[] = [];
     const profile = await this.loadProfile(uid);
     const unlockedSet = new Set(profile.unlockedBoxIds);
@@ -48,6 +56,14 @@ export class UnlockService {
             unlockedSet.add(r.unlockId);
             newly.push(r.unlockId);
           }
+        }
+      }
+      // soft pity: Unstable from Cardboard on 5000-step boundaries if not unlocked
+      if (sourceBoxId === 'box.cardboard' && nextBoxesOpened % 5000n === 0n) {
+        const target = 'box.unstable';
+        if (!unlockedSet.has(target)) {
+          unlockedSet.add(target);
+          newly.push(target);
         }
       }
     }

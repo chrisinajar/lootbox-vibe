@@ -16,8 +16,10 @@ function main() {
   const title = titleParts.join(' ').trim();
 
   if (!id) fail('Missing <id>. Example: yarn agent:runbook:new deploy-app "Faster deploys"');
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) fail('Invalid id. Use kebab-case: lowercase letters, numbers, hyphens.');
-  if (!title) fail('Missing "Title" string. Example: yarn agent:runbook:new deploy-app "Faster deploys"');
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(id))
+    fail('Invalid id. Use kebab-case: lowercase letters, numbers, hyphens.');
+  if (!title)
+    fail('Missing "Title" string. Example: yarn agent:runbook:new deploy-app "Faster deploys"');
 
   const root = process.cwd();
   const templatePath = path.join(root, 'docs', 'runbooks', '_template.md');
@@ -43,4 +45,3 @@ function main() {
 }
 
 main();
-

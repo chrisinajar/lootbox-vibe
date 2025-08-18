@@ -11,10 +11,11 @@ function genReqId() {
 }
 
 export function buildContext(req: Request): RequestContext {
-  const headerUid = (req.headers['x-user-id'] || req.headers['X-User-Id' as any]) as string | undefined;
+  const headerUid = (req.headers['x-user-id'] || req.headers['X-User-Id' as any]) as
+    | string
+    | undefined;
   const fallbackUid = process.env.DEFAULT_UID;
   const uid = headerUid || fallbackUid || 'anonymous';
   const reqId = (req.headers['x-request-id'] as string | undefined) || genReqId();
   return { uid, reqId };
 }
-

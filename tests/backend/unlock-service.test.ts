@@ -5,7 +5,15 @@ import { describe, it, expect } from '@jest/globals';
 import { LevelStorage } from '../../src/backend/storage/LevelStorage';
 import { UnlockService } from '../../src/backend/services/UnlockService';
 
-function u64be(n: bigint): Buffer { const b=Buffer.alloc(8); let v=n; for(let i=7;i>=0;i--){ b[i]=Number(v&0xffn); v>>=8n;} return b; }
+function u64be(n: bigint): Buffer {
+  const b = Buffer.alloc(8);
+  let v = n;
+  for (let i = 7; i >= 0; i--) {
+    b[i] = Number(v & 0xffn);
+    v >>= 8n;
+  }
+  return b;
+}
 
 describe('UnlockService', () => {
   it('milestone unlocks when threshold crossed', async () => {
@@ -32,7 +40,9 @@ describe('UnlockService', () => {
     const db = new LevelStorage(dir);
     await db.open();
     const uid = 'u2';
-    const svc = new UnlockService(db, undefined as any, [{ unlockId: 'unlock.dim', sourceBoxId: 'box.cardboard', chance: 1.0 }]);
+    const svc = new UnlockService(db, undefined as any, [
+      { unlockId: 'unlock.dim', sourceBoxId: 'box.cardboard', chance: 1.0 },
+    ]);
     const a = await svc.prepareUnlockOps(uid, 0n, 'box.cardboard');
     const b = await svc.prepareUnlockOps(uid, 0n, 'box.other');
     expect(a.unlocked.includes('unlock.dim')).toBe(true);

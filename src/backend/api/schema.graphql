@@ -4,12 +4,14 @@ enum Rarity { COMMON UNCOMMON RARE EPIC LEGENDARY MYTHIC }
 
 type CountByRarity { rarity: Rarity!, count: BigInt! }
 type CountByType   { typeId: ID!, count: BigInt! }
+type CountBySource { sourceBoxId: ID!, count: BigInt! }
 
 type InventorySummary {
   totalStacks: Int!
   totalItems: BigInt!
   byRarity: [CountByRarity!]!
   byType: [CountByType!]!
+  bySource: [CountBySource!]!
 }
 
 type Query {

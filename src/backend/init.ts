@@ -14,6 +14,7 @@ import { ConfigService } from './services/ConfigService';
 import { buildContext } from './api/context';
 import { OpenBoxesService } from './services/OpenBoxesService';
 import { SalvageService } from './services/SalvageService';
+import { TelemetryService } from './services/TelemetryService';
 
 type InitOptions = {
   port?: number;
@@ -24,7 +25,7 @@ type InitOptions = {
 export async function initializeServer(options: InitOptions = {}) {
   const port = options.port ?? Number(process.env.API_PORT ?? 4000);
   const graphqlPath = options.graphqlPath ?? '/graphql';
-  const corsOrigin = options.corsOrigin ?? (process.env.CORS_ORIGIN ?? 'http://localhost:5173');
+  const corsOrigin = options.corsOrigin ?? process.env.CORS_ORIGIN ?? 'http://localhost:5173';
   const logLevel = process.env.LOG_LEVEL ?? 'info';
 
   const schemaPath = path.resolve(__dirname, './api/schema.graphql');
@@ -38,6 +39,9 @@ export async function initializeServer(options: InitOptions = {}) {
   const summarySvc = new InventorySummaryService(summariesRepo);
   const openSvc = new OpenBoxesService(storage);
   const salvageSvc = new SalvageService(storage);
+  const elogPath = process.env.ELOG_PATH;
+  const elogEnabled = process.env.ELOG_ENABLED !== '0' && Boolean(elogPath);
+  const telemetry = new TelemetryService({ outPath: elogPath, enabled: elogEnabled });
 
   const configSvc = new ConfigService();
 
@@ -46,7 +50,17 @@ export async function initializeServer(options: InitOptions = {}) {
     Query: {
       inventorySummary: async (_: any, __: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';
-        return await summarySvc.getSummary(uid);
+        const started = Date.now();
+        const res = await summarySvc.getSummary(uid);
+        const entry = telemetry.buildEntry(
+          'inventorySummary',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          res,
+        );
+        await telemetry.write(entry);
+        return res;
       },
       configHash: () => {
         if (process.env.EXPOSE_CONFIG_HASH === '1' || process.env.NODE_ENV !== 'production') {
@@ -58,11 +72,29 @@ export async function initializeServer(options: InitOptions = {}) {
     Mutation: {
       openBoxes: async (_: any, { input }: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';
-        return await openSvc.open(uid, input);
+        if (input?.count > 1000) {
+          throw new Error('batch too large: max 1000');
+        }
+        const started = Date.now();
+        const res = await openSvc.open(uid, input);
+        const reqId: string = input?.requestId ?? ctx?.reqId ?? 'n/a';
+        const entry = telemetry.buildEntry('openBoxes', uid, reqId, Date.now() - started, res);
+        await telemetry.write(entry);
+        return res;
       },
       salvage: async (_: any, { input }: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';
-        return await salvageSvc.salvage(uid, input);
+        const started = Date.now();
+        const res = await salvageSvc.salvage(uid, input);
+        const entry = telemetry.buildEntry(
+          'salvage',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          res,
+        );
+        await telemetry.write(entry);
+        return res;
       },
     },
   } as const;

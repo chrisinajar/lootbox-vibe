@@ -5,7 +5,11 @@ import { describe, it, expect } from '@jest/globals';
 import { LevelStorage } from '../../src/backend/storage/LevelStorage';
 import { SummariesRepo } from '../../src/backend/services/SummariesRepo';
 
-function u32be(n: number): Buffer { const b = Buffer.alloc(4); b.writeUInt32BE(n >>> 0, 0); return b; }
+function u32be(n: number): Buffer {
+  const b = Buffer.alloc(4);
+  b.writeUInt32BE(n >>> 0, 0);
+  return b;
+}
 
 describe('SummariesRepo fallbacks', () => {
   it('computes byType and byRarity from idx + inv when sum:* missing', async () => {

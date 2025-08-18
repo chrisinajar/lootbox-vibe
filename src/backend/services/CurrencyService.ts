@@ -24,4 +24,3 @@ export class CurrencyService {
     await this.tm.adjustCurrencies([{ uid, currency, delta: -amount }]);
   }
 }
-

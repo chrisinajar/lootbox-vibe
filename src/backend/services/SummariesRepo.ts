@@ -3,6 +3,7 @@ import { StorageProvider } from '../storage/StorageProvider';
 export type Totals = { totalStacks: number; totalItems: bigint };
 export type RarityCount = { rarity: string; count: bigint };
 export type TypeCount = { typeId: string; count: bigint };
+export type SourceCount = { sourceBoxId: string; count: bigint };
 
 const RARITY_ORDER = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY', 'MYTHIC'] as const;
 
@@ -22,7 +23,16 @@ export class SummariesRepo {
   constructor(private storage: StorageProvider) {}
 
   async getTotals(uid: string): Promise<Totals> {
-    // Derive totals from inv prefix; fallback to sums if available
+    // Prefer transactional sums; fallback to recompute
+    const sumStacksBuf = await this.storage.get(`sum:totalStacks:${uid}`);
+    const sumItemsBuf = await this.storage.get(`sum:totalItems:${uid}`);
+    if (sumStacksBuf || sumItemsBuf) {
+      const totalStacks = sumStacksBuf ? Number(readU64(sumStacksBuf)) : 0;
+      const totalItems = sumItemsBuf ? readU64(sumItemsBuf) : 0n;
+      return { totalStacks, totalItems };
+    }
+
+    // Fallback: scan inv and aggregate
     let totalStacks = 0;
     let totalItems = 0n;
     await this.storage.scanPrefix(`inv:${uid}:`, (_key, value) => {
@@ -33,14 +43,6 @@ export class SummariesRepo {
         totalItems += count;
       }
     });
-
-    // If nothing in inv, try sum:type path for totalItems
-    if (totalItems === 0n) {
-      await this.storage.scanPrefix(`sum:type:${uid}:`, (_k, v) => {
-        totalItems += readU64(v);
-      });
-    }
-
     return { totalStacks, totalItems };
   }
 
@@ -109,5 +111,33 @@ export class SummariesRepo {
       totals.set(typeId, (totals.get(typeId) ?? 0n) + add);
     }
     return Array.from(totals.entries()).map(([typeId, count]) => ({ typeId, count }));
+  }
+
+  async getBySource(uid: string): Promise<SourceCount[]> {
+    const out: SourceCount[] = [];
+    // Prefer sum:src
+    await this.storage.scanPrefix(`sum:src:${uid}:`, (key, value) => {
+      const parts = key.split(':');
+      const sourceBoxId = parts[parts.length - 1];
+      if (sourceBoxId) out.push({ sourceBoxId, count: readU64(value) });
+    });
+    if (out.length > 0) return out;
+
+    // Fallback: aggregate via idx:src and inv counts
+    const totals = new Map<string, bigint>();
+    const pairs: Array<{ source: string; stackId: string }> = [];
+    await this.storage.scanPrefix(`idx:src:${uid}:`, (k) => {
+      // idx:src:{uid}:{source}:{stackId}
+      const parts = k.split(':');
+      const source = parts[3];
+      const stackId = parts[4];
+      if (source && stackId) pairs.push({ source, stackId });
+    });
+    for (const { source, stackId } of pairs) {
+      const inv = await this.storage.get(`inv:${uid}:${stackId}`);
+      const add = BigInt(readU32BE(inv as Buffer));
+      totals.set(source, (totals.get(source) ?? 0n) + add);
+    }
+    return Array.from(totals.entries()).map(([sourceBoxId, count]) => ({ sourceBoxId, count }));
   }
 }
