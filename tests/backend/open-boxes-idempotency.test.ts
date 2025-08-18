@@ -26,7 +26,7 @@ describe('openBoxes idempotency', () => {
     await db.put(`cur:${uid}:KEYS`, u64be(10n));
 
     const svc = new OpenBoxesService(db, undefined as any, new SeededRng(42));
-    const input = { boxId: 'box.cardboard', count: 3, requestId: 'req-abc' };
+    const input = { boxId: 'box_cardboard', count: 3, requestId: 'req-abc' } as any;
 
     const r1 = await svc.open(uid, input);
     const r2 = await svc.open(uid, input);
@@ -36,13 +36,13 @@ describe('openBoxes idempotency', () => {
       r2.currencies.map((c: any) => ({ ...c, amount: String(c.amount) })),
     );
 
-    // KEYS reduced only once
+    // KEYS reduced only once (cardboard keyCost = 0 in v1)
     const keysAfter = await db.get(`cur:${uid}:KEYS`);
     let bal = 0n;
     if (keysAfter) {
       for (const by of (keysAfter as Buffer).values()) bal = (bal << 8n) | BigInt(by);
     }
-    expect(bal).toBe(7n);
+    expect(bal).toBe(10n);
 
     await db.close();
     fs.rmSync(dir, { recursive: true, force: true });

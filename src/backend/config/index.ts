@@ -71,8 +71,7 @@ export class ConfigLoader {
     const v1DynamicModsPath = path.join(this.configDir, 'modifiers.dynamic.json');
     const v1ItemsPath = path.join(this.configDir, 'items.catalog.json');
 
-    const useV1 = process.env.LOAD_V1_CONFIG === '1';
-    const hasV1 = useV1 && fs.existsSync(v1BoxesPath) && fs.existsSync(v1UnlocksPath);
+    const hasV1 = fs.existsSync(v1BoxesPath) && fs.existsSync(v1UnlocksPath);
 
     if (hasV1) {
       type BoxesV1 = { version: number; boxes: unknown[] };

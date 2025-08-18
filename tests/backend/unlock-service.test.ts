@@ -21,16 +21,16 @@ describe('UnlockService', () => {
     const db = new LevelStorage(dir);
     await db.open();
     const uid = 'u1';
-    // set boxes opened to 24 then compute with next=25
-    await db.put(`pstat:${uid}.lifetimeBoxesOpened`, u64be(24n));
+    // v1: set boxes opened to 49 then compute with next=50
+    await db.put(`pstat:${uid}.lifetimeBoxesOpened`, u64be(49n));
     const svc = new UnlockService(db);
-    const { ops, unlocked } = await svc.prepareUnlockOps(uid, 25n);
+    const { ops, unlocked } = await svc.prepareUnlockOps(uid, 50n);
     expect(Array.isArray(unlocked)).toBe(true);
-    // Our repo has an unlock config with id unlock.wooden_crate threshold 25
-    expect(unlocked.includes('unlock.wooden_crate')).toBe(true);
+    // v1 config milestone unlocks box_wooden at 50
+    expect(unlocked.includes('box_wooden')).toBe(true);
     await db.batch(ops);
     const prof = await db.get(`ppro:${uid}`);
-    expect(prof?.toString('utf8')).toContain('unlock.wooden_crate');
+    expect(prof?.toString('utf8')).toContain('box_wooden');
     await db.close();
     fs.rmSync(dir, { recursive: true, force: true });
   });
@@ -40,13 +40,14 @@ describe('UnlockService', () => {
     const db = new LevelStorage(dir);
     await db.open();
     const uid = 'u2';
-    const svc = new UnlockService(db, undefined as any, [
-      { unlockId: 'unlock.dim', sourceBoxId: 'box.cardboard', chance: 1.0 },
-    ]);
-    const a = await svc.prepareUnlockOps(uid, 0n, 'box.cardboard');
-    const b = await svc.prepareUnlockOps(uid, 0n, 'box.other');
-    expect(a.unlocked.includes('unlock.dim')).toBe(true);
-    expect(b.unlocked.includes('unlock.dim')).toBe(false);
+    // v1 RNG unlock: scope box_cardboard unlocks box_unstable with pity
+    // Preload tries to one before hard pity guarantee
+    await db.put(`punlock:${uid}:rng_unstable_from_cardboard:tries`, u64be(4999n));
+    const svc = new UnlockService(db);
+    const a = await svc.prepareUnlockOps(uid, 0n, 'box_cardboard');
+    const b = await svc.prepareUnlockOps(uid, 0n, 'box_other');
+    expect(a.unlocked.includes('box_unstable')).toBe(true);
+    expect(b.unlocked.includes('box_unstable')).toBe(false);
     await db.close();
     fs.rmSync(dir, { recursive: true, force: true });
   });

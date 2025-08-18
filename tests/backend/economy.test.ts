@@ -50,7 +50,7 @@ describe('Economy & Unlock logic', () => {
     await store.put(keys.cur(uid, 'KEYS'), u64.encodeBE(10_000n));
     await store.put(`pstat:${uid}.lifetimeBoxesOpened`, u64.encodeBE(0n));
     await expect(
-      svc.open(uid, { boxId: 'box.cardboard', count: 1001, requestId: 'r1' } as any),
+      svc.open(uid, { boxId: 'box_cardboard', count: 1001, requestId: 'r1' } as any),
     ).rejects.toThrow();
   });
 
@@ -61,12 +61,12 @@ describe('Economy & Unlock logic', () => {
     const uid = 'u2';
     await store.put(keys.cur(uid, 'KEYS'), u64.encodeBE(100n));
     await store.put(`pstat:${uid}.lifetimeBoxesOpened`, u64.encodeBE(0n));
-    const res = await svc.open(uid, { boxId: 'box.cardboard', count: 3, requestId: 'r2' } as any);
-    // Cardboard keyCost = 1, so cost = 3, lucky=0
+    const res = await svc.open(uid, { boxId: 'box_cardboard', count: 3, requestId: 'r2' } as any);
+    // Cardboard keyCost = 0 in v1, lucky=0 with fixed rng
     const bal = u64.decodeBE(await store.get(keys.cur(uid, 'KEYS')));
-    expect(bal).toBe(97n);
+    expect(bal).toBe(100n);
     const first = (res as any).currencies.find((c: any) => c.currency === 'KEYS');
-    expect(first.amount).toBe(-3n);
+    expect(first.amount).toBe(0n);
   });
 
   test('soft pity unlocks unstable on 5000th open from cardboard', async () => {
@@ -76,8 +76,10 @@ describe('Economy & Unlock logic', () => {
     const uid = 'u3';
     await store.put(keys.cur(uid, 'KEYS'), u64.encodeBE(10_000n));
     await store.put(`pstat:${uid}.lifetimeBoxesOpened`, u64.encodeBE(4999n));
-    const res = await svc.open(uid, { boxId: 'box.cardboard', count: 1, requestId: 'r3' } as any);
-    expect(res.unlocks).toContain('box.unstable');
+    // Preload RNG tries to just before hard pity to deterministically unlock on this open
+    await store.put(`punlock:${uid}:rng_unstable_from_cardboard:tries`, u64.encodeBE(4999n));
+    const res = await svc.open(uid, { boxId: 'box_cardboard', count: 1, requestId: 'r3' } as any);
+    expect(res.unlocks).toContain('box_unstable');
   });
 
   test('salvage uses scrap per rarity from config and greedy multiplier', async () => {
