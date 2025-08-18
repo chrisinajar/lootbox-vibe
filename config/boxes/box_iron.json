@@ -1,0 +1,21 @@
+{
+  "id": "box_iron",
+  "name": "Iron Chest",
+  "tier": 3,
+  "keyCost": 20,
+  "forbidSelfDrop": true,
+  "dropTable": {
+    "rolls": 1,
+    "entries": [
+      { "type": "ITEM", "weight": 3800, "itemId": "itm_gilded_spoon", "rarity": "UNCOMMON", "staticModsPool": ["m_shiny", "m_rainbow_text", "m_scrap_boost_3"] },
+      { "type": "ITEM", "weight": 900,  "itemId": "itm_pocket_portal", "rarity": "RARE", "staticModsPool": ["m_key_boost_2", "m_duplicate_self_1"] },
+      { "type": "ITEM", "weight": 180,  "itemId": "itm_heroic_sticker", "rarity": "EPIC", "staticModsPool": ["m_tiny_chance_rare", "m_glitter_border"] },
+
+      { "type": "CURRENCY", "weight": 800, "currency": "KEYS", "amount": { "min": 2, "max": 3 } },
+      { "type": "MATERIAL", "weight": 320, "materialId": "mat_scrap_chunk", "amount": { "min": 4, "max": 8 } },
+
+      { "type": "BOX", "weight": 200, "boxId": "box_wooden", "count": { "min": 1, "max": 2 } }
+    ]
+  }
+}
+

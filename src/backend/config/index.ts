@@ -26,15 +26,9 @@ export class ConfigLoader {
 
     // Load schemas
     const schemas = {
-      // legacy
-      boxesLegacy: readJson(path.join(schemaDir, 'boxes.schema.json')),
-      modifiersLegacy: readJson(path.join(schemaDir, 'modifiers.schema.json')),
-      unlocksLegacy: readJson(path.join(schemaDir, 'unlocks.schema.json')),
-      idleLegacy: readJson(path.join(schemaDir, 'flavor.schema.json')),
-      itemsLegacy: readJson(path.join(schemaDir, 'items.schema.json')),
-      economyLegacy: readJson(path.join(schemaDir, 'economy.schema.json')),
       // v1 pack
       boxesV1: readJson(path.join(schemaDir, 'boxes.v1.schema.json')),
+      boxV1: readJson(path.join(schemaDir, 'box.v1.schema.json')),
       modifiersStaticV1: readJson(path.join(schemaDir, 'modifiers.static.v1.schema.json')),
       modifiersDynamicV1: readJson(path.join(schemaDir, 'modifiers.dynamic.v1.schema.json')),
       unlocksV1: readJson(path.join(schemaDir, 'unlocks.v1.schema.json')),
@@ -44,15 +38,9 @@ export class ConfigLoader {
     } as const;
 
     const validators = {
-      // legacy
-      box: this.ajv.compile(schemas.boxesLegacy.definitions.box),
-      modifiers: this.ajv.compile(schemas.modifiersLegacy),
-      unlock: this.ajv.compile(schemas.unlocksLegacy.definitions.unlock),
-      idle: this.ajv.compile(schemas.idleLegacy),
-      items: this.ajv.compile(schemas.itemsLegacy),
-      economy: this.ajv.compile(schemas.economyLegacy),
       // v1 pack
       boxesV1: this.ajv.compile(schemas.boxesV1),
+      boxV1: this.ajv.compile(schemas.boxV1),
       modifiersStaticV1: this.ajv.compile(schemas.modifiersStaticV1),
       modifiersDynamicV1: this.ajv.compile(schemas.modifiersDynamicV1),
       unlocksV1: this.ajv.compile(schemas.unlocksV1),
@@ -64,6 +52,7 @@ export class ConfigLoader {
     // Load data
     // Detect v1 content pack files
     const v1BoxesPath = path.join(this.configDir, 'boxes.json');
+    const v1BoxesDir = path.join(this.configDir, 'boxes');
     const v1UnlocksPath = path.join(this.configDir, 'unlocks.json');
     const v1EconomyPath = path.join(this.configDir, 'economy.json');
     const v1IdlePath = path.join(this.configDir, 'idle.json');
@@ -71,7 +60,7 @@ export class ConfigLoader {
     const v1DynamicModsPath = path.join(this.configDir, 'modifiers.dynamic.json');
     const v1ItemsPath = path.join(this.configDir, 'items.catalog.json');
 
-    const hasV1 = fs.existsSync(v1BoxesPath) && fs.existsSync(v1UnlocksPath);
+    const hasV1 = (fs.existsSync(v1BoxesPath) || fs.existsSync(v1BoxesDir)) && fs.existsSync(v1UnlocksPath);
 
     if (hasV1) {
       type BoxesV1 = { version: number; boxes: unknown[] };
@@ -82,7 +71,7 @@ export class ConfigLoader {
       type ModsDynamicV1 = { version: number; modifiers: unknown[] };
       type ItemsV1 = { version: number; items: unknown[] };
 
-      const boxesBlob: unknown = readJson(v1BoxesPath);
+      const boxesBlob: unknown = fs.existsSync(v1BoxesPath) ? readJson(v1BoxesPath) : undefined;
       const unlocksBlob: unknown = readJson(v1UnlocksPath);
       const economyBlob: unknown = fs.existsSync(v1EconomyPath) ? readJson(v1EconomyPath) : {};
       const idleBlob: unknown = fs.existsSync(v1IdlePath) ? readJson(v1IdlePath) : {};
@@ -96,8 +85,26 @@ export class ConfigLoader {
         ? readJson(v1ItemsPath)
         : { version: 1, items: [] };
 
-      if (!validators.boxesV1(boxesBlob))
-        throw new Error('Invalid boxes v1: ' + JSON.stringify(validators.boxesV1.errors));
+      let boxes: unknown[] = [];
+      let boxesVersion: number | undefined;
+      if (boxesBlob) {
+        if (!validators.boxesV1(boxesBlob))
+          throw new Error('Invalid boxes v1: ' + JSON.stringify(validators.boxesV1.errors));
+        const bb = boxesBlob as { version: number; boxes: unknown[] };
+        boxes = bb.boxes;
+        boxesVersion = bb.version;
+      } else {
+        // folder form
+        const files = fs.existsSync(v1BoxesDir)
+          ? fs.readdirSync(v1BoxesDir).filter((f) => f.endsWith('.json'))
+          : [];
+        for (const f of files) {
+          const obj = readJson(path.join(v1BoxesDir, f));
+          if (!validators.boxV1(obj)) throw new Error('Invalid box in config/boxes: ' + f);
+          boxes.push(obj);
+        }
+        if (boxes.length === 0) throw new Error('No boxes config found');
+      }
       if (!validators.unlocksV1(unlocksBlob))
         throw new Error('Invalid unlocks v1: ' + JSON.stringify(validators.unlocksV1.errors));
       if (!validators.economyV1(economyBlob))
@@ -115,7 +122,6 @@ export class ConfigLoader {
       if (!validators.itemsV1(itemsBlob))
         throw new Error('Invalid items v1: ' + JSON.stringify(validators.itemsV1.errors));
 
-      const b = boxesBlob as BoxesV1;
       const u = unlocksBlob as UnlocksV1;
       const e = economyBlob as EconomyV1;
       const i = idleBlob as IdleV1;
@@ -124,7 +130,7 @@ export class ConfigLoader {
       const it = itemsBlob as ItemsV1;
 
       const versionNums = [
-        b.version,
+        boxesVersion,
         (u as any).version,
         (e as any).version,
         (i as any).version,
@@ -134,7 +140,7 @@ export class ConfigLoader {
       ].filter((v) => typeof v === 'number') as number[];
 
       return {
-        boxes: b.boxes,
+        boxes,
         unlocks: u,
         modifiers: { static: ms.modifiers, dynamic: md.modifiers },
         idle: i,
@@ -143,54 +149,6 @@ export class ConfigLoader {
         configVersion: versionNums.length ? Math.max(...versionNums) : 1,
       };
     }
-
-    // Legacy folder-based configs
-    const boxesDir = path.join(this.configDir, 'boxes');
-    const unlocksDir = path.join(this.configDir, 'unlocks');
-    const modifiersDir = path.join(this.configDir, 'modifiers');
-    const idleDir = path.join(this.configDir, 'idle');
-    const economyDir = path.join(this.configDir, 'economy');
-
-    const boxes = fs
-      .readdirSync(boxesDir)
-      .filter((f) => f.endsWith('.json'))
-      .map((f) => readJson(path.join(boxesDir, f)));
-
-    const unlocks = fs
-      .readdirSync(unlocksDir)
-      .filter((f) => f.endsWith('.json'))
-      .map((f) => readJson(path.join(unlocksDir, f)));
-
-    const modsStatic = readJson(path.join(modifiersDir, 'static.json'));
-    const modsDynamic = readJson(path.join(modifiersDir, 'dynamic.json'));
-    const modifiers = { static: modsStatic, dynamic: modsDynamic } as any;
-
-    const idle = readJson(path.join(idleDir, 'flavor.json'));
-    const economy = readJson(path.join(economyDir, 'economy.json'));
-
-    // Validate legacy
-    for (const b of boxes) {
-      if (!validators.box(b))
-        throw new Error('Invalid box config: ' + JSON.stringify(validators.box.errors));
-    }
-    for (const u of unlocks) {
-      if (!validators.unlock(u))
-        throw new Error('Invalid unlock: ' + JSON.stringify(validators.unlock.errors));
-    }
-    if (!validators.modifiers(modifiers))
-      throw new Error('Invalid modifiers: ' + JSON.stringify(validators.modifiers.errors));
-    if (!validators.idle(idle))
-      throw new Error('Invalid idle config: ' + JSON.stringify(validators.idle.errors));
-    if (!validators.economy(economy))
-      throw new Error('Invalid economy config: ' + JSON.stringify(validators.economy.errors));
-
-    return {
-      boxes,
-      unlocks,
-      modifiers: modifiers as { static?: unknown[]; dynamic?: unknown[] },
-      idle,
-      economy,
-      configVersion: 1,
-    };
+    throw new Error('v1 configs not found');
   }
 }

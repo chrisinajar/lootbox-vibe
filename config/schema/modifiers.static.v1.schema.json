@@ -30,7 +30,17 @@
             "additionalProperties": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "not": {
+              "allOf": [
+                { "properties": { "category": { "const": "COSMETIC" } } },
+                { "properties": { "effect": {} }, "required": ["effect"] }
+              ]
+            }
+          }
+        ]
       }
     }
   },

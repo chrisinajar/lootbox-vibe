@@ -13,15 +13,17 @@ describe('Modifiers schema validation', () => {
     const schemaDir = path.resolve(process.cwd(), 'config/schema');
     const ajv = new Ajv2020({ allErrors: true, strict: true });
     addFormats(ajv);
-    const schema = readJson(path.join(schemaDir, 'modifiers.schema.json'));
+    const schema = readJson(path.join(schemaDir, 'modifiers.static.v1.schema.json'));
     const validate = ajv.compile(schema);
 
-    const good = { static: [{ id: 'm.cos', category: 'COSMETIC', desc: 'skin' }], dynamic: [] };
+    const good = { version: 1, modifiers: [{ id: 'm.cos', name: 'Cos', category: 'COSMETIC' }] };
     expect(validate(good)).toBe(true);
 
     const bad = {
-      static: [{ id: 'm.bad', category: 'COSMETIC', economic: { scrapYieldMult: 0.1 } }],
-      dynamic: [],
+      version: 1,
+      modifiers: [
+        { id: 'm.bad', name: 'Bad', category: 'COSMETIC', effect: { type: 'SCRAP_MULTIPLIER', valuePct: 1 } },
+      ],
     };
     expect(ajv.validate(schema, bad)).toBe(false);
   });

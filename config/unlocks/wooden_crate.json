@@ -1,5 +1,0 @@
-{
-  "id": "unlock.wooden_crate",
-  "name": "Wooden crate",
-  "requires": { "boxesOpened": 25 }
-}
