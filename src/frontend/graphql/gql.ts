@@ -20,6 +20,7 @@ type Documents = {
     "query InventorySummary {\n  inventorySummary {\n    totalStacks\n    totalItems\n    byRarity {\n      rarity\n      count\n    }\n    byType {\n      typeId\n      count\n    }\n  }\n}": typeof types.InventorySummaryDocument,
     "mutation OpenBoxes($input: OpenBoxesInput!) {\n  openBoxes(input: $input) {\n    stacks {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    currencies {\n      currency\n      amount\n    }\n    unlocks\n  }\n}": typeof types.OpenBoxesDocument,
     "mutation Salvage($input: SalvageInput!) {\n  salvage(input: $input) {\n    scrapped {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    currencies {\n      currency\n      amount\n    }\n  }\n}": typeof types.SalvageDocument,
+    "query Shop {\n  shop {\n    upgrades {\n      id\n      name\n      desc\n      costScrap\n      purchased\n    }\n    exchange {\n      id\n      from\n      to\n      rateFrom\n      rateTo\n      mintedToday\n      dailyCapTo\n    }\n  }\n}\n\nmutation PurchaseUpgrade($input: PurchaseUpgradeInput!) {\n  purchaseUpgrade(input: $input) {\n    upgrades {\n      id\n      purchased\n    }\n    exchange {\n      mintedToday\n    }\n  }\n}\n\nmutation ExchangeScrapToKeys($input: ExchangeInput!) {\n  exchangeScrapToKeys(input: $input) {\n    exchange {\n      mintedToday\n    }\n  }\n}": typeof types.ShopDocument,
     "query UnlockedBoxes {\n  unlockedBoxes\n}": typeof types.UnlockedBoxesDocument,
 };
 const documents: Documents = {
@@ -29,6 +30,7 @@ const documents: Documents = {
     "query InventorySummary {\n  inventorySummary {\n    totalStacks\n    totalItems\n    byRarity {\n      rarity\n      count\n    }\n    byType {\n      typeId\n      count\n    }\n  }\n}": types.InventorySummaryDocument,
     "mutation OpenBoxes($input: OpenBoxesInput!) {\n  openBoxes(input: $input) {\n    stacks {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    currencies {\n      currency\n      amount\n    }\n    unlocks\n  }\n}": types.OpenBoxesDocument,
     "mutation Salvage($input: SalvageInput!) {\n  salvage(input: $input) {\n    scrapped {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    currencies {\n      currency\n      amount\n    }\n  }\n}": types.SalvageDocument,
+    "query Shop {\n  shop {\n    upgrades {\n      id\n      name\n      desc\n      costScrap\n      purchased\n    }\n    exchange {\n      id\n      from\n      to\n      rateFrom\n      rateTo\n      mintedToday\n      dailyCapTo\n    }\n  }\n}\n\nmutation PurchaseUpgrade($input: PurchaseUpgradeInput!) {\n  purchaseUpgrade(input: $input) {\n    upgrades {\n      id\n      purchased\n    }\n    exchange {\n      mintedToday\n    }\n  }\n}\n\nmutation ExchangeScrapToKeys($input: ExchangeInput!) {\n  exchangeScrapToKeys(input: $input) {\n    exchange {\n      mintedToday\n    }\n  }\n}": types.ShopDocument,
     "query UnlockedBoxes {\n  unlockedBoxes\n}": types.UnlockedBoxesDocument,
 };
 
@@ -70,6 +72,10 @@ export function gql(source: "mutation OpenBoxes($input: OpenBoxesInput!) {\n  op
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation Salvage($input: SalvageInput!) {\n  salvage(input: $input) {\n    scrapped {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    currencies {\n      currency\n      amount\n    }\n  }\n}"): (typeof documents)["mutation Salvage($input: SalvageInput!) {\n  salvage(input: $input) {\n    scrapped {\n      stackId\n      typeId\n      rarity\n      count\n    }\n    currencies {\n      currency\n      amount\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query Shop {\n  shop {\n    upgrades {\n      id\n      name\n      desc\n      costScrap\n      purchased\n    }\n    exchange {\n      id\n      from\n      to\n      rateFrom\n      rateTo\n      mintedToday\n      dailyCapTo\n    }\n  }\n}\n\nmutation PurchaseUpgrade($input: PurchaseUpgradeInput!) {\n  purchaseUpgrade(input: $input) {\n    upgrades {\n      id\n      purchased\n    }\n    exchange {\n      mintedToday\n    }\n  }\n}\n\nmutation ExchangeScrapToKeys($input: ExchangeInput!) {\n  exchangeScrapToKeys(input: $input) {\n    exchange {\n      mintedToday\n    }\n  }\n}"): (typeof documents)["query Shop {\n  shop {\n    upgrades {\n      id\n      name\n      desc\n      costScrap\n      purchased\n    }\n    exchange {\n      id\n      from\n      to\n      rateFrom\n      rateTo\n      mintedToday\n      dailyCapTo\n    }\n  }\n}\n\nmutation PurchaseUpgrade($input: PurchaseUpgradeInput!) {\n  purchaseUpgrade(input: $input) {\n    upgrades {\n      id\n      purchased\n    }\n    exchange {\n      mintedToday\n    }\n  }\n}\n\nmutation ExchangeScrapToKeys($input: ExchangeInput!) {\n  exchangeScrapToKeys(input: $input) {\n    exchange {\n      mintedToday\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

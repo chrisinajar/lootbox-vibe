@@ -21,6 +21,7 @@ type Query {
   currencies: [CurrencyBalance!]!
   unlockedBoxes: [ID!]!
   collectionLog: CollectionLog!
+  shop: ShopState!
 }
 
 input OpenBoxesInput { boxId: ID!, count: Int!, requestId: ID! }
@@ -62,3 +63,14 @@ type CollectionItem {
 }
 type CountProgress { key: ID!, discovered: Int!, total: Int! }
 type CollectionLog { items: [CollectionItem!]!, byRarity: [CountProgress!]!, byType: [CountProgress!]! }
+
+# Shop & upgrades
+type Upgrade { id: ID!, name: String!, desc: String!, costScrap: Int!, purchased: Boolean! }
+type ExchangeInfo { id: ID!, from: ID!, to: ID!, rateFrom: Int!, rateTo: Int!, mintedToday: Int!, dailyCapTo: Int! }
+type ShopState { upgrades: [Upgrade!]!, exchange: ExchangeInfo! }
+
+input PurchaseUpgradeInput { upgradeId: ID! }
+extend type Mutation { purchaseUpgrade(input: PurchaseUpgradeInput!): ShopState! }
+
+input ExchangeInput { toAmount: Int! }
+extend type Mutation { exchangeScrapToKeys(input: ExchangeInput!): ShopState! }

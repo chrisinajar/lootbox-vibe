@@ -16,6 +16,7 @@ import { buildContext } from './api/context';
 import { OpenBoxesService } from './services/OpenBoxesService';
 import { SalvageService } from './services/SalvageService';
 import { IdleSvc } from './services/IdleSvc';
+import { ShopService } from './services/ShopService';
 import { TelemetryService } from './services/TelemetryService';
 import { CurrencyService } from './services/CurrencyService';
 
@@ -44,6 +45,7 @@ export async function initializeServer(options: InitOptions = {}) {
   const openSvc = new OpenBoxesService(storage);
   const salvageSvc = new SalvageService(storage);
   const idleSvc = new IdleSvc();
+  const shopSvc = new ShopService(storage, new CurrencyService(storage));
   const elogPath = process.env.ELOG_PATH;
   const elogEnabled = process.env.ELOG_ENABLED !== '0' && Boolean(elogPath);
   const telemetry = new TelemetryService({ outPath: elogPath, enabled: elogEnabled });
@@ -209,6 +211,11 @@ export async function initializeServer(options: InitOptions = {}) {
         }
         return 'disabled';
       },
+      shop: async (_: any, __: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const res = await shopSvc.getShop(uid);
+        return res;
+      },
     },
     Mutation: {
       openBoxes: async (_: any, { input }: any, ctx: any) => {
@@ -249,6 +256,17 @@ export async function initializeServer(options: InitOptions = {}) {
           res,
         );
         await telemetry.write(entry);
+        return res;
+      },
+      purchaseUpgrade: async (_: any, { input }: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const res = await shopSvc.purchase(uid, String(input?.upgradeId));
+        return res;
+      },
+      exchangeScrapToKeys: async (_: any, { input }: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const toAmount = Number(input?.toAmount ?? 0);
+        const res = await shopSvc.exchange(uid, toAmount);
         return res;
       },
     },

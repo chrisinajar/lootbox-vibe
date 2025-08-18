@@ -71,6 +71,21 @@ export type CurrencyBalance = {
   currency: Scalars['ID']['output'];
 };
 
+export type ExchangeInfo = {
+  __typename?: 'ExchangeInfo';
+  dailyCapTo: Scalars['Int']['output'];
+  from: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  mintedToday: Scalars['Int']['output'];
+  rateFrom: Scalars['Int']['output'];
+  rateTo: Scalars['Int']['output'];
+  to: Scalars['ID']['output'];
+};
+
+export type ExchangeInput = {
+  toAmount: Scalars['Int']['input'];
+};
+
 export type IdleReport = {
   __typename?: 'IdleReport';
   boxesOpened: Scalars['Int']['output'];
@@ -105,7 +120,9 @@ export type ItemStack = {
 export type Mutation = {
   __typename?: 'Mutation';
   claimIdle: IdleReport;
+  exchangeScrapToKeys: ShopState;
   openBoxes: Rewards;
+  purchaseUpgrade: ShopState;
   salvage: SalvageResult;
 };
 
@@ -115,8 +132,18 @@ export type MutationClaimIdleArgs = {
 };
 
 
+export type MutationExchangeScrapToKeysArgs = {
+  input: ExchangeInput;
+};
+
+
 export type MutationOpenBoxesArgs = {
   input: OpenBoxesInput;
+};
+
+
+export type MutationPurchaseUpgradeArgs = {
+  input: PurchaseUpgradeInput;
 };
 
 
@@ -136,6 +163,10 @@ export type PageItemStacks = {
   rows: Array<ItemStack>;
 };
 
+export type PurchaseUpgradeInput = {
+  upgradeId: Scalars['ID']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   collectionLog: CollectionLog;
@@ -143,6 +174,7 @@ export type Query = {
   currencies: Array<CurrencyBalance>;
   inventoryList: PageItemStacks;
   inventorySummary: InventorySummary;
+  shop: ShopState;
   unlockedBoxes: Array<Scalars['ID']['output']>;
 };
 
@@ -195,6 +227,21 @@ export type SalvageResult = {
   scrapped: Array<RewardStack>;
 };
 
+export type ShopState = {
+  __typename?: 'ShopState';
+  exchange: ExchangeInfo;
+  upgrades: Array<Upgrade>;
+};
+
+export type Upgrade = {
+  __typename?: 'Upgrade';
+  costScrap: Scalars['Int']['output'];
+  desc: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  purchased: Scalars['Boolean']['output'];
+};
+
 export type CollectionLogQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -233,6 +280,25 @@ export type SalvageMutationVariables = Exact<{
 
 export type SalvageMutation = { __typename?: 'Mutation', salvage: { __typename?: 'SalvageResult', scrapped: Array<{ __typename?: 'RewardStack', stackId: string, typeId: string, rarity: Rarity, count: number }>, currencies: Array<{ __typename?: 'RewardCurrency', currency: string, amount: any }> } };
 
+export type ShopQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ShopQuery = { __typename?: 'Query', shop: { __typename?: 'ShopState', upgrades: Array<{ __typename?: 'Upgrade', id: string, name: string, desc: string, costScrap: number, purchased: boolean }>, exchange: { __typename?: 'ExchangeInfo', id: string, from: string, to: string, rateFrom: number, rateTo: number, mintedToday: number, dailyCapTo: number } } };
+
+export type PurchaseUpgradeMutationVariables = Exact<{
+  input: PurchaseUpgradeInput;
+}>;
+
+
+export type PurchaseUpgradeMutation = { __typename?: 'Mutation', purchaseUpgrade: { __typename?: 'ShopState', upgrades: Array<{ __typename?: 'Upgrade', id: string, purchased: boolean }>, exchange: { __typename?: 'ExchangeInfo', mintedToday: number } } };
+
+export type ExchangeScrapToKeysMutationVariables = Exact<{
+  input: ExchangeInput;
+}>;
+
+
+export type ExchangeScrapToKeysMutation = { __typename?: 'Mutation', exchangeScrapToKeys: { __typename?: 'ShopState', exchange: { __typename?: 'ExchangeInfo', mintedToday: number } } };
+
 export type UnlockedBoxesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -245,4 +311,7 @@ export const InventoryListDocument = {"kind":"Document","definitions":[{"kind":"
 export const InventorySummaryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InventorySummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inventorySummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalStacks"}},{"kind":"Field","name":{"kind":"Name","value":"totalItems"}},{"kind":"Field","name":{"kind":"Name","value":"byRarity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"byType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]}}]} as unknown as DocumentNode<InventorySummaryQuery, InventorySummaryQueryVariables>;
 export const OpenBoxesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"OpenBoxes"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OpenBoxesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"openBoxes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stacks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stackId"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currencies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"unlocks"}}]}}]}}]} as unknown as DocumentNode<OpenBoxesMutation, OpenBoxesMutationVariables>;
 export const SalvageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Salvage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SalvageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"salvage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scrapped"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stackId"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currencies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]}}]} as unknown as DocumentNode<SalvageMutation, SalvageMutationVariables>;
+export const ShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Shop"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upgrades"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"costScrap"}},{"kind":"Field","name":{"kind":"Name","value":"purchased"}}]}},{"kind":"Field","name":{"kind":"Name","value":"exchange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"rateFrom"}},{"kind":"Field","name":{"kind":"Name","value":"rateTo"}},{"kind":"Field","name":{"kind":"Name","value":"mintedToday"}},{"kind":"Field","name":{"kind":"Name","value":"dailyCapTo"}}]}}]}}]}}]} as unknown as DocumentNode<ShopQuery, ShopQueryVariables>;
+export const PurchaseUpgradeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PurchaseUpgrade"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PurchaseUpgradeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"purchaseUpgrade"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upgrades"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"purchased"}}]}},{"kind":"Field","name":{"kind":"Name","value":"exchange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mintedToday"}}]}}]}}]}}]} as unknown as DocumentNode<PurchaseUpgradeMutation, PurchaseUpgradeMutationVariables>;
+export const ExchangeScrapToKeysDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ExchangeScrapToKeys"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ExchangeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exchangeScrapToKeys"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"exchange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mintedToday"}}]}}]}}]}}]} as unknown as DocumentNode<ExchangeScrapToKeysMutation, ExchangeScrapToKeysMutationVariables>;
 export const UnlockedBoxesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UnlockedBoxes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unlockedBoxes"}}]}}]} as unknown as DocumentNode<UnlockedBoxesQuery, UnlockedBoxesQueryVariables>;

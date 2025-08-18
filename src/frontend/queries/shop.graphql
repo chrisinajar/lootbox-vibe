@@ -1,0 +1,15 @@
+query Shop {
+  shop {
+    upgrades { id name desc costScrap purchased }
+    exchange { id from to rateFrom rateTo mintedToday dailyCapTo }
+  }
+}
+
+mutation PurchaseUpgrade($input: PurchaseUpgradeInput!) {
+  purchaseUpgrade(input: $input) { upgrades { id purchased } exchange { mintedToday } }
+}
+
+mutation ExchangeScrapToKeys($input: ExchangeInput!) {
+  exchangeScrapToKeys(input: $input) { exchange { mintedToday } }
+}
+
