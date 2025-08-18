@@ -35,6 +35,13 @@ export type CountByType = {
   typeId: Scalars['ID']['output'];
 };
 
+export type InventoryFilter = {
+  curatedTags?: InputMaybe<Array<Scalars['ID']['input']>>;
+  rarity?: InputMaybe<Rarity>;
+  sourceBoxId?: InputMaybe<Scalars['ID']['input']>;
+  typeId?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type InventorySummary = {
   __typename?: 'InventorySummary';
   byRarity: Array<CountByRarity>;
@@ -42,6 +49,14 @@ export type InventorySummary = {
   byType: Array<CountByType>;
   totalItems: Scalars['BigInt']['output'];
   totalStacks: Scalars['Int']['output'];
+};
+
+export type ItemStack = {
+  __typename?: 'ItemStack';
+  count: Scalars['Int']['output'];
+  rarity: Rarity;
+  stackId: Scalars['ID']['output'];
+  typeId: Scalars['ID']['output'];
 };
 
 export type Mutation = {
@@ -66,10 +81,24 @@ export type OpenBoxesInput = {
   requestId: Scalars['ID']['input'];
 };
 
+export type PageItemStacks = {
+  __typename?: 'PageItemStacks';
+  nextCursor?: Maybe<Scalars['ID']['output']>;
+  rows: Array<ItemStack>;
+};
+
 export type Query = {
   __typename?: 'Query';
   configHash: Scalars['String']['output'];
+  inventoryList: PageItemStacks;
   inventorySummary: InventorySummary;
+};
+
+
+export type QueryInventoryListArgs = {
+  cursor?: InputMaybe<Scalars['ID']['input']>;
+  filter?: InputMaybe<InventoryFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export enum Rarity {

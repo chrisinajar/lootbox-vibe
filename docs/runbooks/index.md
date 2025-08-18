@@ -22,3 +22,5 @@ Runbooks:
 - docs-verify: Keep markdown linters/link checks green — when verify breaks on style or network.
 - env-dotenv: Standardize environment configuration via dotenv — when adding env vars or debugging env loading.
 - telemetry-elog: Capture per-request telemetry in JSONL — when instrumenting new operations or analyzing performance.
+- inventory-list-readpath: Implement and extend inventory list with cursors and facets — when adding filters or debugging pagination.
+- storage-index-keys: Index key shapes and 0↔>0 maintenance — when adding new indexes or debugging drift.

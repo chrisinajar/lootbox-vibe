@@ -10,6 +10,7 @@ import { BigIntResolver } from 'graphql-scalars';
 import { LevelStorage } from './storage/LevelStorage';
 import { SummariesRepo } from './services/SummariesRepo';
 import { InventorySummaryService } from './services/InventorySummaryService';
+import { InventoryListService } from './services/InventoryListService';
 import { ConfigService } from './services/ConfigService';
 import { buildContext } from './api/context';
 import { OpenBoxesService } from './services/OpenBoxesService';
@@ -37,6 +38,7 @@ export async function initializeServer(options: InitOptions = {}) {
   await storage.open();
   const summariesRepo = new SummariesRepo(storage);
   const summarySvc = new InventorySummaryService(summariesRepo);
+  const listSvc = new InventoryListService(storage);
   const openSvc = new OpenBoxesService(storage);
   const salvageSvc = new SalvageService(storage);
   const elogPath = process.env.ELOG_PATH;
@@ -54,6 +56,20 @@ export async function initializeServer(options: InitOptions = {}) {
         const res = await summarySvc.getSummary(uid);
         const entry = telemetry.buildEntry(
           'inventorySummary',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          res,
+        );
+        await telemetry.write(entry);
+        return res;
+      },
+      inventoryList: async (_: any, { filter, limit, cursor }: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const started = Date.now();
+        const res = await listSvc.list(uid, filter, limit, cursor ?? undefined);
+        const entry = telemetry.buildEntry(
+          'inventoryList',
           uid,
           ctx?.reqId ?? 'n/a',
           Date.now() - started,

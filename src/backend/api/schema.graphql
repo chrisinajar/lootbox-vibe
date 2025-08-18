@@ -16,6 +16,7 @@ type InventorySummary {
 
 type Query {
   inventorySummary: InventorySummary!
+  inventoryList(filter: InventoryFilter, limit: Int = 100, cursor: ID): PageItemStacks!
   configHash: String!
 }
 
@@ -31,3 +32,8 @@ input SalvageInput { maxRarity: Rarity!, typeIds: [ID!], staticModIds: [ID!] }
 type SalvageResult { scrapped: [RewardStack!]!, currencies: [RewardCurrency!]! }
 
 extend type Mutation { salvage(input: SalvageInput!): SalvageResult! }
+
+# Inventory list types
+input InventoryFilter { rarity: Rarity, typeId: ID, sourceBoxId: ID, curatedTags: [ID!] }
+type ItemStack { stackId: ID!, typeId: ID!, rarity: Rarity!, count: Int! }
+type PageItemStacks { rows: [ItemStack!]!, nextCursor: ID }
