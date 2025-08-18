@@ -2,6 +2,7 @@ import React from 'react';
 import { InventoryOverview, OpenResultsPanel } from '../main';
 import { UserSwitcherBadge } from './UserSwitcherBadge';
 import { useTheme } from './theme/ThemeProvider';
+import { HomeMain } from './home/Home';
 
 function useHashPath() {
   const [path, setPath] = React.useState<string>(() => window.location.hash.slice(1) || '/');
@@ -52,9 +53,7 @@ const HomeShell: React.FC = () => {
         </button>
       </header>
       <main className="space-y-4">
-        <div className="rounded border p-4 panel">
-          <p>Home screen coming in next parts.</p>
-        </div>
+        <HomeMain />
       </main>
       {ENABLE_DEV_UI && (
         <a

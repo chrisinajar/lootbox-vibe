@@ -17,6 +17,7 @@ import { OpenBoxesService } from './services/OpenBoxesService';
 import { SalvageService } from './services/SalvageService';
 import { IdleSvc } from './services/IdleSvc';
 import { TelemetryService } from './services/TelemetryService';
+import { CurrencyService } from './services/CurrencyService';
 
 type InitOptions = {
   port?: number;
@@ -48,6 +49,7 @@ export async function initializeServer(options: InitOptions = {}) {
   const telemetry = new TelemetryService({ outPath: elogPath, enabled: elogEnabled });
 
   const configSvc = new ConfigService();
+  const currencySvc = new CurrencyService(storage);
 
   const resolvers = {
     BigInt: BigIntResolver,
@@ -65,6 +67,50 @@ export async function initializeServer(options: InitOptions = {}) {
         );
         await telemetry.write(entry);
         return res;
+      },
+      currencies: async (_: any, __: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const started = Date.now();
+        const keys = await currencySvc.getBalance(uid, 'KEYS');
+        const scrap = await currencySvc.getBalance(uid, 'SCRAP');
+        const glitter = await currencySvc.getBalance(uid, 'GLITTER');
+        const res = [
+          { currency: 'KEYS', amount: keys },
+          { currency: 'SCRAP', amount: scrap },
+          { currency: 'GLITTER', amount: glitter },
+        ];
+        const entry = telemetry.buildEntry(
+          'currencies',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          res,
+        );
+        await telemetry.write(entry);
+        return res;
+      },
+      unlockedBoxes: async (_: any, __: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const started = Date.now();
+        const key = `ppro:${uid}`;
+        const buf = await storage.get(key);
+        let boxes: string[] = [];
+        if (buf) {
+          try {
+            const parsed = JSON.parse(String(buf));
+            if (Array.isArray(parsed.unlockedBoxIds)) boxes = parsed.unlockedBoxIds.map(String);
+          } catch {}
+        }
+        if (boxes.length === 0) boxes = ['box.cardboard'];
+        const entry = telemetry.buildEntry(
+          'unlockedBoxes',
+          uid,
+          ctx?.reqId ?? 'n/a',
+          Date.now() - started,
+          boxes,
+        );
+        await telemetry.write(entry);
+        return boxes;
       },
       inventoryList: async (_: any, { filter, limit, cursor }: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';

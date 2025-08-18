@@ -6,6 +6,7 @@
     "baseUrl": ".",
     "lib": ["ES2022", "DOM"],
     "jsx": "react-jsx",
+    "types": ["vite/client", "jest", "node"],
     "strict": true,
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,

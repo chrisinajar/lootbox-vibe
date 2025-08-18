@@ -18,6 +18,8 @@ type Query {
   inventorySummary: InventorySummary!
   inventoryList(filter: InventoryFilter, limit: Int = 100, cursor: ID): PageItemStacks!
   configHash: String!
+  currencies: [CurrencyBalance!]!
+  unlockedBoxes: [ID!]!
 }
 
 input OpenBoxesInput { boxId: ID!, count: Int!, requestId: ID! }
@@ -42,3 +44,6 @@ extend type Mutation { claimIdle(input: ClaimIdleInput): IdleReport! }
 input InventoryFilter { rarity: Rarity, typeId: ID, sourceBoxId: ID, curatedTags: [ID!] }
 type ItemStack { stackId: ID!, typeId: ID!, rarity: Rarity!, count: Int! }
 type PageItemStacks { rows: [ItemStack!]!, nextCursor: ID }
+
+# Currency balances
+type CurrencyBalance { currency: ID!, amount: BigInt! }

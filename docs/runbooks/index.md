@@ -27,3 +27,4 @@ Runbooks:
 - storage-index-keys: Index key shapes and 0↔>0 maintenance — when adding new indexes or debugging drift.
 - modifiers-categories-economy: COSMETIC vs MECHANICAL rules and economic fields — when adding static modifiers.
 - boxes-self-drop-rules: Configure and enforce self-drop behavior — when adding/changing box drop rules.
+- ui-home-loop: Home loop UI (open CTA, currencies, results) — when changing box selection, currencies, or results panel.
