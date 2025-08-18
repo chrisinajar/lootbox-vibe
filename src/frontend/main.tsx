@@ -21,6 +21,10 @@ import {
   OpenBoxesDocument,
   SalvageDocument,
   Rarity,
+  CollectionLogDocument,
+  type CollectionLogQuery,
+  BoxCatalogDocument,
+  type BoxCatalogQuery,
 } from './graphql/graphql';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -117,13 +121,28 @@ export const OpenResultsPanel: React.FC = () => {
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
   const sfx = useSfx();
+  const { data: catalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const { data: boxesCatalog } = useQuery<BoxCatalogQuery>(BoxCatalogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const nameById = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    const items = catalog?.collectionLog?.items ?? [];
+    for (const it of items) map[it.id] = it.name;
+    const boxes = boxesCatalog?.boxCatalog ?? [];
+    for (const b of boxes) map[b.id] = b.name;
+    // materials mapping can be added here if needed for dev panel in future
+    return map;
+  }, [catalog?.collectionLog?.items, boxesCatalog?.boxCatalog]);
 
   const doOpen = async () => {
     setBusy(true);
     const requestId = uuidv4();
     try {
       const res = await openBoxes({
-        variables: { input: { boxId: 'box.cardboard', count: 10, requestId } },
+        variables: { input: { boxId: 'box_cardboard', count: 10, requestId } },
       });
       setLast(res.data?.openBoxes ?? null);
       try {
@@ -185,7 +204,7 @@ export const OpenResultsPanel: React.FC = () => {
               <ul className="grid grid-cols-2 gap-1">
                 {last.stacks.map((s: any) => (
                   <li key={s.stackId} className="rounded px-2 py-1 chip">
-                    {s.typeId} ({s.rarity}): +{s.count}
+                    {nameById[s.typeId] ?? s.typeId} ({s.rarity}): +{s.count}
                   </li>
                 ))}
               </ul>

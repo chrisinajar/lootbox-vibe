@@ -6,6 +6,8 @@ import {
   type InventoryListQueryVariables,
   Rarity,
   SalvageDocument,
+  CollectionLogDocument,
+  type CollectionLogQuery,
 } from '../../graphql/graphql';
 
 type Row = { stackId: string; typeId: string; rarity: Rarity; count: number };
@@ -56,6 +58,15 @@ export const InventoryView: React.FC = () => {
       notifyOnNetworkStatusChange: true,
     },
   );
+  const { data: catalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const nameById = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    const items = catalog?.collectionLog?.items ?? [];
+    for (const it of items) map[it.id] = it.name;
+    return map;
+  }, [catalog?.collectionLog?.items]);
 
   // refetch when filter changes
   React.useEffect(() => {
@@ -224,7 +235,7 @@ export const InventoryView: React.FC = () => {
       >
         <div className="w-8 h-8 rounded" style={{ background: 'var(--chip-bg)' }} />
         <div className="flex-1">
-          <div className="font-medium">{r.typeId}</div>
+          <div className="font-medium">{nameById[r.typeId] ?? r.typeId}</div>
           <div className="text-xs opacity-70">{r.rarity}</div>
         </div>
         <div className="rounded px-2 py-1 chip text-sm">×{r.count}</div>

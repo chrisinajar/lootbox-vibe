@@ -11,7 +11,7 @@
     "dev:api": "tsx watch --tsconfig tsconfig.backend.json src/backend/index.ts",
     "build:backend": "tsc -p tsconfig.backend.json",
     "start:backend": "node dist/src/backend/index.js",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "test": "jest --passWithNoTests",

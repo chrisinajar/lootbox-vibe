@@ -22,6 +22,9 @@ type Query {
   unlockedBoxes: [ID!]!
   collectionLog: CollectionLog!
   shop: ShopState!
+  availableBoxes: [BoxInfo!]!
+  boxCatalog: [BoxInfo!]!
+  materialsCatalog: [MaterialInfo!]!
 }
 
 input OpenBoxesInput { boxId: ID!, count: Int!, requestId: ID! }
@@ -63,6 +66,10 @@ type CollectionItem {
 }
 type CountProgress { key: ID!, discovered: Int!, total: Int! }
 type CollectionLog { items: [CollectionItem!]!, byRarity: [CountProgress!]!, byType: [CountProgress!]! }
+
+# Box info for selection UI
+type BoxInfo { id: ID!, name: String! }
+type MaterialInfo { id: ID!, name: String! }
 
 # Shop & upgrades
 type Upgrade { id: ID!, name: String!, desc: String!, costScrap: Int!, purchased: Boolean! }

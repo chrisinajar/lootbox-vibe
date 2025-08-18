@@ -105,7 +105,10 @@ export async function initializeServer(options: InitOptions = {}) {
             if (Array.isArray(parsed.unlockedBoxIds)) boxes = parsed.unlockedBoxIds.map(String);
           } catch {}
         }
-        if (boxes.length === 0) boxes = ['box.cardboard'];
+        // Ensure baseline cardboard is always available (append, not replace)
+        const set = new Set<string>(boxes);
+        set.add('box_cardboard');
+        boxes = Array.from(set);
         const entry = telemetry.buildEntry(
           'unlockedBoxes',
           uid,
@@ -115,6 +118,50 @@ export async function initializeServer(options: InitOptions = {}) {
         );
         await telemetry.write(entry);
         return boxes;
+      },
+      availableBoxes: async (_: any, __: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        // read unlocked profile
+        const buf = await storage.get(`ppro:${uid}`);
+        let unlocked: string[] = [];
+        if (buf) {
+          try {
+            const parsed = JSON.parse(String(buf));
+            if (Array.isArray(parsed.unlockedBoxIds)) unlocked = parsed.unlockedBoxIds.map(String);
+          } catch {}
+        }
+        // Ensure baseline cardboard is always present
+        const uSet = new Set<string>(unlocked);
+        uSet.add('box_cardboard');
+        unlocked = Array.from(uSet);
+        // load boxes from config
+        const cfg = cfgLoader.load();
+        const boxesArr: any[] = Array.isArray((cfg as any).boxes)
+          ? ((cfg as any).boxes as any[])
+          : [];
+        const byId = new Map<string, string>();
+        for (const b of boxesArr) byId.set(String(b.id), String(b.name ?? b.id));
+        const out = unlocked
+          .filter((id) => byId.has(id))
+          .map((id) => ({ id, name: byId.get(id)! }));
+        if (out.length === 0 && byId.has('box_cardboard')) {
+          out.push({ id: 'box_cardboard', name: byId.get('box_cardboard')! });
+        }
+        return out;
+      },
+      boxCatalog: async () => {
+        const cfg = cfgLoader.load();
+        const boxesArr: any[] = Array.isArray((cfg as any).boxes)
+          ? ((cfg as any).boxes as any[])
+          : [];
+        return boxesArr.map((b: any) => ({ id: String(b.id), name: String(b.name ?? b.id) }));
+      },
+      materialsCatalog: async () => {
+        const cfg = cfgLoader.load();
+        const mats: any[] = Array.isArray((cfg as any).materials)
+          ? ((cfg as any).materials as any[])
+          : [];
+        return mats.map((m: any) => ({ id: String(m.id), name: String(m.name ?? m.id) }));
       },
       collectionLog: async (_: any, __: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';

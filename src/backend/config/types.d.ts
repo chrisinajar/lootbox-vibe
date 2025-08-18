@@ -141,6 +141,20 @@ export interface ItemsCatalogV1 {
   }[];
 }
 
+export interface MaterialsCatalogV1 {
+  $schema?: string;
+  version: number;
+  materials: {
+    id: string;
+    name: string;
+    description: string;
+    iconId: string;
+    rarity: "COMMON" | "UNCOMMON" | "RARE" | "EPIC" | "LEGENDARY" | "MYTHIC";
+    stackable: boolean;
+    scrapValue: number;
+  }[];
+}
+
 export interface DynamicModifiersV1 {
   $schema?: string;
   version: number;

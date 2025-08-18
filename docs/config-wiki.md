@@ -1,6 +1,6 @@
 # Game Configuration Reference (Generated)
 
-Generated at: 2025-08-18T20:42:45.599Z
+Generated at: 2025-08-18T21:30:51.515Z
 This document is generated from files in the `config/` directory. Do not edit by hand.
 
 ## Economy
@@ -204,6 +204,12 @@ Entries:
 | itm_jester_hat     | Jester's Hat   | cosmetic |    10 | m_confetti_burst, m_tiny_chance_rare |
 | itm_heroic_sticker | Heroic Sticker | cosmetic |    10 | m_tiny_chance_rare, m_glitter_border |
 | itm_glitch_crystal | Glitch Crystal | trinket  |    10 | m_confetti_burst, m_rainbow_text     |
+
+## Materials Catalog
+
+| id              | name        | rarity | scrapValue |
+| --------------- | ----------- | ------ | ---------: |
+| mat_scrap_chunk | Scrap Chunk | COMMON |          0 |
 
 ## Idle Flavor
 

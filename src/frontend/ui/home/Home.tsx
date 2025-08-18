@@ -11,9 +11,17 @@ import {
   type OpenBoxesMutationVariables,
 } from '../../graphql/graphql';
 import { CurrenciesDocument, type CurrenciesQuery } from '../../graphql/graphql';
-import { UnlockedBoxesDocument, type UnlockedBoxesQuery } from '../../graphql/graphql';
+import { AvailableBoxesDocument, type AvailableBoxesQuery } from '../../graphql/graphql';
+import { CollectionLogDocument, type CollectionLogQuery } from '../../graphql/graphql';
+import {
+  BoxCatalogDocument,
+  type BoxCatalogQuery,
+  MaterialsCatalogDocument,
+  type MaterialsCatalogQuery,
+} from '../../graphql/graphql';
+// labels come from server via AvailableBoxes query
 
-const BOX_ORDER = ['box.cardboard', 'box.wooden', 'box.iron', 'box.unstable'];
+const BOX_ORDER = ['box_cardboard', 'box_wooden', 'box_iron', 'box_unstable'];
 
 function rarityRank(r: Rarity): number {
   const order: Record<Rarity, number> = {
@@ -90,7 +98,10 @@ export const CurrenciesBar: React.FC = () => {
 
 type Row = { typeId: string; rarity: Rarity; count: number };
 
-const RecentRewards: React.FC<{ rows: Row[] }> = ({ rows }) => (
+const RecentRewards: React.FC<{ rows: Row[]; nameById?: Record<string, string> }> = ({
+  rows,
+  nameById,
+}) => (
   <ul className="flex gap-2 flex-wrap">
     {rows.slice(0, 5).map((r, i) => (
       <motion.li
@@ -100,17 +111,18 @@ const RecentRewards: React.FC<{ rows: Row[] }> = ({ rows }) => (
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
-        {r.typeId} ({r.rarity}) ×{r.count}
+        {(nameById && nameById[r.typeId]) || r.typeId} ({r.rarity}) ×{r.count}
       </motion.li>
     ))}
   </ul>
 );
 
-const VirtualList: React.FC<{ rows: Row[]; height?: number; rowHeight?: number }> = ({
-  rows,
-  height = 260,
-  rowHeight = 28,
-}) => {
+const VirtualList: React.FC<{
+  rows: Row[];
+  height?: number;
+  rowHeight?: number;
+  nameById?: Record<string, string>;
+}> = ({ rows, height = 260, rowHeight = 28, nameById }) => {
   const [scrollTop, setScrollTop] = React.useState(0);
   const total = rows.length;
   const start = Math.max(0, Math.floor(scrollTop / rowHeight) - 5);
@@ -136,7 +148,7 @@ const VirtualList: React.FC<{ rows: Row[]; height?: number; rowHeight?: number }
             className="px-3 flex items-center"
           >
             <span className="text-sm opacity-80 mr-2">{r.rarity}</span>
-            <span className="text-sm">{r.typeId}</span>
+            <span className="text-sm">{(nameById && nameById[r.typeId]) || r.typeId}</span>
             <span className="ml-auto text-sm">×{r.count}</span>
           </div>
         ))}
@@ -145,7 +157,10 @@ const VirtualList: React.FC<{ rows: Row[]; height?: number; rowHeight?: number }
   );
 };
 
-const ResultPanel: React.FC<{ rows: Row[] }> = ({ rows }) => {
+const ResultPanel: React.FC<{ rows: Row[]; nameById?: Record<string, string> }> = ({
+  rows,
+  nameById,
+}) => {
   const [expanded, setExpanded] = React.useState(false);
   const [groupByRarity, setGroupByRarity] = React.useState(true);
   const [collapseDupes, setCollapseDupes] = React.useState(true);
@@ -167,7 +182,7 @@ const ResultPanel: React.FC<{ rows: Row[] }> = ({ rows }) => {
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <div className="mr-auto">
-          <RecentRewards rows={rows} />
+          <RecentRewards rows={rows} nameById={nameById} />
         </div>
         <label className="text-sm flex items-center gap-1">
           <input
@@ -196,7 +211,7 @@ const ResultPanel: React.FC<{ rows: Row[] }> = ({ rows }) => {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
           >
-            <VirtualList rows={list.slice(0, 5000)} />
+            <VirtualList rows={list.slice(0, 5000)} nameById={nameById} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -204,8 +219,9 @@ const ResultPanel: React.FC<{ rows: Row[] }> = ({ rows }) => {
   );
 };
 
-const BoxFX: React.FC<{ boxId?: string; trigger: number; rare: boolean }> = ({
+const BoxFX: React.FC<{ boxId?: string; boxName?: string; trigger: number; rare: boolean }> = ({
   boxId,
+  boxName,
   trigger,
   rare,
 }) => {
@@ -237,7 +253,7 @@ const BoxFX: React.FC<{ boxId?: string; trigger: number; rare: boolean }> = ({
         className="rounded px-10 py-8"
         style={{ background: 'var(--panel-bg)', border: `1px solid var(--panel-border)` }}
       >
-        <div className="text-sm opacity-80">{boxId ?? 'select a box'}</div>
+        <div className="text-sm opacity-80">{boxName ?? boxId ?? 'select a box'}</div>
       </motion.div>
       <AnimatePresence>
         {rare && (
@@ -274,8 +290,8 @@ const BoxFX: React.FC<{ boxId?: string; trigger: number; rare: boolean }> = ({
 export const HomeMain: React.FC = () => {
   const client = useApolloClient();
   const { data: curData } = useQuery<CurrenciesQuery>(CurrenciesDocument);
-  const { data: ub } = useQuery<UnlockedBoxesQuery>(UnlockedBoxesDocument);
-  const unlocked = ub?.unlockedBoxes ?? [];
+  const { data: ub } = useQuery<AvailableBoxesQuery>(AvailableBoxesDocument);
+  const unlocked = (ub?.availableBoxes ?? []).map((b) => b.id);
   const [selected, setSelected] = useLastBox(unlocked);
   const [openBoxes] = useMutation<OpenBoxesMutation, OpenBoxesMutationVariables>(OpenBoxesDocument);
   const [busy, setBusy] = React.useState(false);
@@ -283,6 +299,29 @@ export const HomeMain: React.FC = () => {
   const [fxKey, setFxKey] = React.useState(0);
   const [rare, setRare] = React.useState(false);
   const sfx = useSfx();
+  const { data: catalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const { data: boxesCatalog } = useQuery<BoxCatalogQuery>(BoxCatalogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const { data: matsCatalog } = useQuery<MaterialsCatalogQuery>(MaterialsCatalogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const nameById = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    const items = catalog?.collectionLog?.items ?? [];
+    for (const it of items) map[it.id] = it.name;
+    const boxes = boxesCatalog?.boxCatalog ?? [];
+    for (const b of boxes) map[b.id] = b.name;
+    const mats = matsCatalog?.materialsCatalog ?? [];
+    for (const m of mats) map[m.id] = m.name;
+    return map;
+  }, [catalog?.collectionLog?.items, boxesCatalog?.boxCatalog, matsCatalog?.materialsCatalog]);
+  const selectedName = React.useMemo(
+    () => (ub?.availableBoxes ?? []).find((b) => b.id === selected)?.name,
+    [ub?.availableBoxes, selected],
+  );
 
   const doOpen = async (count: number) => {
     if (!selected) return;
@@ -323,9 +362,9 @@ export const HomeMain: React.FC = () => {
               value={selected ?? ''}
               onChange={(e: any) => setSelected(e.target.value)}
             >
-              {unlocked.map((b) => (
-                <option key={b} value={b}>
-                  {b}
+              {(ub?.availableBoxes ?? []).map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
                 </option>
               ))}
             </select>
@@ -333,13 +372,18 @@ export const HomeMain: React.FC = () => {
           <button disabled={!selected || busy} className="btn-primary" onClick={() => doOpen(10)}>
             Open 10
           </button>
-          <div className="text-sm opacity-80">Last used: {selected ?? '-'}</div>
+          <div className="text-sm opacity-80">
+            Last used:{' '}
+            {selected
+              ? ((ub?.availableBoxes ?? []).find((b) => b.id === selected)?.name ?? selected)
+              : '-'}
+          </div>
         </div>
-        <BoxFX boxId={selected} trigger={fxKey} rare={rare} />
+        <BoxFX boxId={selected} boxName={selectedName} trigger={fxKey} rare={rare} />
       </div>
       <div className="rounded border p-4 panel">
         <div className="font-medium mb-2">Results</div>
-        <ResultPanel rows={rows} />
+        <ResultPanel rows={rows} nameById={nameById} />
       </div>
     </div>
   );

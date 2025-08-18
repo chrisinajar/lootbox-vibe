@@ -1,0 +1,4 @@
+query MaterialsCatalog {
+  materialsCatalog { id name }
+}
+

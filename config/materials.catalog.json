@@ -1,0 +1,15 @@
+{
+  "$schema": "https://lootboxsim/schemas/materials.json",
+  "version": 1,
+  "materials": [
+    {
+      "id": "mat_scrap_chunk",
+      "name": "Scrap Chunk",
+      "description": "Common leftover material. Can be traded or used in upgrades.",
+      "iconId": "mat_scrap_chunk",
+      "rarity": "COMMON",
+      "stackable": true,
+      "scrapValue": 0
+    }
+  ]
+}

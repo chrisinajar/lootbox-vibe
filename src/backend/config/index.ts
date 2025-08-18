@@ -6,6 +6,7 @@ import addFormats from 'ajv-formats';
 export interface LoadedConfig {
   boxes: unknown[];
   items?: unknown[];
+  materials?: unknown[];
   modifiers?: { static?: unknown[]; dynamic?: unknown[] };
   unlocks?: unknown;
   idle?: unknown;
@@ -14,11 +15,7 @@ export interface LoadedConfig {
 }
 
 export class ConfigLoader {
-  private ajv: Ajv2020;
-  constructor(private configDir = path.resolve(process.cwd(), 'config')) {
-    this.ajv = new Ajv2020({ allErrors: true, strict: true });
-    addFormats(this.ajv);
-  }
+  constructor(private configDir = path.resolve(process.cwd(), 'config')) {}
 
   load(): LoadedConfig {
     const schemaDir = path.join(this.configDir, 'schema');
@@ -34,18 +31,23 @@ export class ConfigLoader {
       unlocks: readJson(path.join(schemaDir, 'unlocks.schema.json')),
       idle: readJson(path.join(schemaDir, 'idle.schema.json')),
       items: readJson(path.join(schemaDir, 'items.schema.json')),
+      materials: readJson(path.join(schemaDir, 'materials.schema.json')),
       economy: readJson(path.join(schemaDir, 'economy.schema.json')),
     } as const;
 
+    // Compile validators with a fresh Ajv instance per load to avoid duplicate $id errors
+    const ajv = new Ajv2020({ allErrors: true, strict: true });
+    addFormats(ajv);
     const validators = {
-      boxes: this.ajv.compile(schemas.boxes),
-      box: this.ajv.compile(schemas.box),
-      modifiersStatic: this.ajv.compile(schemas.modifiersStatic),
-      modifiersDynamic: this.ajv.compile(schemas.modifiersDynamic),
-      unlocks: this.ajv.compile(schemas.unlocks),
-      idle: this.ajv.compile(schemas.idle),
-      items: this.ajv.compile(schemas.items),
-      economy: this.ajv.compile(schemas.economy),
+      boxes: ajv.compile(schemas.boxes),
+      box: ajv.compile(schemas.box),
+      modifiersStatic: ajv.compile(schemas.modifiersStatic),
+      modifiersDynamic: ajv.compile(schemas.modifiersDynamic),
+      unlocks: ajv.compile(schemas.unlocks),
+      idle: ajv.compile(schemas.idle),
+      items: ajv.compile(schemas.items),
+      materials: ajv.compile(schemas.materials),
+      economy: ajv.compile(schemas.economy),
     } as const;
 
     // Load data
@@ -58,6 +60,7 @@ export class ConfigLoader {
     const staticModsPath = path.join(this.configDir, 'modifiers.static.json');
     const dynamicModsPath = path.join(this.configDir, 'modifiers.dynamic.json');
     const itemsPath = path.join(this.configDir, 'items.catalog.json');
+    const materialsPath = path.join(this.configDir, 'materials.catalog.json');
 
     const hasConfig =
       (fs.existsSync(boxesPath) || fs.existsSync(boxesDir)) && fs.existsSync(unlocksPath);
@@ -70,6 +73,7 @@ export class ConfigLoader {
       type ModsStatic = { version: number; modifiers: unknown[] };
       type ModsDynamic = { version: number; modifiers: unknown[] };
       type Items = { version: number; items: unknown[] };
+      type Materials = { version: number; materials: unknown[] };
 
       const boxesBlob: unknown = fs.existsSync(boxesPath) ? readJson(boxesPath) : undefined;
       const unlocksBlob: unknown = readJson(unlocksPath);
@@ -84,6 +88,9 @@ export class ConfigLoader {
       const itemsBlob: unknown = fs.existsSync(itemsPath)
         ? readJson(itemsPath)
         : { version: 1, items: [] };
+      const materialsBlob: unknown = fs.existsSync(materialsPath)
+        ? readJson(materialsPath)
+        : { version: 1, materials: [] };
 
       let boxes: unknown[] = [];
       let boxesVersion: number | undefined;
@@ -121,6 +128,8 @@ export class ConfigLoader {
         );
       if (!validators.items(itemsBlob))
         throw new Error('Invalid items: ' + JSON.stringify(validators.items.errors));
+      if (!validators.materials(materialsBlob))
+        throw new Error('Invalid materials: ' + JSON.stringify(validators.materials.errors));
 
       const u = unlocksBlob as Unlocks;
       const e = economyBlob as Economy;
@@ -128,6 +137,7 @@ export class ConfigLoader {
       const ms = staticModsBlob as ModsStatic;
       const md = dynamicModsBlob as ModsDynamic;
       const it = itemsBlob as Items;
+      const mat = materialsBlob as Materials;
 
       const versionNums = [
         boxesVersion,
@@ -146,6 +156,7 @@ export class ConfigLoader {
         idle: i,
         economy: e,
         items: it.items,
+        materials: mat.materials,
         configVersion: versionNums.length ? Math.max(...versionNums) : 1,
       };
     }

@@ -70,6 +70,9 @@ function main() {
   const items = exists(path.join(cfgDir, 'items.catalog.json'))
     ? readJson(path.join(cfgDir, 'items.catalog.json'))
     : { items: [] };
+  const materials = exists(path.join(cfgDir, 'materials.catalog.json'))
+    ? readJson(path.join(cfgDir, 'materials.catalog.json'))
+    : { materials: [] };
 
   // Build markdown
   const out: string[] = [];
@@ -236,6 +239,17 @@ function main() {
       }
       out.push('');
     }
+  }
+
+  // Materials
+  if (Array.isArray(materials.materials)) {
+    pushHeading(out, 2, 'Materials Catalog');
+    out.push('| id | name | rarity | scrapValue |');
+    out.push('|---|---|---|---:|');
+    for (const m of materials.materials) {
+      out.push(`| ${m.id} | ${m.name} | ${m.rarity} | ${m.scrapValue ?? 0} |`);
+    }
+    out.push('');
   }
 
   // Idle flavor
