@@ -196,7 +196,7 @@ export async function initializeServer(options: InitOptions = {}) {
             hint: typeof it.hint === 'string' ? it.hint : null,
             hasCosmetic: hasCos,
             hasMechanical: hasMech,
-            discovered: discoveredTypes.has(String(it.typeId)),
+            discovered: discoveredTypes.has(String(it.id)),
           };
         });
         // progress by rarity
@@ -284,12 +284,24 @@ export async function initializeServer(options: InitOptions = {}) {
             if (Array.isArray(p.unlockedBoxIds)) unlocked = p.unlockedBoxIds;
           } catch {}
         }
+        const boxesArr: any[] = Array.isArray((cfg as any).boxes)
+          ? ((cfg as any).boxes as any[])
+          : [];
+        const boxName = (id: string) => boxesArr.find((b: any) => String(b.id) === id)?.name ?? id;
         const mOut = milestones.map((m: any) => {
           // compute target from first OPEN_COUNT requirement
           const reqs: any[] = Array.isArray(m.requirements) ? m.requirements : [];
           const reqOpen = reqs.find((r: any) => r.type === 'OPEN_COUNT');
           const target = Number(reqOpen?.count ?? 0);
-          const label = String(m.id);
+          const needBox = reqOpen?.boxId ? boxName(String(reqOpen.boxId)) : undefined;
+          const unlockBoxId = (Array.isArray(m.unlocks) ? m.unlocks : []).find(
+            (u: any) => u?.kind === 'BOX_TYPE',
+          )?.boxId;
+          const unlockName = unlockBoxId ? boxName(String(unlockBoxId)) : undefined;
+          const label =
+            unlockName && needBox && target
+              ? `Unlock ${unlockName}: open ${target} ${needBox}`
+              : String(m.id);
           // unlocked if any unlocks[].boxId present in unlocked list
           let isUnlocked = false;
           const us: any[] = Array.isArray(m.unlocks) ? m.unlocks : [];

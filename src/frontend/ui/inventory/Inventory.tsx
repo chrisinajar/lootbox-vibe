@@ -8,6 +8,8 @@ import {
   SalvageDocument,
   CollectionLogDocument,
   type CollectionLogQuery,
+  BoxCatalogDocument,
+  MaterialsCatalogDocument,
 } from '../../graphql/graphql';
 
 type Row = { stackId: string; typeId: string; rarity: Rarity; count: number };
@@ -58,15 +60,20 @@ export const InventoryView: React.FC = () => {
       notifyOnNetworkStatusChange: true,
     },
   );
-  const { data: catalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
+  const { data: itemsCatalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
+    fetchPolicy: 'cache-first',
+  });
+  const { data: boxCatalog } = useQuery<any>(BoxCatalogDocument, { fetchPolicy: 'cache-first' });
+  const { data: matsCatalog } = useQuery<any>(MaterialsCatalogDocument, {
     fetchPolicy: 'cache-first',
   });
   const nameById = React.useMemo(() => {
     const map: Record<string, string> = {};
-    const items = catalog?.collectionLog?.items ?? [];
-    for (const it of items) map[it.id] = it.name;
+    for (const it of itemsCatalog?.collectionLog?.items ?? []) map[it.id] = it.name;
+    for (const b of boxCatalog?.boxCatalog ?? []) map[b.id] = b.name;
+    for (const m of matsCatalog?.materialsCatalog ?? []) map[m.id] = m.name;
     return map;
-  }, [catalog?.collectionLog?.items]);
+  }, [itemsCatalog?.collectionLog?.items, boxCatalog?.boxCatalog, matsCatalog?.materialsCatalog]);
 
   // refetch when filter changes
   React.useEffect(() => {

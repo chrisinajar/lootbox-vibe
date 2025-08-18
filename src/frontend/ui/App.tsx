@@ -53,6 +53,20 @@ const HomeShell: React.FC = () => {
           <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
             UI Milestone 2 — foundation in place.
           </p>
+          <nav className="mt-2 flex gap-3 text-sm">
+            <a href="/#/inventory" className="underline hover:opacity-80">
+              Inventory
+            </a>
+            <a href="/#/collection" className="underline hover:opacity-80">
+              Collection
+            </a>
+            <a href="/#/shop" className="underline hover:opacity-80">
+              Shop
+            </a>
+            <a href="/#/progression" className="underline hover:opacity-80">
+              Progression
+            </a>
+          </nav>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setSettingsOpen(true)} className="btn-accent">
@@ -83,6 +97,25 @@ const HomeShell: React.FC = () => {
 const App: React.FC = () => {
   const path = useHashPath();
   if (ENABLE_DEV_UI && path === '/dev') return <DevDashboard />;
+  const Nav: React.FC = () => (
+    <nav className="mt-2 flex gap-3 text-sm">
+      <a href="/#/" className="underline hover:opacity-80">
+        Home
+      </a>
+      <a href="/#/inventory" className="underline hover:opacity-80">
+        Inventory
+      </a>
+      <a href="/#/collection" className="underline hover:opacity-80">
+        Collection
+      </a>
+      <a href="/#/shop" className="underline hover:opacity-80">
+        Shop
+      </a>
+      <a href="/#/progression" className="underline hover:opacity-80">
+        Progression
+      </a>
+    </nav>
+  );
   if (path === '/progression')
     return (
       <div className="min-h-dvh p-6">
@@ -92,6 +125,7 @@ const App: React.FC = () => {
             <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
               Milestones and RNG unlocks.
             </p>
+            <Nav />
           </div>
           <a href="/#/" className="btn-primary">
             Back to Home
@@ -109,6 +143,7 @@ const App: React.FC = () => {
             <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
               Spend scrap on upgrades or exchange for keys.
             </p>
+            <Nav />
           </div>
           <a href="/#/" className="btn-primary">
             Back to Home
@@ -126,6 +161,7 @@ const App: React.FC = () => {
             <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
               Discover items and track completion by rarity.
             </p>
+            <Nav />
           </div>
           <a href="/#/" className="btn-primary">
             Back to Home
@@ -143,6 +179,7 @@ const App: React.FC = () => {
             <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
               Virtualized infinite list with filters and salvage.
             </p>
+            <Nav />
           </div>
           <a href="/#/" className="btn-primary">
             Back to Home
