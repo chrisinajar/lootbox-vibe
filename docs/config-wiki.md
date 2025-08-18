@@ -1,6 +1,6 @@
 # Game Configuration Reference (Generated)
 
-Generated at: 2025-08-18T06:34:03.932Z
+Generated at: 2025-08-18T06:56:43.726Z
 This document is generated from files in the `config/` directory. Do not edit by hand.
 
 ## Economy
@@ -45,17 +45,18 @@ This document is generated from files in the `config/` directory. Do not edit by
 - selfDropCap: 1
 
 Entries:
-| type | weight | details |
-|---|---:|---|
-| ITEM | 4500 | itemId=itm_rusty_spoon rarity=COMMON |
-| ITEM | 3500 | itemId=itm_bent_nail rarity=COMMON |
-| ITEM | 800 | itemId=itm_cat_figurine rarity=UNCOMMON |
-| ITEM | 150 | itemId=itm_mini_anvil rarity=RARE |
-| ITEM | 30 | itemId=itm_echoing_coin rarity=EPIC |
-| CURRENCY | 400 | currency=KEYS amount=1–1 |
-| CURRENCY | 50 | currency=KEYS amount=2–2 |
-| BOX | 500 | boxId=box_cardboard count=1 |
-| MATERIAL | 540 | materialId=mat_scrap_chunk amount=1–2 |
+
+| type     | weight | details                                 |
+| -------- | -----: | --------------------------------------- |
+| ITEM     |   4500 | itemId=itm_rusty_spoon rarity=COMMON    |
+| ITEM     |   3500 | itemId=itm_bent_nail rarity=COMMON      |
+| ITEM     |    800 | itemId=itm_cat_figurine rarity=UNCOMMON |
+| ITEM     |    150 | itemId=itm_mini_anvil rarity=RARE       |
+| ITEM     |     30 | itemId=itm_echoing_coin rarity=EPIC     |
+| CURRENCY |    400 | currency=KEYS amount=1–1                |
+| CURRENCY |     50 | currency=KEYS amount=2–2                |
+| BOX      |    500 | boxId=box_cardboard count=1             |
+| MATERIAL |    540 | materialId=mat_scrap_chunk amount=1–2   |
 
 ### Wooden Crate (box_wooden)
 
@@ -64,15 +65,16 @@ Entries:
 - forbidSelfDrop: true
 
 Entries:
-| type | weight | details |
-|---|---:|---|
-| ITEM | 4200 | itemId=itm_polished_stone rarity=COMMON |
-| ITEM | 3000 | itemId=itm_tiny_gear rarity=UNCOMMON |
-| ITEM | 600 | itemId=itm_clockwork_mouse rarity=RARE |
-| ITEM | 140 | itemId=itm_jester_hat rarity=EPIC |
-| CURRENCY | 700 | currency=KEYS amount=1–2 |
-| MATERIAL | 360 | materialId=mat_scrap_chunk amount=2–4 |
-| BOX | 200 | boxId=box_cardboard count=2–5 |
+
+| type     | weight | details                                 |
+| -------- | -----: | --------------------------------------- |
+| ITEM     |   4200 | itemId=itm_polished_stone rarity=COMMON |
+| ITEM     |   3000 | itemId=itm_tiny_gear rarity=UNCOMMON    |
+| ITEM     |    600 | itemId=itm_clockwork_mouse rarity=RARE  |
+| ITEM     |    140 | itemId=itm_jester_hat rarity=EPIC       |
+| CURRENCY |    700 | currency=KEYS amount=1–2                |
+| MATERIAL |    360 | materialId=mat_scrap_chunk amount=2–4   |
+| BOX      |    200 | boxId=box_cardboard count=2–5           |
 
 ### Iron Chest (box_iron)
 
@@ -81,14 +83,15 @@ Entries:
 - forbidSelfDrop: true
 
 Entries:
-| type | weight | details |
-|---|---:|---|
-| ITEM | 3800 | itemId=itm_gilded_spoon rarity=UNCOMMON |
-| ITEM | 900 | itemId=itm_pocket_portal rarity=RARE |
-| ITEM | 180 | itemId=itm_heroic_sticker rarity=EPIC |
-| CURRENCY | 800 | currency=KEYS amount=2–3 |
-| MATERIAL | 320 | materialId=mat_scrap_chunk amount=4–8 |
-| BOX | 200 | boxId=box_wooden count=1–2 |
+
+| type     | weight | details                                 |
+| -------- | -----: | --------------------------------------- |
+| ITEM     |   3800 | itemId=itm_gilded_spoon rarity=UNCOMMON |
+| ITEM     |    900 | itemId=itm_pocket_portal rarity=RARE    |
+| ITEM     |    180 | itemId=itm_heroic_sticker rarity=EPIC   |
+| CURRENCY |    800 | currency=KEYS amount=2–3                |
+| MATERIAL |    320 | materialId=mat_scrap_chunk amount=4–8   |
+| BOX      |    200 | boxId=box_wooden count=1–2              |
 
 ### Dimensionally Unstable Box (box_unstable)
 
@@ -97,14 +100,15 @@ Entries:
 - forbidSelfDrop: true
 
 Entries:
-| type | weight | details |
-|---|---:|---|
-| BOX | 2500 | boxId=box_cardboard count=5–20 |
-| BOX | 2000 | boxId=box_wooden count=2–6 |
-| BOX | 1200 | boxId=box_iron count=1–3 |
-| ITEM | 1800 | itemId=itm_glitch_crystal rarity=EPIC |
-| CURRENCY | 1500 | currency=KEYS amount=5–10 |
-| MATERIAL | 1000 | materialId=mat_scrap_chunk amount=10–25 |
+
+| type     | weight | details                                 |
+| -------- | -----: | --------------------------------------- |
+| BOX      |   2500 | boxId=box_cardboard count=5–20          |
+| BOX      |   2000 | boxId=box_wooden count=2–6              |
+| BOX      |   1200 | boxId=box_iron count=1–3                |
+| ITEM     |   1800 | itemId=itm_glitch_crystal rarity=EPIC   |
+| CURRENCY |   1500 | currency=KEYS amount=5–10               |
+| MATERIAL |   1000 | materialId=mat_scrap_chunk amount=10–25 |
 
 ## Unlocks
 

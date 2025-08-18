@@ -125,6 +125,7 @@ function main() {
     if (dt && Array.isArray(dt.entries)) {
       out.push('');
       out.push('Entries:');
+      out.push('');
       out.push('| type | weight | details |');
       out.push('|---|---:|---|');
       for (const e of dt.entries) {
