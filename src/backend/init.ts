@@ -140,6 +140,80 @@ export async function initializeServer(options: InitOptions = {}) {
     }),
   );
 
+  // REST API for MVP per tech brief §6
+  app.get('/inv/summary', async (req, res) => {
+    try {
+      const uid = String(req.header('X-User-ID') ?? 'anonymous');
+      const started = Date.now();
+      const data = await summarySvc.getSummary(uid);
+      const entry = telemetry.buildEntry(
+        'inventorySummary',
+        uid,
+        String(req.header('X-Request-ID') ?? 'n/a'),
+        Date.now() - started,
+        data,
+      );
+      await telemetry.write(entry);
+      res.json(data);
+    } catch (e: any) {
+      res.status(400).json({ error: e?.message ?? 'bad request' });
+    }
+  });
+  app.get('/inv/list', async (req, res) => {
+    try {
+      const uid = String(req.header('X-User-ID') ?? 'anonymous');
+      const filter = {
+        rarity: req.query.rarity as string | undefined,
+        typeId: req.query.typeId as string | undefined,
+        sourceBoxId: req.query.sourceBoxId as string | undefined,
+        curatedTags: typeof req.query.tag === 'string' ? [req.query.tag as string] : [],
+      } as any;
+      const limit = req.query.limit ? Number(req.query.limit) : 100;
+      const cursor = (req.query.cursor as string | undefined) ?? undefined;
+      const started = Date.now();
+      const data = await listSvc.list(uid, filter, limit, cursor);
+      const entry = telemetry.buildEntry(
+        'inventoryList',
+        uid,
+        String(req.header('X-Request-ID') ?? 'n/a'),
+        Date.now() - started,
+        data,
+      );
+      await telemetry.write(entry);
+      res.json(data);
+    } catch (e: any) {
+      res.status(400).json({ error: e?.message ?? 'bad request' });
+    }
+  });
+  app.post('/inv/mutate', express.json(), async (req, res) => {
+    try {
+      const uid = String(req.header('X-User-ID') ?? 'anonymous');
+      const reqId = String(req.header('X-Request-ID') ?? req.body?.requestId ?? 'n/a');
+      const action = String(req.body?.action ?? '');
+      const input = req.body?.input ?? {};
+      if (action === 'openBoxes') {
+        const started = Date.now();
+        const data = await openSvc.open(uid, {
+          boxId: input.boxId,
+          count: Number(input.count ?? 1),
+          requestId: reqId,
+        });
+        const entry = telemetry.buildEntry('openBoxes', uid, reqId, Date.now() - started, data);
+        await telemetry.write(entry);
+        return res.json(data);
+      } else if (action === 'salvage') {
+        const started = Date.now();
+        const data = await salvageSvc.salvage(uid, input);
+        const entry = telemetry.buildEntry('salvage', uid, reqId, Date.now() - started, data);
+        await telemetry.write(entry);
+        return res.json(data);
+      }
+      return res.status(400).json({ error: 'unknown action' });
+    } catch (e: any) {
+      res.status(400).json({ error: e?.message ?? 'bad request' });
+    }
+  });
+
   const httpServer = app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`🚀 API ready at http://localhost:${port}${graphqlPath}`);

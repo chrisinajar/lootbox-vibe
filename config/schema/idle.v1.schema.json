@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lootboxsim/schemas/idle.v1.json",
+  "title": "Idle v1",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "catchUp": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "capHours": { "type": "integer" },
+        "strategy": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "flavor": { "type": "array", "items": { "type": "string" } },
+    "flavorVars": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": { "min": { "type": "number" }, "max": { "type": "number" } },
+        "required": ["min", "max"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "flavor"],
+  "additionalProperties": false
+}

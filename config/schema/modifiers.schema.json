@@ -12,6 +12,7 @@
         "properties": {
           "id": { "type": "string" },
           "desc": { "type": "string" },
+          "filterable": { "type": "boolean" },
           "category": { "type": "string", "enum": ["COSMETIC", "MECHANICAL"] },
           "economic": {
             "type": "object",

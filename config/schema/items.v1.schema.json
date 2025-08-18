@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lootboxsim/schemas/items.v1.json",
+  "title": "Items catalog v1",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "typeId", "rarity", "scrap"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "typeId": { "type": "string" },
+          "rarity": {
+            "type": "string",
+            "enum": ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"]
+          },
+          "scrap": { "type": "integer", "minimum": 0 },
+          "allowedStaticMods": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "items"],
+  "additionalProperties": false
+}

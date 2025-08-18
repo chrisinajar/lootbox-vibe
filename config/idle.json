@@ -1,0 +1,19 @@
+{
+  "$schema": "https://lootboxsim/schemas/idle.v1.json",
+  "version": 1,
+  "catchUp": {
+    "enabled": false,
+    "capHours": 8,
+    "strategy": "DETERMINISTIC_ON_LOGIN"
+  },
+  "flavor": [
+    "While you were gone, your cat opened {boxes} boxes and knocked over {cups} cups of water.",
+    "Gremlins broke in and opened {boxes} boxes. They only stole {percent}% of the loot this time.",
+    "Your cardboard golem tirelessly opened {boxes} boxes. It now demands a name."
+  ],
+  "flavorVars": {
+    "boxes": { "min": 5, "max": 400 },
+    "cups": { "min": 1, "max": 12 },
+    "percent": { "min": 3, "max": 50 }
+  }
+}

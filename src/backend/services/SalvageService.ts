@@ -14,7 +14,7 @@ export class SalvageService {
     loader = new ConfigLoader(),
   ) {
     this.economy = loader.load().economy ?? {
-      scrapPerRarity: { COMMON: 1, UNCOMMON: 1, RARE: 1, EPIC: 1, LEGENDARY: 1, MYTHIC: 1 },
+      raritySalvage: { COMMON: 1, UNCOMMON: 1, RARE: 5, EPIC: 10 },
     };
   }
 
@@ -102,7 +102,9 @@ export class SalvageService {
       }
       rarityDelta.set(foundTier, (rarityDelta.get(foundTier) ?? 0n) - BigInt(count));
       if (foundType) typeDelta.set(foundType, (typeDelta.get(foundType) ?? 0n) - BigInt(count));
-      const perUnit = Number(this.economy?.scrapPerRarity?.[foundTier] ?? 1);
+      const perUnit = Number(
+        (this.economy?.raritySalvage ?? this.economy?.scrapPerRarity ?? {})?.[foundTier] ?? 1,
+      );
       totalScrap += BigInt(perUnit * count);
       scrapped.push({ stackId, typeId: foundType || 'Unknown', rarity: foundTier, count });
       totalItemsDelta -= BigInt(count);

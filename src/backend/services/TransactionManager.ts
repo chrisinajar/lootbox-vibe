@@ -11,6 +11,7 @@ export type StackAdjust = {
   typeId: string;
   delta: number;
   source?: string;
+  tags?: string[];
 };
 export type CurrencyAdjust = { uid: string; currency: string; delta: bigint };
 

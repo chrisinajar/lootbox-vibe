@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lootboxsim/schemas/economy.v1.json",
+  "title": "Economy v1",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "currencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "display"],
+        "properties": {
+          "id": { "type": "string" },
+          "display": { "type": "string" },
+          "precision": { "type": "integer" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "raritySalvage": {
+      "type": "object",
+      "properties": {
+        "COMMON": { "type": "integer", "minimum": 0 },
+        "UNCOMMON": { "type": "integer", "minimum": 0 },
+        "RARE": { "type": "integer", "minimum": 0 },
+        "EPIC": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "boxCosts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "startingGrants": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "exchanges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to", "rate"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "rate": {
+            "type": "object",
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "type": "integer", "minimum": 1 },
+              "to": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "dailyCapTo": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "batchOpenLimits": {
+      "type": "object",
+      "properties": { "maxPerRequest": { "type": "integer", "minimum": 1 } },
+      "additionalProperties": false
+    }
+  },
+  "required": ["version"],
+  "additionalProperties": false
+}

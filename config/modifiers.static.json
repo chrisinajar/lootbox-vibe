@@ -1,0 +1,89 @@
+{
+  "$schema": "https://lootboxsim/schemas/modifiers.static.v1.json",
+  "version": 1,
+  "modifiers": [
+    { "id": "m_shiny", "name": "Shiny", "category": "COSMETIC" },
+    { "id": "m_rainbow_text", "name": "Rainbow Text", "category": "COSMETIC" },
+    { "id": "m_confetti_burst", "name": "Confetti Burst", "category": "COSMETIC" },
+    { "id": "m_glitter_border", "name": "Glittering Border", "category": "COSMETIC" },
+    { "id": "m_meme_text", "name": "Meme Flavor Text", "category": "COSMETIC" },
+    { "id": "m_annoying_popup", "name": "Annoying Pop-Up", "category": "COSMETIC" },
+    { "id": "m_screams", "name": "Screams When Opened", "category": "COSMETIC" },
+    { "id": "m_useless", "name": "Useless", "category": "COSMETIC" },
+
+    {
+      "id": "m_scrap_boost_1",
+      "name": "ScrapBoost1",
+      "category": "MECHANICAL",
+      "effect": { "type": "SCRAP_MULTIPLIER", "valuePct": 1 }
+    },
+    {
+      "id": "m_scrap_boost_3",
+      "name": "ScrapBoost3",
+      "category": "MECHANICAL",
+      "effect": { "type": "SCRAP_MULTIPLIER", "valuePct": 3 }
+    },
+    {
+      "id": "m_scrap_boost_5",
+      "name": "ScrapBoost5",
+      "category": "MECHANICAL",
+      "effect": { "type": "SCRAP_MULTIPLIER", "valuePct": 5 }
+    },
+    {
+      "id": "m_scrap_boost_10",
+      "name": "ScrapBoost10",
+      "category": "MECHANICAL",
+      "effect": { "type": "SCRAP_MULTIPLIER", "valuePct": 10 }
+    },
+
+    {
+      "id": "m_key_boost_1",
+      "name": "KeyBoost1",
+      "category": "MECHANICAL",
+      "effect": { "type": "BONUS_KEY_CHANCE_BP", "valueBp": 10 }
+    },
+    {
+      "id": "m_key_boost_2",
+      "name": "KeyBoost2",
+      "category": "MECHANICAL",
+      "effect": { "type": "BONUS_KEY_CHANCE_BP", "valueBp": 20 }
+    },
+    {
+      "id": "m_key_boost_3",
+      "name": "KeyBoost3",
+      "category": "MECHANICAL",
+      "effect": { "type": "BONUS_KEY_CHANCE_BP", "valueBp": 30 }
+    },
+
+    {
+      "id": "m_duplicate_self_1",
+      "name": "DuplicateSelf1",
+      "category": "MECHANICAL",
+      "effect": { "type": "DUPLICATE_ON_SALVAGE", "charges": 1 }
+    },
+    {
+      "id": "m_bulk_opener",
+      "name": "BulkOpener",
+      "category": "MECHANICAL",
+      "effect": { "type": "MILESTONE_PROGRESS_MULT", "valueX": 2 }
+    },
+    {
+      "id": "m_tiny_chance_rare",
+      "name": "TinyChanceRare",
+      "category": "MECHANICAL",
+      "effect": { "type": "RARITY_UPGRADE_CHANCE_BP", "valueBp": 5 }
+    },
+    {
+      "id": "m_salvage_discount",
+      "name": "SalvageDiscount",
+      "category": "MECHANICAL",
+      "effect": { "type": "SALVAGE_FLAT_BONUS", "value": 1 }
+    },
+    {
+      "id": "m_glitter_drip",
+      "name": "GlitterDrip",
+      "category": "MECHANICAL",
+      "effect": { "type": "GLITTER_PER_SALVAGES", "per": 100, "amount": 0.1 }
+    }
+  ]
+}

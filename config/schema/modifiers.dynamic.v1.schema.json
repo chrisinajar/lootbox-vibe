@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lootboxsim/schemas/modifiers.dynamic.v1.json",
+  "title": "Dynamic modifiers v1",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "modifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "appliesOn", "formula"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "appliesOn": { "type": "array", "items": { "type": "string" } },
+          "formula": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "counter": { "type": "string" },
+              "per": { "type": "number" },
+              "pctPerStep": { "type": "number" },
+              "capPct": { "type": "number" },
+              "bpPerStep": { "type": "number" },
+              "capBp": { "type": "number" }
+            },
+            "required": ["type"],
+            "additionalProperties": true
+          },
+          "payout": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "maxPerRequest": { "type": "integer", "minimum": 0 }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "modifiers"],
+  "additionalProperties": false
+}

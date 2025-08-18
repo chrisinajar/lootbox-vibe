@@ -1,0 +1,36 @@
+{
+  "$schema": "https://lootboxsim/schemas/economy.v1.json",
+  "version": 1,
+  "currencies": [
+    { "id": "KEYS", "display": "Keys", "precision": 0 },
+    { "id": "SCRAP", "display": "Scrap", "precision": 0 },
+    { "id": "GLITTER", "display": "Glitter", "precision": 1 }
+  ],
+  "raritySalvage": {
+    "COMMON": 1,
+    "UNCOMMON": 2,
+    "RARE": 5,
+    "EPIC": 10
+  },
+  "boxCosts": {
+    "box_cardboard": 0,
+    "box_wooden": 5,
+    "box_iron": 20,
+    "box_unstable": 50
+  },
+  "startingGrants": {
+    "KEYS": 0,
+    "SCRAP": 0,
+    "GLITTER": 0
+  },
+  "exchanges": [
+    {
+      "id": "ex_scrap_to_keys",
+      "from": "SCRAP",
+      "to": "KEYS",
+      "rate": { "from": 100, "to": 1 },
+      "dailyCapTo": 10
+    }
+  ],
+  "batchOpenLimits": { "maxPerRequest": 1000 }
+}

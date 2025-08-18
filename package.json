@@ -23,6 +23,7 @@
     "prepare": "husky install",
     "agent:runbook:new": "node scripts/agent-runbook-new.js",
     "seed:dev": "tsx scripts/seed-dev.ts",
+    "tools:backfill-totals": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/backfill-totals.ts",
     "codegen": "cross-env CODEGEN_CONCURRENCY=1 graphql-codegen --config codegen.ts"
   },
   "lint-staged": {

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://lootboxsim/schemas/items.v1.json",
+  "version": 1,
+  "items": [
+    {
+      "id": "itm_rusty_spoon",
+      "name": "Rusty Spoon",
+      "typeId": "trinket",
+      "rarity": "COMMON",
+      "scrap": 1,
+      "allowedStaticMods": ["m_useless", "m_meme_text", "m_shiny"]
+    },
+    {
+      "id": "itm_bent_nail",
+      "name": "Bent Nail",
+      "typeId": "material",
+      "rarity": "COMMON",
+      "scrap": 1,
+      "allowedStaticMods": ["m_shiny", "m_rainbow_text"]
+    },
+    {
+      "id": "itm_cat_figurine",
+      "name": "Cat Figurine",
+      "typeId": "trinket",
+      "rarity": "UNCOMMON",
+      "scrap": 2,
+      "allowedStaticMods": ["m_confetti_burst", "m_glitter_border", "m_scrap_boost_1"]
+    },
+    {
+      "id": "itm_mini_anvil",
+      "name": "Mini Anvil",
+      "typeId": "trinket",
+      "rarity": "RARE",
+      "scrap": 5,
+      "allowedStaticMods": ["m_scrap_boost_3", "m_duplicate_self_1"]
+    },
+    {
+      "id": "itm_echoing_coin",
+      "name": "Echoing Coin",
+      "typeId": "trinket",
+      "rarity": "EPIC",
+      "scrap": 10,
+      "allowedStaticMods": ["m_tiny_chance_rare", "m_glitter_border"]
+    },
+
+    {
+      "id": "itm_polished_stone",
+      "name": "Polished Stone",
+      "typeId": "trinket",
+      "rarity": "COMMON",
+      "scrap": 1,
+      "allowedStaticMods": ["m_shiny", "m_meme_text"]
+    },
+    {
+      "id": "itm_tiny_gear",
+      "name": "Tiny Gear",
+      "typeId": "material",
+      "rarity": "UNCOMMON",
+      "scrap": 2,
+      "allowedStaticMods": ["m_scrap_boost_1", "m_glitter_border"]
+    },
+    {
+      "id": "itm_clockwork_mouse",
+      "name": "Clockwork Mouse",
+      "typeId": "trinket",
+      "rarity": "RARE",
+      "scrap": 5,
+      "allowedStaticMods": ["m_scrap_boost_3", "m_key_boost_1"]
+    },
+    {
+      "id": "itm_jester_hat",
+      "name": "Jester's Hat",
+      "typeId": "cosmetic",
+      "rarity": "EPIC",
+      "scrap": 10,
+      "allowedStaticMods": ["m_confetti_burst", "m_tiny_chance_rare"]
+    },
+
+    {
+      "id": "itm_gilded_spoon",
+      "name": "Gilded Spoon",
+      "typeId": "trinket",
+      "rarity": "UNCOMMON",
+      "scrap": 2,
+      "allowedStaticMods": ["m_shiny", "m_rainbow_text", "m_scrap_boost_3"]
+    },
+    {
+      "id": "itm_pocket_portal",
+      "name": "Pocket Portal",
+      "typeId": "trinket",
+      "rarity": "RARE",
+      "scrap": 5,
+      "allowedStaticMods": ["m_key_boost_2", "m_duplicate_self_1"]
+    },
+    {
+      "id": "itm_heroic_sticker",
+      "name": "Heroic Sticker",
+      "typeId": "cosmetic",
+      "rarity": "EPIC",
+      "scrap": 10,
+      "allowedStaticMods": ["m_tiny_chance_rare", "m_glitter_border"]
+    },
+
+    {
+      "id": "itm_glitch_crystal",
+      "name": "Glitch Crystal",
+      "typeId": "trinket",
+      "rarity": "EPIC",
+      "scrap": 10,
+      "allowedStaticMods": ["m_confetti_burst", "m_rainbow_text"]
+    }
+  ]
+}

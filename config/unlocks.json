@@ -1,0 +1,33 @@
+{
+  "$schema": "https://lootboxsim/schemas/unlocks.v1.json",
+  "version": 1,
+  "milestones": [
+    {
+      "id": "ms_wooden_from_cardboard",
+      "type": "milestoneUnlock",
+      "unlocks": [{ "kind": "BOX_TYPE", "boxId": "box_wooden" }],
+      "requirements": [{ "type": "OPEN_COUNT", "boxId": "box_cardboard", "count": 50 }],
+      "rewards": [{ "type": "CURRENCY", "currency": "KEYS", "amount": 3 }]
+    },
+    {
+      "id": "ms_iron_from_wooden",
+      "type": "milestoneUnlock",
+      "unlocks": [{ "kind": "BOX_TYPE", "boxId": "box_iron" }],
+      "requirements": [{ "type": "OPEN_COUNT", "boxId": "box_wooden", "count": 250 }],
+      "rewards": [{ "type": "CURRENCY", "currency": "KEYS", "amount": 10 }]
+    }
+  ],
+  "rngUnlocks": [
+    {
+      "id": "rng_unstable_from_cardboard",
+      "type": "rngUnlock",
+      "baseChanceBp": 5,
+      "scope": { "boxType": "box_cardboard" },
+      "softPity": { "startAt": 2000, "deltaBpPerTry": 2, "capBp": 100 },
+      "hardPity": { "guaranteeAt": 5000 },
+      "resetOnHit": true,
+      "minMilestone": null,
+      "carryover": { "maxCarry": 999999, "dailyDecayPct": 0 }
+    }
+  ]
+}

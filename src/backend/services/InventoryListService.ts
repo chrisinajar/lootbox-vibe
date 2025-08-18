@@ -28,9 +28,10 @@ export class InventoryListService {
     const rarity = filter?.rarity;
     const typeId = filter?.typeId;
     const sourceBoxId = filter?.sourceBoxId;
+    const curatedTags = Array.isArray(filter?.curatedTags) ? (filter!.curatedTags as string[]) : [];
 
     let prefix = '';
-    let mode: 'rarity' | 'type' | 'src' | 'inv' = 'inv';
+    let mode: 'rarity' | 'type' | 'src' | 'tag' | 'inv' = 'inv';
     if (rarity) {
       prefix = `idx:rarity:${uid}:${rarity}:`;
       mode = 'rarity';
@@ -40,6 +41,9 @@ export class InventoryListService {
     } else if (sourceBoxId) {
       prefix = `idx:src:${uid}:${sourceBoxId}:`;
       mode = 'src';
+    } else if (curatedTags.length === 1) {
+      prefix = `idx:tag:${uid}:${curatedTags[0]}:`;
+      mode = 'tag';
     } else {
       prefix = `inv:${uid}:`;
       mode = 'inv';
@@ -76,6 +80,16 @@ export class InventoryListService {
       if (mode !== 'src' && sourceBoxId) {
         const ok = await this.exists(`idx:src:${uid}:${sourceBoxId}:${sid}`);
         if (!ok) continue;
+      }
+      if (curatedTags.length > 0) {
+        let any = false;
+        for (const t of curatedTags) {
+          if (await this.exists(`idx:tag:${uid}:${t}:${sid}`)) {
+            any = true;
+            break;
+          }
+        }
+        if (!any) continue;
       }
       const inv = await this.storage.get(`inv:${uid}:${sid}`);
       const count = inv ? inv.readUInt32BE(0) : 0;

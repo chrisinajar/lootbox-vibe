@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lootboxsim/schemas/unlocks.v1.json",
+  "title": "Unlocks v1",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "unlocks", "requirements"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "const": "milestoneUnlock" },
+          "unlocks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "boxId"],
+              "properties": {
+                "kind": { "type": "string", "const": "BOX_TYPE" },
+                "boxId": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "count"],
+              "properties": {
+                "type": { "type": "string", "const": "OPEN_COUNT" },
+                "boxId": { "type": "string" },
+                "count": { "type": "integer", "minimum": 1 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "rewards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "currency", "amount"],
+              "properties": {
+                "type": { "type": "string", "const": "CURRENCY" },
+                "currency": { "type": "string" },
+                "amount": { "type": "integer", "minimum": 0 }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rngUnlocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "baseChanceBp", "scope"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "const": "rngUnlock" },
+          "baseChanceBp": { "type": "integer", "minimum": 0 },
+          "scope": {
+            "type": "object",
+            "properties": { "boxType": { "type": "string" } },
+            "additionalProperties": false
+          },
+          "softPity": {
+            "type": "object",
+            "properties": {
+              "startAt": { "type": "integer", "minimum": 0 },
+              "deltaBpPerTry": { "type": "integer", "minimum": 0 },
+              "capBp": { "type": "integer", "minimum": 0 }
+            },
+            "required": ["startAt", "deltaBpPerTry", "capBp"],
+            "additionalProperties": false
+          },
+          "hardPity": {
+            "type": "object",
+            "properties": { "guaranteeAt": { "type": "integer", "minimum": 1 } },
+            "required": ["guaranteeAt"],
+            "additionalProperties": false
+          },
+          "resetOnHit": { "type": "boolean" },
+          "minMilestone": { "type": ["string", "null"] },
+          "carryover": {
+            "type": "object",
+            "properties": {
+              "maxCarry": { "type": "integer" },
+              "dailyDecayPct": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version"],
+  "additionalProperties": false
+}
