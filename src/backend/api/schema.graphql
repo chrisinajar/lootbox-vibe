@@ -74,3 +74,10 @@ extend type Mutation { purchaseUpgrade(input: PurchaseUpgradeInput!): ShopState!
 
 input ExchangeInput { toAmount: Int! }
 extend type Mutation { exchangeScrapToKeys(input: ExchangeInput!): ShopState! }
+
+# Progression & idle
+type Milestone { id: ID!, label: String!, target: Int!, current: Int!, unlocked: Boolean! }
+type RngUnlock { id: ID!, label: String!, discovered: Boolean! }
+type Progression { milestones: [Milestone!]!, rng: [RngUnlock!]! }
+type IdleClaim { message: String!, boxesOpened: Int! }
+extend type Query { progression: Progression! }

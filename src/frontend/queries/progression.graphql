@@ -1,0 +1,11 @@
+query Progression {
+  progression {
+    milestones { id label target current unlocked }
+    rng { id label discovered }
+  }
+}
+
+mutation ClaimIdle($input: ClaimIdleInput) {
+  claimIdle(input: $input) { message boxesOpened rewards { unlocks } }
+}
+

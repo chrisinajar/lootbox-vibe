@@ -86,6 +86,12 @@ export type ExchangeInput = {
   toAmount: Scalars['Int']['input'];
 };
 
+export type IdleClaim = {
+  __typename?: 'IdleClaim';
+  boxesOpened: Scalars['Int']['output'];
+  message: Scalars['String']['output'];
+};
+
 export type IdleReport = {
   __typename?: 'IdleReport';
   boxesOpened: Scalars['Int']['output'];
@@ -115,6 +121,15 @@ export type ItemStack = {
   rarity: Rarity;
   stackId: Scalars['ID']['output'];
   typeId: Scalars['ID']['output'];
+};
+
+export type Milestone = {
+  __typename?: 'Milestone';
+  current: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+  target: Scalars['Int']['output'];
+  unlocked: Scalars['Boolean']['output'];
 };
 
 export type Mutation = {
@@ -163,6 +178,12 @@ export type PageItemStacks = {
   rows: Array<ItemStack>;
 };
 
+export type Progression = {
+  __typename?: 'Progression';
+  milestones: Array<Milestone>;
+  rng: Array<RngUnlock>;
+};
+
 export type PurchaseUpgradeInput = {
   upgradeId: Scalars['ID']['input'];
 };
@@ -174,6 +195,7 @@ export type Query = {
   currencies: Array<CurrencyBalance>;
   inventoryList: PageItemStacks;
   inventorySummary: InventorySummary;
+  progression: Progression;
   shop: ShopState;
   unlockedBoxes: Array<Scalars['ID']['output']>;
 };
@@ -213,6 +235,13 @@ export type Rewards = {
   currencies: Array<RewardCurrency>;
   stacks: Array<RewardStack>;
   unlocks: Array<Scalars['ID']['output']>;
+};
+
+export type RngUnlock = {
+  __typename?: 'RngUnlock';
+  discovered: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
 };
 
 export type SalvageInput = {
@@ -273,6 +302,18 @@ export type OpenBoxesMutationVariables = Exact<{
 
 export type OpenBoxesMutation = { __typename?: 'Mutation', openBoxes: { __typename?: 'Rewards', unlocks: Array<string>, stacks: Array<{ __typename?: 'RewardStack', stackId: string, typeId: string, rarity: Rarity, count: number }>, currencies: Array<{ __typename?: 'RewardCurrency', currency: string, amount: any }> } };
 
+export type ProgressionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ProgressionQuery = { __typename?: 'Query', progression: { __typename?: 'Progression', milestones: Array<{ __typename?: 'Milestone', id: string, label: string, target: number, current: number, unlocked: boolean }>, rng: Array<{ __typename?: 'RngUnlock', id: string, label: string, discovered: boolean }> } };
+
+export type ClaimIdleMutationVariables = Exact<{
+  input?: InputMaybe<ClaimIdleInput>;
+}>;
+
+
+export type ClaimIdleMutation = { __typename?: 'Mutation', claimIdle: { __typename?: 'IdleReport', message: string, boxesOpened: number, rewards: { __typename?: 'Rewards', unlocks: Array<string> } } };
+
 export type SalvageMutationVariables = Exact<{
   input: SalvageInput;
 }>;
@@ -310,6 +351,8 @@ export const CurrenciesDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const InventoryListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InventoryList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"InventoryFilter"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inventoryList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"cursor"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rows"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stackId"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"nextCursor"}}]}}]}}]} as unknown as DocumentNode<InventoryListQuery, InventoryListQueryVariables>;
 export const InventorySummaryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InventorySummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inventorySummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalStacks"}},{"kind":"Field","name":{"kind":"Name","value":"totalItems"}},{"kind":"Field","name":{"kind":"Name","value":"byRarity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"byType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]}}]} as unknown as DocumentNode<InventorySummaryQuery, InventorySummaryQueryVariables>;
 export const OpenBoxesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"OpenBoxes"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OpenBoxesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"openBoxes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stacks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stackId"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currencies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"unlocks"}}]}}]}}]} as unknown as DocumentNode<OpenBoxesMutation, OpenBoxesMutationVariables>;
+export const ProgressionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Progression"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"progression"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"milestones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"target"}},{"kind":"Field","name":{"kind":"Name","value":"current"}},{"kind":"Field","name":{"kind":"Name","value":"unlocked"}}]}},{"kind":"Field","name":{"kind":"Name","value":"rng"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"discovered"}}]}}]}}]}}]} as unknown as DocumentNode<ProgressionQuery, ProgressionQueryVariables>;
+export const ClaimIdleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ClaimIdle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ClaimIdleInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"claimIdle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"boxesOpened"}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unlocks"}}]}}]}}]}}]} as unknown as DocumentNode<ClaimIdleMutation, ClaimIdleMutationVariables>;
 export const SalvageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Salvage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SalvageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"salvage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scrapped"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stackId"}},{"kind":"Field","name":{"kind":"Name","value":"typeId"}},{"kind":"Field","name":{"kind":"Name","value":"rarity"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currencies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]}}]} as unknown as DocumentNode<SalvageMutation, SalvageMutationVariables>;
 export const ShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Shop"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upgrades"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"desc"}},{"kind":"Field","name":{"kind":"Name","value":"costScrap"}},{"kind":"Field","name":{"kind":"Name","value":"purchased"}}]}},{"kind":"Field","name":{"kind":"Name","value":"exchange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"rateFrom"}},{"kind":"Field","name":{"kind":"Name","value":"rateTo"}},{"kind":"Field","name":{"kind":"Name","value":"mintedToday"}},{"kind":"Field","name":{"kind":"Name","value":"dailyCapTo"}}]}}]}}]}}]} as unknown as DocumentNode<ShopQuery, ShopQueryVariables>;
 export const PurchaseUpgradeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PurchaseUpgrade"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PurchaseUpgradeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"purchaseUpgrade"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upgrades"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"purchased"}}]}},{"kind":"Field","name":{"kind":"Name","value":"exchange"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mintedToday"}}]}}]}}]}}]} as unknown as DocumentNode<PurchaseUpgradeMutation, PurchaseUpgradeMutationVariables>;

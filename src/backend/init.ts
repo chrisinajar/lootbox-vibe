@@ -17,6 +17,7 @@ import { OpenBoxesService } from './services/OpenBoxesService';
 import { SalvageService } from './services/SalvageService';
 import { IdleSvc } from './services/IdleSvc';
 import { ShopService } from './services/ShopService';
+import { u64 } from './storage/codec';
 import { TelemetryService } from './services/TelemetryService';
 import { CurrencyService } from './services/CurrencyService';
 
@@ -215,6 +216,52 @@ export async function initializeServer(options: InitOptions = {}) {
         const uid: string = ctx?.uid ?? 'anonymous';
         const res = await shopSvc.getShop(uid);
         return res;
+      },
+      progression: async (_: any, __: any, ctx: any) => {
+        const uid: string = ctx?.uid ?? 'anonymous';
+        const cfg = cfgLoader.load();
+        const milestones: any[] = Array.isArray((cfg as any).unlocks?.milestones)
+          ? ((cfg as any).unlocks.milestones as any[])
+          : [];
+        const rngs: any[] = Array.isArray((cfg as any).unlocks?.rngUnlocks)
+          ? ((cfg as any).unlocks.rngUnlocks as any[])
+          : [];
+        const lifetimeKey = `pstat:${uid}.lifetimeBoxesOpened`;
+        const currentOpens = Number(u64.decodeBE(await storage.get(lifetimeKey)));
+        // unlocked boxes profile
+        const pbuf = await storage.get(`ppro:${uid}`);
+        let unlocked: string[] = [];
+        if (pbuf) {
+          try {
+            const p = JSON.parse(String(pbuf));
+            if (Array.isArray(p.unlockedBoxIds)) unlocked = p.unlockedBoxIds;
+          } catch {}
+        }
+        const mOut = milestones.map((m: any) => {
+          // compute target from first OPEN_COUNT requirement
+          const reqs: any[] = Array.isArray(m.requirements) ? m.requirements : [];
+          const reqOpen = reqs.find((r: any) => r.type === 'OPEN_COUNT');
+          const target = Number(reqOpen?.count ?? 0);
+          const label = String(m.id);
+          // unlocked if any unlocks[].boxId present in unlocked list
+          let isUnlocked = false;
+          const us: any[] = Array.isArray(m.unlocks) ? m.unlocks : [];
+          for (const u of us) {
+            if (u?.kind === 'BOX_TYPE' && unlocked.includes(String(u.boxId))) {
+              isUnlocked = true;
+              break;
+            }
+          }
+          return {
+            id: String(m.id),
+            label,
+            target,
+            current: Math.min(currentOpens, target || currentOpens),
+            unlocked: isUnlocked,
+          };
+        });
+        const rOut = rngs.map((r: any) => ({ id: String(r.id), label: '???', discovered: false }));
+        return { milestones: mOut, rng: rOut };
       },
     },
     Mutation: {

@@ -5,6 +5,7 @@ import { useTheme } from './theme/ThemeProvider';
 import { HomeMain } from './home/Home';
 import { InventoryView } from './inventory/Inventory';
 import { CollectionView } from './collection/Collection';
+import { ProgressionView } from './progression/Progression';
 import { ShopView } from './shop/Shop';
 
 function useHashPath() {
@@ -74,6 +75,23 @@ const HomeShell: React.FC = () => {
 const App: React.FC = () => {
   const path = useHashPath();
   if (ENABLE_DEV_UI && path === '/dev') return <DevDashboard />;
+  if (path === '/progression')
+    return (
+      <div className="min-h-dvh p-6">
+        <header className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Progression</h1>
+            <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
+              Milestones and RNG unlocks.
+            </p>
+          </div>
+          <a href="/#/" className="btn-primary">
+            Back to Home
+          </a>
+        </header>
+        <ProgressionView />
+      </div>
+    );
   if (path === '/shop')
     return (
       <div className="min-h-dvh p-6">
