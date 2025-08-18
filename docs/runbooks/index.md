@@ -24,3 +24,5 @@ Runbooks:
 - telemetry-elog: Capture per-request telemetry in JSONL — when instrumenting new operations or analyzing performance.
 - inventory-list-readpath: Implement and extend inventory list with cursors and facets — when adding filters or debugging pagination.
 - storage-index-keys: Index key shapes and 0↔>0 maintenance — when adding new indexes or debugging drift.
+- modifiers-categories-economy: COSMETIC vs MECHANICAL rules and economic fields — when adding static modifiers.
+- boxes-self-drop-rules: Configure and enforce self-drop behavior — when adding/changing box drop rules.

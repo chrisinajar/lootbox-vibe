@@ -22,7 +22,9 @@
             "additionalProperties": false
           }
         },
-        "keyCost": { "type": "number", "minimum": 0 }
+        "keyCost": { "type": "number", "minimum": 0 },
+        "selfDropCap": { "type": "number", "minimum": 0 },
+        "forbidSelfDrop": { "type": "boolean" }
       },
       "additionalProperties": false
     }

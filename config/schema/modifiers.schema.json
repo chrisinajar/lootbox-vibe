@@ -8,8 +8,32 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id"],
-        "properties": { "id": { "type": "string" }, "desc": { "type": "string" } }
+        "required": ["id", "category"],
+        "properties": {
+          "id": { "type": "string" },
+          "desc": { "type": "string" },
+          "category": { "type": "string", "enum": ["COSMETIC", "MECHANICAL"] },
+          "economic": {
+            "type": "object",
+            "description": "Economic effect settings only allowed for MECHANICAL mods",
+            "properties": {
+              "scrapYieldMult": { "type": "number" },
+              "keyBonusChance": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "not": {
+              "allOf": [
+                { "properties": { "category": { "const": "COSMETIC" } } },
+                { "properties": { "economic": {} }, "required": ["economic"] }
+              ]
+            }
+          }
+        ]
       }
     },
     "dynamic": {

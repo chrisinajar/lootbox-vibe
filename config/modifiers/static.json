@@ -1,4 +1,4 @@
 [
-  { "id": "mod.lucky", "desc": "+5% luck" },
-  { "id": "mod.rugged", "desc": "+2% durability" }
+  { "id": "mod.lucky", "desc": "+5% luck", "category": "COSMETIC" },
+  { "id": "mod.rugged", "desc": "+2% durability", "category": "COSMETIC" }
 ]
