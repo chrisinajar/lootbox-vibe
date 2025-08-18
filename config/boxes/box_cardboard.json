@@ -8,19 +8,53 @@
   "dropTable": {
     "rolls": 1,
     "entries": [
-      { "type": "ITEM", "weight": 4500, "itemId": "itm_rusty_spoon", "rarity": "COMMON", "staticModsPool": ["m_useless", "m_meme_text", "m_shiny"] },
-      { "type": "ITEM", "weight": 3500, "itemId": "itm_bent_nail", "rarity": "COMMON", "staticModsPool": ["m_shiny", "m_rainbow_text"] },
-      { "type": "ITEM", "weight": 800, "itemId": "itm_cat_figurine", "rarity": "UNCOMMON", "staticModsPool": ["m_confetti_burst", "m_glitter_border", "m_scrap_boost_1"] },
-      { "type": "ITEM", "weight": 150, "itemId": "itm_mini_anvil", "rarity": "RARE", "staticModsPool": ["m_scrap_boost_3", "m_duplicate_self_1"] },
-      { "type": "ITEM", "weight": 30, "itemId": "itm_echoing_coin", "rarity": "EPIC", "staticModsPool": ["m_tiny_chance_rare", "m_glitter_border"] },
+      {
+        "type": "ITEM",
+        "weight": 4500,
+        "itemId": "itm_rusty_spoon",
+        "rarity": "COMMON",
+        "staticModsPool": ["m_useless", "m_meme_text", "m_shiny"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 3500,
+        "itemId": "itm_bent_nail",
+        "rarity": "COMMON",
+        "staticModsPool": ["m_shiny", "m_rainbow_text"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 800,
+        "itemId": "itm_cat_figurine",
+        "rarity": "UNCOMMON",
+        "staticModsPool": ["m_confetti_burst", "m_glitter_border", "m_scrap_boost_1"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 150,
+        "itemId": "itm_mini_anvil",
+        "rarity": "RARE",
+        "staticModsPool": ["m_scrap_boost_3", "m_duplicate_self_1"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 30,
+        "itemId": "itm_echoing_coin",
+        "rarity": "EPIC",
+        "staticModsPool": ["m_tiny_chance_rare", "m_glitter_border"]
+      },
 
       { "type": "CURRENCY", "weight": 400, "currency": "KEYS", "amount": { "min": 1, "max": 1 } },
-      { "type": "CURRENCY", "weight": 50,  "currency": "KEYS", "amount": { "min": 2, "max": 2 } },
+      { "type": "CURRENCY", "weight": 50, "currency": "KEYS", "amount": { "min": 2, "max": 2 } },
 
       { "type": "BOX", "weight": 500, "boxId": "box_cardboard", "count": 1 },
 
-      { "type": "MATERIAL", "weight": 540, "materialId": "mat_scrap_chunk", "amount": { "min": 1, "max": 2 } }
+      {
+        "type": "MATERIAL",
+        "weight": 540,
+        "materialId": "mat_scrap_chunk",
+        "amount": { "min": 1, "max": 2 }
+      }
     ]
   }
 }
-

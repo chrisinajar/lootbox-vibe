@@ -1,15 +1,17 @@
 # Game Configuration Reference (Generated)
 
-Generated at: 2025-08-18T06:32:57.114Z
+Generated at: 2025-08-18T06:34:03.932Z
 This document is generated from files in the `config/` directory. Do not edit by hand.
 
 ## Economy
+
 ### Currencies
-| id | display | precision |
-|---|---|---:|
-| KEYS | Keys | 0 |
-| SCRAP | Scrap | 0 |
-| GLITTER | Glitter | 1 |
+
+| id      | display | precision |
+| ------- | ------- | --------: |
+| KEYS    | Keys    |         0 |
+| SCRAP   | Scrap   |         0 |
+| GLITTER | Glitter |         1 |
 
 ### Rarity Salvage
 
@@ -26,13 +28,17 @@ This document is generated from files in the `config/` directory. Do not edit by
 - box_unstable: 50
 
 ### Exchanges
+
 - ex_scrap_to_keys: SCRAP -> KEYS at 100:1 (daily cap to = 10)
 
 ### Batch Open Limits
+
 - maxPerRequest: 1000
 
 ## Boxes
+
 ### Cardboard Box (box_cardboard)
+
 - tier: 1
 - keyCost: 0
 - forbidSelfDrop: false
@@ -52,6 +58,7 @@ Entries:
 | MATERIAL | 540 | materialId=mat_scrap_chunk amount=1–2 |
 
 ### Wooden Crate (box_wooden)
+
 - tier: 2
 - keyCost: 5
 - forbidSelfDrop: true
@@ -68,6 +75,7 @@ Entries:
 | BOX | 200 | boxId=box_cardboard count=2–5 |
 
 ### Iron Chest (box_iron)
+
 - tier: 3
 - keyCost: 20
 - forbidSelfDrop: true
@@ -83,6 +91,7 @@ Entries:
 | BOX | 200 | boxId=box_wooden count=1–2 |
 
 ### Dimensionally Unstable Box (box_unstable)
+
 - tier: 4
 - keyCost: 50
 - forbidSelfDrop: true
@@ -98,7 +107,9 @@ Entries:
 | MATERIAL | 1000 | materialId=mat_scrap_chunk amount=10–25 |
 
 ## Unlocks
+
 ### Milestones
+
 - ms_wooden_from_cardboard:
   - requirements: OPEN_COUNT(box_cardboard):50
   - unlocks: BOX_TYPE:box_wooden
@@ -109,14 +120,18 @@ Entries:
   - rewards: CURRENCY:KEYS+10
 
 ### RNG Unlocks
+
 - rng_unstable_from_cardboard: scope=box_cardboard baseChanceBp=5
   - softPity: startAt=2000 deltaBpPerTry=2 capBp=100
   - hardPity: guaranteeAt=5000
   - resetOnHit: true
 
 ## Modifiers
+
 ### Static
+
 #### COSMETIC
+
 - m_shiny — Shiny
 - m_rainbow_text — Rainbow Text
 - m_confetti_burst — Confetti Burst
@@ -125,7 +140,9 @@ Entries:
 - m_annoying_popup — Annoying Pop-Up
 - m_screams — Screams When Opened
 - m_useless — Useless
+
 #### MECHANICAL
+
 - m_scrap_boost_1 — ScrapBoost1 (effect: SCRAP_MULTIPLIER)
 - m_scrap_boost_3 — ScrapBoost3 (effect: SCRAP_MULTIPLIER)
 - m_scrap_boost_5 — ScrapBoost5 (effect: SCRAP_MULTIPLIER)
@@ -140,6 +157,7 @@ Entries:
 - m_glitter_drip — GlitterDrip (effect: GLITTER_PER_SALVAGES)
 
 ### Dynamic
+
 - d_greedy — Greedy
   - appliesOn: SALVAGE_VALUE_PRE_CREDIT, UI_VALUE_PREVIEW
   - formula: LINEAR_PER_COUNTER
@@ -149,40 +167,48 @@ Entries:
   - payout: BONUS_KEYS (maxPerRequest=1)
 
 ## Items Catalog
+
 ### COMMON
-| id | name | type | scrap | mods |
-|---|---|---|---:|---|
-| itm_rusty_spoon | Rusty Spoon | trinket | 1 | m_useless, m_meme_text, m_shiny |
-| itm_bent_nail | Bent Nail | material | 1 | m_shiny, m_rainbow_text |
-| itm_polished_stone | Polished Stone | trinket | 1 | m_shiny, m_meme_text |
+
+| id                 | name           | type     | scrap | mods                            |
+| ------------------ | -------------- | -------- | ----: | ------------------------------- |
+| itm_rusty_spoon    | Rusty Spoon    | trinket  |     1 | m_useless, m_meme_text, m_shiny |
+| itm_bent_nail      | Bent Nail      | material |     1 | m_shiny, m_rainbow_text         |
+| itm_polished_stone | Polished Stone | trinket  |     1 | m_shiny, m_meme_text            |
 
 ### UNCOMMON
-| id | name | type | scrap | mods |
-|---|---|---|---:|---|
-| itm_cat_figurine | Cat Figurine | trinket | 2 | m_confetti_burst, m_glitter_border, m_scrap_boost_1 |
-| itm_tiny_gear | Tiny Gear | material | 2 | m_scrap_boost_1, m_glitter_border |
-| itm_gilded_spoon | Gilded Spoon | trinket | 2 | m_shiny, m_rainbow_text, m_scrap_boost_3 |
+
+| id               | name         | type     | scrap | mods                                                |
+| ---------------- | ------------ | -------- | ----: | --------------------------------------------------- |
+| itm_cat_figurine | Cat Figurine | trinket  |     2 | m_confetti_burst, m_glitter_border, m_scrap_boost_1 |
+| itm_tiny_gear    | Tiny Gear    | material |     2 | m_scrap_boost_1, m_glitter_border                   |
+| itm_gilded_spoon | Gilded Spoon | trinket  |     2 | m_shiny, m_rainbow_text, m_scrap_boost_3            |
 
 ### RARE
-| id | name | type | scrap | mods |
-|---|---|---|---:|---|
-| itm_mini_anvil | Mini Anvil | trinket | 5 | m_scrap_boost_3, m_duplicate_self_1 |
-| itm_clockwork_mouse | Clockwork Mouse | trinket | 5 | m_scrap_boost_3, m_key_boost_1 |
-| itm_pocket_portal | Pocket Portal | trinket | 5 | m_key_boost_2, m_duplicate_self_1 |
+
+| id                  | name            | type    | scrap | mods                                |
+| ------------------- | --------------- | ------- | ----: | ----------------------------------- |
+| itm_mini_anvil      | Mini Anvil      | trinket |     5 | m_scrap_boost_3, m_duplicate_self_1 |
+| itm_clockwork_mouse | Clockwork Mouse | trinket |     5 | m_scrap_boost_3, m_key_boost_1      |
+| itm_pocket_portal   | Pocket Portal   | trinket |     5 | m_key_boost_2, m_duplicate_self_1   |
 
 ### EPIC
-| id | name | type | scrap | mods |
-|---|---|---|---:|---|
-| itm_echoing_coin | Echoing Coin | trinket | 10 | m_tiny_chance_rare, m_glitter_border |
-| itm_jester_hat | Jester's Hat | cosmetic | 10 | m_confetti_burst, m_tiny_chance_rare |
-| itm_heroic_sticker | Heroic Sticker | cosmetic | 10 | m_tiny_chance_rare, m_glitter_border |
-| itm_glitch_crystal | Glitch Crystal | trinket | 10 | m_confetti_burst, m_rainbow_text |
+
+| id                 | name           | type     | scrap | mods                                 |
+| ------------------ | -------------- | -------- | ----: | ------------------------------------ |
+| itm_echoing_coin   | Echoing Coin   | trinket  |    10 | m_tiny_chance_rare, m_glitter_border |
+| itm_jester_hat     | Jester's Hat   | cosmetic |    10 | m_confetti_burst, m_tiny_chance_rare |
+| itm_heroic_sticker | Heroic Sticker | cosmetic |    10 | m_tiny_chance_rare, m_glitter_border |
+| itm_glitch_crystal | Glitch Crystal | trinket  |    10 | m_confetti_burst, m_rainbow_text     |
 
 ## Idle Flavor
+
 - catchUp.enabled: false
 - catchUp.capHours: 8
 - catchUp.strategy: DETERMINISTIC_ON_LOGIN
+
 ### Flavor lines
+
 - While you were gone, your cat opened {boxes} boxes and knocked over {cups} cups of water.
 - Gremlins broke in and opened {boxes} boxes. They only stole {percent}% of the loot this time.
 - Your cardboard golem tirelessly opened {boxes} boxes. It now demands a name.

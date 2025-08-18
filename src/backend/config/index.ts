@@ -59,7 +59,8 @@ export class ConfigLoader {
     const dynamicModsPath = path.join(this.configDir, 'modifiers.dynamic.json');
     const itemsPath = path.join(this.configDir, 'items.catalog.json');
 
-    const hasConfig = (fs.existsSync(boxesPath) || fs.existsSync(boxesDir)) && fs.existsSync(unlocksPath);
+    const hasConfig =
+      (fs.existsSync(boxesPath) || fs.existsSync(boxesDir)) && fs.existsSync(unlocksPath);
 
     if (hasConfig) {
       type BoxesMany = { version: number; boxes: unknown[] };
@@ -111,9 +112,13 @@ export class ConfigLoader {
       if (!validators.idle(idleBlob))
         throw new Error('Invalid idle: ' + JSON.stringify(validators.idle.errors));
       if (!validators.modifiersStatic(staticModsBlob))
-        throw new Error('Invalid static modifiers: ' + JSON.stringify(validators.modifiersStatic.errors));
+        throw new Error(
+          'Invalid static modifiers: ' + JSON.stringify(validators.modifiersStatic.errors),
+        );
       if (!validators.modifiersDynamic(dynamicModsBlob))
-        throw new Error('Invalid dynamic modifiers: ' + JSON.stringify(validators.modifiersDynamic.errors));
+        throw new Error(
+          'Invalid dynamic modifiers: ' + JSON.stringify(validators.modifiersDynamic.errors),
+        );
       if (!validators.items(itemsBlob))
         throw new Error('Invalid items: ' + JSON.stringify(validators.items.errors));
 

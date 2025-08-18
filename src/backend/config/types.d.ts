@@ -1,7 +1,37 @@
 /* auto-generated from /config/schema */
 
-export interface BoxesSchema {
-  [k: string]: unknown;
+export interface SingleBoxV1 {
+  id: string;
+  name: string;
+  tier: number;
+  keyCost: number;
+  forbidSelfDrop?: boolean;
+  selfDropCap?: number;
+  dropTable: {
+    rolls: number;
+    entries: {
+      type: "ITEM" | "CURRENCY" | "BOX" | "MATERIAL";
+      weight: number;
+      itemId?: string;
+      rarity?: string;
+      staticModsPool?: string[];
+      currency?: string;
+      amount?:
+        | number
+        | {
+            min: number;
+            max: number;
+          };
+      boxId?: string;
+      count?:
+        | number
+        | {
+            min: number;
+            max: number;
+          };
+      materialId?: string;
+    }[];
+  };
 }
 
 export interface BoxesV1 {
@@ -42,17 +72,6 @@ export interface BoxesV1 {
   }[];
 }
 
-export interface EconomySchema {
-  scrapPerRarity: {
-    COMMON: number;
-    UNCOMMON: number;
-    RARE: number;
-    EPIC: number;
-    LEGENDARY: number;
-    MYTHIC: number;
-  };
-}
-
 export interface EconomyV1 {
   $schema?: string;
   version: number;
@@ -90,10 +109,6 @@ export interface EconomyV1 {
   };
 }
 
-export interface FlavorSchema {
-  flavors: string[];
-}
-
 export interface IdleV1 {
   $schema?: string;
   version: number;
@@ -111,12 +126,6 @@ export interface IdleV1 {
     };
   };
 }
-
-export type ItemsSchema = {
-  id: string;
-  name: string;
-  rarity: "common" | "uncommon" | "rare" | "epic" | "legendary";
-}[];
 
 export interface ItemsCatalogV1 {
   $schema?: string;
@@ -156,40 +165,12 @@ export interface DynamicModifiersV1 {
   }[];
 }
 
-export interface ModifiersSchema {
-  static?: {
-    [k: string]: unknown;
-  }[];
-  dynamic?: {
-    id: string;
-    desc?: string;
-    [k: string]: unknown;
-  }[];
-}
-
 export interface StaticModifiersV1 {
   $schema?: string;
   version: number;
   modifiers: {
-    id: string;
-    name: string;
-    category: "COSMETIC" | "MECHANICAL";
-    effect?: {
-      type?: string;
-      valuePct?: number;
-      valueBp?: number;
-      charges?: number;
-      value?: number;
-      per?: number;
-      amount?: number;
-      valueX?: number;
-      [k: string]: unknown;
-    };
+    [k: string]: unknown;
   }[];
-}
-
-export interface UnlocksSchema {
-  [k: string]: unknown;
 }
 
 export interface UnlocksV1 {

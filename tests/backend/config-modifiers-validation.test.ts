@@ -22,7 +22,12 @@ describe('Modifiers schema validation', () => {
     const bad = {
       version: 1,
       modifiers: [
-        { id: 'm.bad', name: 'Bad', category: 'COSMETIC', effect: { type: 'SCRAP_MULTIPLIER', valuePct: 1 } },
+        {
+          id: 'm.bad',
+          name: 'Bad',
+          category: 'COSMETIC',
+          effect: { type: 'SCRAP_MULTIPLIER', valuePct: 1 },
+        },
       ],
     };
     expect(ajv.validate(schema, bad)).toBe(false);

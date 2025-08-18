@@ -7,16 +7,44 @@
   "dropTable": {
     "rolls": 1,
     "entries": [
-      { "type": "ITEM", "weight": 4200, "itemId": "itm_polished_stone", "rarity": "COMMON", "staticModsPool": ["m_shiny", "m_meme_text"] },
-      { "type": "ITEM", "weight": 3000, "itemId": "itm_tiny_gear", "rarity": "UNCOMMON", "staticModsPool": ["m_scrap_boost_1", "m_glitter_border"] },
-      { "type": "ITEM", "weight": 600,  "itemId": "itm_clockwork_mouse", "rarity": "RARE", "staticModsPool": ["m_scrap_boost_3", "m_key_boost_1"] },
-      { "type": "ITEM", "weight": 140,  "itemId": "itm_jester_hat", "rarity": "EPIC", "staticModsPool": ["m_confetti_burst", "m_tiny_chance_rare"] },
+      {
+        "type": "ITEM",
+        "weight": 4200,
+        "itemId": "itm_polished_stone",
+        "rarity": "COMMON",
+        "staticModsPool": ["m_shiny", "m_meme_text"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 3000,
+        "itemId": "itm_tiny_gear",
+        "rarity": "UNCOMMON",
+        "staticModsPool": ["m_scrap_boost_1", "m_glitter_border"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 600,
+        "itemId": "itm_clockwork_mouse",
+        "rarity": "RARE",
+        "staticModsPool": ["m_scrap_boost_3", "m_key_boost_1"]
+      },
+      {
+        "type": "ITEM",
+        "weight": 140,
+        "itemId": "itm_jester_hat",
+        "rarity": "EPIC",
+        "staticModsPool": ["m_confetti_burst", "m_tiny_chance_rare"]
+      },
 
       { "type": "CURRENCY", "weight": 700, "currency": "KEYS", "amount": { "min": 1, "max": 2 } },
-      { "type": "MATERIAL", "weight": 360, "materialId": "mat_scrap_chunk", "amount": { "min": 2, "max": 4 } },
+      {
+        "type": "MATERIAL",
+        "weight": 360,
+        "materialId": "mat_scrap_chunk",
+        "amount": { "min": 2, "max": 4 }
+      },
 
       { "type": "BOX", "weight": 200, "boxId": "box_cardboard", "count": { "min": 2, "max": 5 } }
     ]
   }
 }
-

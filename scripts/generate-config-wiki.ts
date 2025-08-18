@@ -44,23 +44,33 @@ function main() {
     const blob = readJson(boxesJson);
     boxes = Array.isArray(blob?.boxes) ? blob.boxes : [];
   }
-  const economy = exists(path.join(cfgDir, 'economy.json')) ? readJson(path.join(cfgDir, 'economy.json')) : {};
-  const unlocks = exists(path.join(cfgDir, 'unlocks.json')) ? readJson(path.join(cfgDir, 'unlocks.json')) : {};
+  const economy = exists(path.join(cfgDir, 'economy.json'))
+    ? readJson(path.join(cfgDir, 'economy.json'))
+    : {};
+  const unlocks = exists(path.join(cfgDir, 'unlocks.json'))
+    ? readJson(path.join(cfgDir, 'unlocks.json'))
+    : {};
   const modsStatic = exists(path.join(cfgDir, 'modifiers.static.json'))
     ? readJson(path.join(cfgDir, 'modifiers.static.json'))
     : { modifiers: [] };
   const modsDynamic = exists(path.join(cfgDir, 'modifiers.dynamic.json'))
     ? readJson(path.join(cfgDir, 'modifiers.dynamic.json'))
     : { modifiers: [] };
-  const idle = exists(path.join(cfgDir, 'idle.json')) ? readJson(path.join(cfgDir, 'idle.json')) : {};
-  const items = exists(path.join(cfgDir, 'items.catalog.json')) ? readJson(path.join(cfgDir, 'items.catalog.json')) : { items: [] };
+  const idle = exists(path.join(cfgDir, 'idle.json'))
+    ? readJson(path.join(cfgDir, 'idle.json'))
+    : {};
+  const items = exists(path.join(cfgDir, 'items.catalog.json'))
+    ? readJson(path.join(cfgDir, 'items.catalog.json'))
+    : { items: [] };
 
   // Build markdown
   const out: string[] = [];
   out.push(h(1, 'Game Configuration Reference (Generated)'));
   out.push('');
   out.push(`Generated at: ${new Date().toISOString()}`);
-  out.push('This document is generated from files in the `config/` directory. Do not edit by hand.');
+  out.push(
+    'This document is generated from files in the `config/` directory. Do not edit by hand.',
+  );
   out.push('');
 
   // Economy
@@ -69,7 +79,8 @@ function main() {
     out.push(h(3, 'Currencies'));
     out.push('| id | display | precision |');
     out.push('|---|---|---:|');
-    for (const c of economy.currencies) out.push(`| ${c.id} | ${c.display} | ${c.precision ?? 0} |`);
+    for (const c of economy.currencies)
+      out.push(`| ${c.id} | ${c.display} | ${c.precision ?? 0} |`);
     out.push('');
   }
   if (economy.raritySalvage) {
@@ -87,7 +98,9 @@ function main() {
   if (Array.isArray(economy.exchanges)) {
     out.push(h(3, 'Exchanges'));
     for (const ex of economy.exchanges) {
-      out.push(`- ${ex.id}: ${ex.from} -> ${ex.to} at ${ex.rate?.from}:${ex.rate?.to} (daily cap to = ${ex.dailyCapTo ?? 0})`);
+      out.push(
+        `- ${ex.id}: ${ex.from} -> ${ex.to} at ${ex.rate?.from}:${ex.rate?.to} (daily cap to = ${ex.dailyCapTo ?? 0})`,
+      );
     }
     out.push('');
   }
@@ -99,7 +112,9 @@ function main() {
 
   // Boxes
   out.push(h(2, 'Boxes'));
-  const boxesSorted = [...boxes].sort((a, b) => (a.tier ?? 0) - (b.tier ?? 0) || String(a.name).localeCompare(String(b.name)));
+  const boxesSorted = [...boxes].sort(
+    (a, b) => (a.tier ?? 0) - (b.tier ?? 0) || String(a.name).localeCompare(String(b.name)),
+  );
   for (const b of boxesSorted) {
     out.push(h(3, `${b.name} (${b.id})`));
     out.push(`- tier: ${b.tier}`);
@@ -115,9 +130,11 @@ function main() {
       for (const e of dt.entries) {
         let details = '';
         if (e.type === 'ITEM') details = `itemId=${e.itemId} rarity=${e.rarity}`;
-        else if (e.type === 'CURRENCY') details = `currency=${e.currency} amount=${fmtRange(e.amount)}`;
+        else if (e.type === 'CURRENCY')
+          details = `currency=${e.currency} amount=${fmtRange(e.amount)}`;
         else if (e.type === 'BOX') details = `boxId=${e.boxId} count=${fmtRange(e.count)}`;
-        else if (e.type === 'MATERIAL') details = `materialId=${e.materialId} amount=${fmtRange(e.amount)}`;
+        else if (e.type === 'MATERIAL')
+          details = `materialId=${e.materialId} amount=${fmtRange(e.amount)}`;
         out.push(`| ${e.type} | ${e.weight} | ${details} |`);
       }
       out.push('');
@@ -130,9 +147,18 @@ function main() {
     out.push(h(3, 'Milestones'));
     for (const m of unlocks.milestones) {
       out.push(`- ${m.id}:`);
-      if (Array.isArray(m.requirements)) out.push(`  - requirements: ${m.requirements.map((r: any) => `${r.type}${r.boxId ? `(${r.boxId})` : ''}:${r.count ?? ''}`).join(', ')}`);
-      if (Array.isArray(m.unlocks)) out.push(`  - unlocks: ${m.unlocks.map((u: any) => `${u.kind}:${u.boxId ?? ''}`).join(', ')}`);
-      if (Array.isArray(m.rewards)) out.push(`  - rewards: ${m.rewards.map((r: any) => `${r.type}:${r.currency ?? ''}+${r.amount ?? ''}`).join(', ')}`);
+      if (Array.isArray(m.requirements))
+        out.push(
+          `  - requirements: ${m.requirements.map((r: any) => `${r.type}${r.boxId ? `(${r.boxId})` : ''}:${r.count ?? ''}`).join(', ')}`,
+        );
+      if (Array.isArray(m.unlocks))
+        out.push(
+          `  - unlocks: ${m.unlocks.map((u: any) => `${u.kind}:${u.boxId ?? ''}`).join(', ')}`,
+        );
+      if (Array.isArray(m.rewards))
+        out.push(
+          `  - rewards: ${m.rewards.map((r: any) => `${r.type}:${r.currency ?? ''}+${r.amount ?? ''}`).join(', ')}`,
+        );
     }
     out.push('');
   }
@@ -140,7 +166,10 @@ function main() {
     out.push(h(3, 'RNG Unlocks'));
     for (const r of unlocks.rngUnlocks) {
       out.push(`- ${r.id}: scope=${r.scope?.boxType ?? 'global'} baseChanceBp=${r.baseChanceBp}`);
-      if (r.softPity) out.push(`  - softPity: startAt=${r.softPity.startAt} deltaBpPerTry=${r.softPity.deltaBpPerTry} capBp=${r.softPity.capBp}`);
+      if (r.softPity)
+        out.push(
+          `  - softPity: startAt=${r.softPity.startAt} deltaBpPerTry=${r.softPity.deltaBpPerTry} capBp=${r.softPity.capBp}`,
+        );
       if (r.hardPity) out.push(`  - hardPity: guaranteeAt=${r.hardPity.guaranteeAt}`);
       out.push(`  - resetOnHit: ${r.resetOnHit ? 'true' : 'false'}`);
     }
@@ -170,7 +199,10 @@ function main() {
       out.push(`- ${m.id} — ${m.name}`);
       if (Array.isArray(m.appliesOn)) out.push(`  - appliesOn: ${m.appliesOn.join(', ')}`);
       if (m.formula) out.push(`  - formula: ${m.formula.type}`);
-      if (m.payout) out.push(`  - payout: ${m.payout.type}${m.payout.maxPerRequest ? ` (maxPerRequest=${m.payout.maxPerRequest})` : ''}`);
+      if (m.payout)
+        out.push(
+          `  - payout: ${m.payout.type}${m.payout.maxPerRequest ? ` (maxPerRequest=${m.payout.maxPerRequest})` : ''}`,
+        );
     }
     out.push('');
   }
@@ -179,7 +211,8 @@ function main() {
   if (Array.isArray(items.items)) {
     out.push(h(2, 'Items Catalog'));
     const byRarity = new Map<string, any[]>();
-    for (const it of items.items) byRarity.set(it.rarity ?? 'UNKNOWN', [...(byRarity.get(it.rarity ?? 'UNKNOWN') ?? []), it]);
+    for (const it of items.items)
+      byRarity.set(it.rarity ?? 'UNKNOWN', [...(byRarity.get(it.rarity ?? 'UNKNOWN') ?? []), it]);
     const order = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY', 'MYTHIC'];
     for (const rare of order) {
       const list = byRarity.get(rare) ?? [];
@@ -199,7 +232,8 @@ function main() {
   out.push(h(2, 'Idle Flavor'));
   if (idle.catchUp) {
     out.push(`- catchUp.enabled: ${Boolean(idle.catchUp.enabled)}`);
-    if (typeof idle.catchUp.capHours === 'number') out.push(`- catchUp.capHours: ${idle.catchUp.capHours}`);
+    if (typeof idle.catchUp.capHours === 'number')
+      out.push(`- catchUp.capHours: ${idle.catchUp.capHours}`);
     if (idle.catchUp.strategy) out.push(`- catchUp.strategy: ${idle.catchUp.strategy}`);
   }
   if (Array.isArray(idle.flavor)) {
@@ -217,4 +251,3 @@ function main() {
 }
 
 main();
-

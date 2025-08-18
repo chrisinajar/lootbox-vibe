@@ -45,11 +45,15 @@ function main() {
   // Validate modifiers
   const modsStatic = readJson(path.join(configDir, 'modifiers.static.json'));
   if (!validators.modifiersStatic(modsStatic)) {
-    throw new Error(`Invalid modifiers.static: ${ajv.errorsText(validators.modifiersStatic.errors)}`);
+    throw new Error(
+      `Invalid modifiers.static: ${ajv.errorsText(validators.modifiersStatic.errors)}`,
+    );
   }
   const modsDynamic = readJson(path.join(configDir, 'modifiers.dynamic.json'));
   if (!validators.modifiersDynamic(modsDynamic)) {
-    throw new Error(`Invalid modifiers.dynamic: ${ajv.errorsText(validators.modifiersDynamic.errors)}`);
+    throw new Error(
+      `Invalid modifiers.dynamic: ${ajv.errorsText(validators.modifiersDynamic.errors)}`,
+    );
   }
 
   // Validate unlocks (single file)

@@ -30,6 +30,7 @@ Each file should begin with a `$schema` property pointing to the schema `$id` li
 - Self‑drop rules per box: `forbidSelfDrop` and `selfDropCap`.
 
 Minimal example (per file in `config/boxes/`):
+
 ```
 {
   "$schema": "https://lootboxsim/schemas/box.json",
@@ -87,4 +88,3 @@ Minimal example (per file in `config/boxes/`):
   - `yarn typecheck && yarn test` (code/tests)
 
 If you need new fields or behaviors, propose them; we’ll evolve the schema together (and keep the docs updated).
-
