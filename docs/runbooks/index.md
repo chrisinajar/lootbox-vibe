@@ -30,3 +30,4 @@ Runbooks:
 - ui-home-loop: Home loop UI (open CTA, currencies, results) — when changing box selection, currencies, or results panel.
 - ui-inventory: Inventory view (infinite scroll, filters, salvage) — when adding filters/sorts, bulk salvage, or list perf.
 - verify-all: Full project verification across code, docs, schema, codegen — run before PRs and after major changes.
+- ui-juice-settings: Animations, SFX, and settings — when adjusting juice, audio, or global toggles.

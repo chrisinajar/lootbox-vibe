@@ -1,7 +1,8 @@
 import React from 'react';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { v4 as uuidv4 } from 'uuid';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useSfx } from '../sound/Sound';
 import {
   OpenBoxesDocument,
   InventorySummaryDocument,
@@ -60,12 +61,24 @@ export const CurrenciesBar: React.FC = () => {
   const keys = map.get('KEYS') ?? 0n;
   const scrap = map.get('SCRAP') ?? 0n;
   const glitter = map.get('GLITTER') ?? 0n;
-  const Item: React.FC<{ label: string; value: bigint }> = ({ label, value }) => (
-    <div className="rounded px-3 py-2 chip min-w-28 flex items-center justify-between">
-      <span className="opacity-80 mr-2">{label}</span>
-      <motion.span animate={{}}>{String(value)}</motion.span>
-    </div>
-  );
+  const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
+    const mv = useMotionValue(value);
+    const sp = useSpring(mv, { stiffness: 250, damping: 30, mass: 0.3 });
+    const rounded = useTransform(sp, (v) => Math.round(v).toString());
+    React.useEffect(() => {
+      mv.set(value);
+    }, [value, mv]);
+    return (<motion.span>{rounded}</motion.span>) as any;
+  };
+  const Item: React.FC<{ label: string; value: bigint }> = ({ label, value }) => {
+    const n = Number(value);
+    return (
+      <div className="rounded px-3 py-2 chip min-w-28 flex items-center justify-between">
+        <span className="opacity-80 mr-2">{label}</span>
+        <AnimatedNumber value={isFinite(n) ? n : 0} />
+      </div>
+    );
+  };
   return (
     <div className="flex gap-3">
       <Item label="Keys" value={keys} />
@@ -80,9 +93,15 @@ type Row = { typeId: string; rarity: Rarity; count: number };
 const RecentRewards: React.FC<{ rows: Row[] }> = ({ rows }) => (
   <ul className="flex gap-2 flex-wrap">
     {rows.slice(0, 5).map((r, i) => (
-      <li key={i} className="rounded px-2 py-1 chip text-sm">
+      <motion.li
+        key={i}
+        className="rounded px-2 py-1 chip text-sm"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      >
         {r.typeId} ({r.rarity}) ×{r.count}
-      </li>
+      </motion.li>
     ))}
   </ul>
 );
@@ -263,6 +282,7 @@ export const HomeMain: React.FC = () => {
   const [rows, setRows] = React.useState<Row[]>([]);
   const [fxKey, setFxKey] = React.useState(0);
   const [rare, setRare] = React.useState(false);
+  const sfx = useSfx();
 
   const doOpen = async (count: number) => {
     if (!selected) return;
@@ -280,6 +300,10 @@ export const HomeMain: React.FC = () => {
       );
       setRare(hasRare);
       setFxKey((k) => k + 1);
+      try {
+        sfx.open();
+        if (hasRare) sfx.rare();
+      } catch {}
       await client.refetchQueries({ include: [InventorySummaryDocument, CurrenciesDocument] });
     } finally {
       setBusy(false);

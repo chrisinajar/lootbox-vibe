@@ -13,6 +13,8 @@ import {
 import { setContext } from '@apollo/client/link/context';
 import App from './ui/App';
 import { ThemeProvider } from './ui/theme/ThemeProvider';
+import { SettingsProvider } from './ui/settings/SettingsProvider';
+import { useSfx } from './ui/sound/Sound';
 import './index.css';
 import {
   InventorySummaryDocument,
@@ -53,9 +55,11 @@ const client = new ApolloClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <SettingsProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </SettingsProvider>
     </ApolloProvider>
   </React.StrictMode>,
 );
@@ -111,6 +115,8 @@ export const OpenResultsPanel: React.FC = () => {
   const [salvage] = useMutation(SalvageDocument);
   const [last, setLast] = React.useState<any | null>(null);
   const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState<string | null>(null);
+  const sfx = useSfx();
 
   const doOpen = async () => {
     setBusy(true);
@@ -120,6 +126,15 @@ export const OpenResultsPanel: React.FC = () => {
         variables: { input: { boxId: 'box.cardboard', count: 10, requestId } },
       });
       setLast(res.data?.openBoxes ?? null);
+      try {
+        sfx?.open?.();
+        if (
+          (res.data?.openBoxes?.stacks ?? []).some((s: any) =>
+            ['RARE', 'EPIC', 'LEGENDARY', 'MYTHIC'].includes(s.rarity),
+          )
+        )
+          sfx?.rare?.();
+      } catch {}
       await client.refetchQueries({ include: [InventorySummaryDocument] });
     } finally {
       setBusy(false);
@@ -128,10 +143,20 @@ export const OpenResultsPanel: React.FC = () => {
 
   const doSalvageCommons = async () => {
     setBusy(true);
+    setErr(null);
     try {
       const res = await salvage({ variables: { input: { maxRarity: Rarity.Uncommon } } });
       setLast(res.data?.salvage ?? null);
+      try {
+        sfx?.salvage?.();
+      } catch {}
       await client.refetchQueries({ include: [InventorySummaryDocument] });
+    } catch (e: any) {
+      setErr('Something went wrong salvaging your items. Please try again.');
+      // silent retry once
+      try {
+        await salvage({ variables: { input: { maxRarity: Rarity.Uncommon } } });
+      } catch {}
     } finally {
       setBusy(false);
     }
@@ -147,6 +172,11 @@ export const OpenResultsPanel: React.FC = () => {
           Salvage commons+
         </button>
       </div>
+      {err && (
+        <div className="text-sm" style={{ color: 'var(--muted-text)' }}>
+          {err}
+        </div>
+      )}
       {last && (
         <div className="text-sm space-y-2">
           {'stacks' in last && last.stacks && (

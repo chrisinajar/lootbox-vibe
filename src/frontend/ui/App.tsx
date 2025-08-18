@@ -5,6 +5,7 @@ import { useTheme } from './theme/ThemeProvider';
 import { HomeMain } from './home/Home';
 import { InventoryView } from './inventory/Inventory';
 import { CollectionView } from './collection/Collection';
+import { SettingsModal } from './settings/SettingsModal';
 import { ProgressionView } from './progression/Progression';
 import { ShopView } from './shop/Shop';
 
@@ -43,6 +44,7 @@ const DevDashboard: React.FC = () => (
 
 const HomeShell: React.FC = () => {
   const { theme, toggle } = useTheme();
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
   return (
     <div className="min-h-dvh p-6">
       <header className="mb-6 flex items-center justify-between">
@@ -52,13 +54,19 @@ const HomeShell: React.FC = () => {
             UI Milestone 2 — foundation in place.
           </p>
         </div>
-        <button onClick={toggle} className="btn-primary">
-          Theme: {theme}
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setSettingsOpen(true)} className="btn-accent">
+            Settings
+          </button>
+          <button onClick={toggle} className="btn-primary">
+            Theme: {theme}
+          </button>
+        </div>
       </header>
       <main className="space-y-4">
         <HomeMain />
       </main>
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {ENABLE_DEV_UI && (
         <a
           href="/#/dev"
