@@ -20,6 +20,7 @@
     "lint:md": "npx -y markdownlint-cli \"**/*.md\" --ignore node_modules",
     "lint:links": "npx -y markdown-link-check -q docs/**/*.md",
     "verify": "yarn lint:md && yarn lint:links",
+    "verify-all": "yarn docs:config:wiki && yarn config:types && yarn codegen && yarn format && yarn config:check && yarn typecheck && yarn test && yarn verify",
     "prepare": "husky install",
     "agent:runbook:new": "node scripts/agent-runbook-new.js",
     "seed:dev": "tsx scripts/seed-dev.ts",
