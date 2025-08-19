@@ -1,9 +1,10 @@
 import path from 'node:path';
-import { LevelStorage } from '../src/backend/storage/LevelStorage';
+
 import { OpenBoxesService } from '../src/backend/services/OpenBoxesService';
+import { SeededRng } from '../src/backend/services/Rng';
 import { u64 } from '../src/backend/storage/codec';
 import { keys } from '../src/backend/storage/keys';
-import { SeededRng } from '../src/backend/services/Rng';
+import { LevelStorage } from '../src/backend/storage/LevelStorage';
 
 (async () => {
   const db = path.resolve(process.cwd(), 'data/debug-db');

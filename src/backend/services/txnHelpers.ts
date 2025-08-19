@@ -1,7 +1,8 @@
-import { StorageProvider, BatchOp } from '../storage/StorageProvider';
+import { ConfigLoader } from '../config';
 import { u32, u64 } from '../storage/codec';
 import { keys } from '../storage/keys';
-import { ConfigLoader } from '../config';
+import { StorageProvider, BatchOp } from '../storage/StorageProvider';
+
 import { UnderflowError, StackAdjust } from './TransactionManager';
 
 export async function prepareStackOps(

@@ -1,6 +1,7 @@
-import { StorageProvider } from '../storage/StorageProvider';
 import { u64 } from '../storage/codec';
 import { keys } from '../storage/keys';
+import { StorageProvider } from '../storage/StorageProvider';
+
 import { TransactionManager } from './TransactionManager';
 
 export type Currency = 'KEYS' | 'SCRAP' | 'GLITTER';

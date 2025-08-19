@@ -272,7 +272,7 @@ function main() {
   let body = out.join('\n');
   if (!body.endsWith('\n')) body += '\n';
   fs.writeFileSync(outPath, body, 'utf8');
-  // eslint-disable-next-line no-console
+
   console.log(`Wrote ${outPath}`);
 }
 

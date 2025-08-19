@@ -1,25 +1,26 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express4';
-import express from 'express';
 import cors from 'cors';
 import type { CorsRequest } from 'cors';
-import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import express from 'express';
 import { BigIntResolver } from 'graphql-scalars';
-import { LevelStorage } from './storage/LevelStorage';
-import { SummariesRepo } from './services/SummariesRepo';
-import { InventorySummaryService } from './services/InventorySummaryService';
-import { InventoryListService } from './services/InventoryListService';
-import { ConfigService } from './services/ConfigService';
+
 import { buildContext } from './api/context';
+import { ConfigService } from './services/ConfigService';
+import { CurrencyService } from './services/CurrencyService';
+import { IdleSvc } from './services/IdleSvc';
+import { InventoryListService } from './services/InventoryListService';
+import { InventorySummaryService } from './services/InventorySummaryService';
 import { OpenBoxesService } from './services/OpenBoxesService';
 import { SalvageService } from './services/SalvageService';
-import { IdleSvc } from './services/IdleSvc';
 import { ShopService } from './services/ShopService';
-import { u64 } from './storage/codec';
+import { SummariesRepo } from './services/SummariesRepo';
 import { TelemetryService } from './services/TelemetryService';
-import { CurrencyService } from './services/CurrencyService';
+import { u64 } from './storage/codec';
+import { LevelStorage } from './storage/LevelStorage';
 
 type InitOptions = {
   port?: number;
@@ -387,7 +388,6 @@ export async function initializeServer(options: InitOptions = {}) {
     const start = Date.now();
     res.on('finish', () => {
       if (logLevel !== 'silent') {
-        // eslint-disable-next-line no-console
         console.log(`[api] ${req.method} ${req.path} ${res.statusCode} ${Date.now() - start}ms`);
       }
     });
@@ -478,7 +478,6 @@ export async function initializeServer(options: InitOptions = {}) {
   });
 
   const httpServer = app.listen(port, () => {
-    // eslint-disable-next-line no-console
     console.log(`🚀 API ready at http://localhost:${port}${graphqlPath}`);
   });
 

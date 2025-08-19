@@ -1,10 +1,11 @@
-import path from 'node:path';
 import fs from 'node:fs';
-import { LevelStorage } from '../src/backend/storage/LevelStorage';
-import { u64 } from '../src/backend/storage/codec';
-import { keys as kv } from '../src/backend/storage/keys';
+import path from 'node:path';
+
 import { OpenBoxesService } from '../src/backend/services/OpenBoxesService';
 import { SeededRng } from '../src/backend/services/Rng';
+import { u64 } from '../src/backend/storage/codec';
+import { keys as kv } from '../src/backend/storage/keys';
+import { LevelStorage } from '../src/backend/storage/LevelStorage';
 
 describe('OpenBoxesService key consumption', () => {
   const tmpDir = path.resolve(process.cwd(), 'data/test-leveldb-openboxes');

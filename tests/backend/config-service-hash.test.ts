@@ -1,4 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
+
 import { ConfigService } from '../../src/backend/services/ConfigService';
 
 describe('ConfigService hash', () => {

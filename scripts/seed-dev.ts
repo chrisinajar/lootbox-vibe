@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import path from 'node:path';
+
 import { LevelStorage } from '../src/backend/storage/LevelStorage';
 
 type SeedOpts = { uid: string; writeSums: boolean };
@@ -89,30 +90,29 @@ async function seed({ uid, writeSums }: SeedOpts) {
     ? new Set(stacks.map((s) => s.rarity)).size + new Set(stacks.map((s) => s.typeId)).size
     : 0;
 
-  // eslint-disable-next-line no-console
   console.log('--- Seed Summary ---');
-  // eslint-disable-next-line no-console
+
   console.log(`DB: ${dbPath}`);
-  // eslint-disable-next-line no-console
+
   console.log(`User: ${uid}`);
-  // eslint-disable-next-line no-console
+
   console.log(`Write sums: ${writeSums ? 'yes' : 'no'}`);
-  // eslint-disable-next-line no-console
+
   console.log(`Totals: stacks=${totalStacks}, items=${totalItems}`);
-  // eslint-disable-next-line no-console
+
   console.log(`By rarity: ${byRaritySummary}`);
-  // eslint-disable-next-line no-console
+
   console.log(`By type:   ${byTypeSummary}`);
-  // eslint-disable-next-line no-console
+
   console.log(
     `Keys written: inv=${invCount}, idx:rarity=${idxRarityCount}, idx:type=${idxTypeCount}, sum=${sumCount}`,
   );
   console.log(`Currencies: KEYS=100, SCRAP=0`);
-  // eslint-disable-next-line no-console
+
   console.log('Tip: in browser console:');
-  // eslint-disable-next-line no-console
+
   console.log("  sessionStorage.setItem('X-User-Id','seed-user')  // or localStorage");
-  // eslint-disable-next-line no-console
+
   console.log("  sessionStorage.setItem('X-User-Id','anonymous') // switch back");
   await db.close();
 }
@@ -125,12 +125,10 @@ function parseArgs(): SeedOpts {
 
 seed(parseArgs()).then(
   () => {
-    // eslint-disable-next-line no-console
     console.log('Seed complete');
     process.exit(0);
   },
   (err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
   },

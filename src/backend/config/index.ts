@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 

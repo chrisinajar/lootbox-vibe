@@ -1,13 +1,15 @@
 import React from 'react';
+
 import { InventoryOverview, OpenResultsPanel } from '../main';
-import { UserSwitcherBadge } from './UserSwitcherBadge';
-import { useTheme } from './theme/ThemeProvider';
+
+import { CollectionView } from './collection/Collection';
 import { HomeMain } from './home/Home';
 import { InventoryView } from './inventory/Inventory';
-import { CollectionView } from './collection/Collection';
-import { SettingsModal } from './settings/SettingsModal';
 import { ProgressionView } from './progression/Progression';
+import { SettingsModal } from './settings/SettingsModal';
 import { ShopView } from './shop/Shop';
+import { useTheme } from './theme/ThemeProvider';
+import { UserSwitcherBadge } from './UserSwitcherBadge';
 
 function useHashPath() {
   const [path, setPath] = React.useState<string>(() => window.location.hash.slice(1) || '/');

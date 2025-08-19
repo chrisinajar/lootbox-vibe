@@ -1,7 +1,7 @@
-import { StorageProvider } from '../storage/StorageProvider';
-import { keys } from '../storage/keys';
-import { u32, u64 } from '../storage/codec';
 import { ConfigLoader } from '../config';
+import { u32, u64 } from '../storage/codec';
+import { keys } from '../storage/keys';
+import { StorageProvider } from '../storage/StorageProvider';
 
 export type SalvageInput = { maxRarity: string; typeIds?: string[]; staticModIds?: string[] };
 

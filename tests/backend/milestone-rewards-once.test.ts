@@ -1,11 +1,13 @@
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
+
 import { describe, it, expect } from '@jest/globals';
-import { LevelStorage } from '../../src/backend/storage/LevelStorage';
-import { u64 } from '../../src/backend/storage/codec';
-import { keys as kv } from '../../src/backend/storage/keys';
+
 import { OpenBoxesService } from '../../src/backend/services/OpenBoxesService';
 import { SeededRng } from '../../src/backend/services/Rng';
+import { u64 } from '../../src/backend/storage/codec';
+import { keys as kv } from '../../src/backend/storage/keys';
+import { LevelStorage } from '../../src/backend/storage/LevelStorage';
 
 describe('Unlock milestones – rewards credited once and do not overwrite deductions', () => {
   const tmpDir = fs.mkdtempSync(path.join(process.cwd(), 'data/test-leveldb-milestones-'));

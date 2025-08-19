@@ -1,9 +1,10 @@
-import { ApolloServer } from '@apollo/server';
 import fs from 'node:fs';
 import path from 'node:path';
+
+import { ApolloServer } from '@apollo/server';
 // executeOperation-based smoke in sandbox (no HTTP listen)
-import { BigIntResolver } from 'graphql-scalars';
 import { describe, it, expect } from '@jest/globals';
+import { BigIntResolver } from 'graphql-scalars';
 
 const schemaPath = path.resolve(__dirname, '../../src/backend/api/schema.graphql');
 

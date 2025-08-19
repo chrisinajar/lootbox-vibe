@@ -1,8 +1,8 @@
 import { OpenBoxesService } from '../../src/backend/services/OpenBoxesService';
 import { SalvageService } from '../../src/backend/services/SalvageService';
-import { StorageProvider, BatchOp } from '../../src/backend/storage/StorageProvider';
 import { u64, u32 } from '../../src/backend/storage/codec';
 import { keys } from '../../src/backend/storage/keys';
+import { StorageProvider, BatchOp } from '../../src/backend/storage/StorageProvider';
 
 class MemStore implements StorageProvider {
   private m = new Map<string, Buffer>();

@@ -1,5 +1,6 @@
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
+
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 
@@ -80,7 +81,6 @@ function main() {
     throw new Error(`Invalid items: ${ajv.errorsText(validators.items.errors)}`);
   }
 
-  // eslint-disable-next-line no-console
   console.log('Config validation passed');
 }
 

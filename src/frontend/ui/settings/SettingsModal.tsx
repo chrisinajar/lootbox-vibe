@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useSettings } from './SettingsProvider';
 
 export const SettingsModal: React.FC<{ open: boolean; onClose: () => void }> = ({

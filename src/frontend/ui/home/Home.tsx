@@ -1,24 +1,26 @@
-import React from 'react';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useSfx } from '../sound/Sound';
+import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   OpenBoxesDocument,
   InventorySummaryDocument,
   Rarity,
   type OpenBoxesMutation,
   type OpenBoxesMutationVariables,
-} from '../../graphql/graphql';
-import { CurrenciesDocument, type CurrenciesQuery } from '../../graphql/graphql';
-import { AvailableBoxesDocument, type AvailableBoxesQuery } from '../../graphql/graphql';
-import { CollectionLogDocument, type CollectionLogQuery } from '../../graphql/graphql';
-import {
+  CurrenciesDocument,
+  type CurrenciesQuery,
+  AvailableBoxesDocument,
+  type AvailableBoxesQuery,
+  CollectionLogDocument,
+  type CollectionLogQuery,
   BoxCatalogDocument,
   type BoxCatalogQuery,
   MaterialsCatalogDocument,
   type MaterialsCatalogQuery,
 } from '../../graphql/graphql';
+import { useSfx } from '../sound/Sound';
 // labels come from server via AvailableBoxes query
 
 const BOX_ORDER = ['box_cardboard', 'box_wooden', 'box_iron', 'box_unstable'];

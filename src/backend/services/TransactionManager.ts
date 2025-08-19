@@ -1,6 +1,6 @@
-import { StorageProvider, BatchOp } from '../storage/StorageProvider';
 import { u32, u64 } from '../storage/codec';
 import { keys } from '../storage/keys';
+import { StorageProvider, BatchOp } from '../storage/StorageProvider';
 
 export class UnderflowError extends Error {}
 

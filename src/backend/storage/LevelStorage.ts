@@ -1,4 +1,5 @@
 import { Level } from 'level';
+
 import { StorageProvider, BatchOp } from './StorageProvider';
 
 export class LevelStorage implements StorageProvider {

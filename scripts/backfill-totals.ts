@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import path from 'node:path';
-import { LevelStorage } from '../src/backend/storage/LevelStorage';
-import { keys } from '../src/backend/storage/keys';
+
 import { u32, u64 } from '../src/backend/storage/codec';
+import { keys } from '../src/backend/storage/keys';
+import { LevelStorage } from '../src/backend/storage/LevelStorage';
 
 async function backfill(uid: string) {
   const dbPath = path.resolve(process.cwd(), 'data/leveldb');
@@ -19,7 +20,7 @@ async function backfill(uid: string) {
   });
   await db.put(keys.sumTotalStacks(uid), u64.encodeBE(BigInt(totalStacks)));
   await db.put(keys.sumTotalItems(uid), u64.encodeBE(totalItems));
-  // eslint-disable-next-line no-console
+
   console.log(`Backfilled ${uid}: stacks=${totalStacks}, items=${totalItems}`);
   await db.close();
 }
@@ -31,7 +32,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error(err);
   process.exit(1);
 });

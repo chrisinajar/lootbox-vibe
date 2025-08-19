@@ -1,5 +1,6 @@
-import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
+import React from 'react';
+
 import {
   ProgressionDocument,
   type ProgressionQuery,

@@ -1,6 +1,6 @@
 import { ApolloServer } from '@apollo/server';
-import { BigIntResolver } from 'graphql-scalars';
 import { describe, it, expect } from '@jest/globals';
+import { BigIntResolver } from 'graphql-scalars';
 
 describe('BigInt serialization', () => {
   it('returns huge counts as strings without precision loss', async () => {

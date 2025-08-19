@@ -1,7 +1,8 @@
-import { StorageProvider } from '../storage/StorageProvider';
 import { ConfigLoader } from '../config';
-import { CurrencyService } from './CurrencyService';
 import { u64 } from '../storage/codec';
+import { StorageProvider } from '../storage/StorageProvider';
+
+import { CurrencyService } from './CurrencyService';
 
 type UpgradeDef = { id: string; name: string; desc: string; costScrap: number };
 

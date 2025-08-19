@@ -1,5 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
 import {
   ApolloClient,
   ApolloProvider,
@@ -11,11 +9,10 @@ import {
   useApolloClient,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import App from './ui/App';
-import { ThemeProvider } from './ui/theme/ThemeProvider';
-import { SettingsProvider } from './ui/settings/SettingsProvider';
-import { useSfx } from './ui/sound/Sound';
-import './index.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   InventorySummaryDocument,
   OpenBoxesDocument,
@@ -28,7 +25,11 @@ import {
   BoxCatalogDocument,
   type BoxCatalogQuery,
 } from './graphql/graphql';
-import { v4 as uuidv4 } from 'uuid';
+import App from './ui/App';
+import { SettingsProvider } from './ui/settings/SettingsProvider';
+import { useSfx } from './ui/sound/Sound';
+import { ThemeProvider } from './ui/theme/ThemeProvider';
+import './index.css';
 
 export function getTestUserId(): string | undefined {
   try {

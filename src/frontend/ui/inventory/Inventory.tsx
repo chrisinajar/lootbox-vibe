@@ -1,5 +1,6 @@
-import React from 'react';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client';
+import React from 'react';
+
 import {
   InventoryListDocument,
   type InventoryListQuery,

@@ -1,5 +1,6 @@
-import React from 'react';
 import { useQuery } from '@apollo/client';
+import React from 'react';
+
 import { CollectionLogDocument, type CollectionLogQuery, Rarity } from '../../graphql/graphql';
 
 function rarityOrder(r: Rarity): number {

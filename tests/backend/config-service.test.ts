@@ -1,7 +1,9 @@
-import { describe, it, expect } from '@jest/globals';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
+import { describe, it, expect } from '@jest/globals';
+
 import { ConfigLoader } from '../../src/backend/config/index';
 
 describe('ConfigService validation', () => {

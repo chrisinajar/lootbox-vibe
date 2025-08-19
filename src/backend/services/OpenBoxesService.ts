@@ -1,10 +1,11 @@
-import { StorageProvider } from '../storage/StorageProvider';
 import { ConfigLoader } from '../config';
-import { keys } from '../storage/keys';
 import { u64 } from '../storage/codec';
+import { keys } from '../storage/keys';
+import { StorageProvider } from '../storage/StorageProvider';
+
 import { Rng, DefaultRng } from './Rng';
-import { UnlockService } from './UnlockService';
 import { prepareStackOps } from './txnHelpers';
+import { UnlockService } from './UnlockService';
 
 export type OpenBoxesInput = { boxId: string; count: number; requestId: string };
 

@@ -1,7 +1,8 @@
-import { buildContext } from '../../src/backend/api/context';
-import type { Request } from 'express';
 import { ApolloServer } from '@apollo/server';
 import { describe, it, expect } from '@jest/globals';
+import type { Request } from 'express';
+
+import { buildContext } from '../../src/backend/api/context';
 
 describe('Context extractor', () => {
   it('extracts uid from X-User-Id header', () => {

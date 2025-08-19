@@ -1,5 +1,6 @@
-import { useSettings } from '../settings/SettingsProvider';
 import React from 'react';
+
+import { useSettings } from '../settings/SettingsProvider';
 
 let ctx: AudioContext | undefined;
 function ensureCtx() {

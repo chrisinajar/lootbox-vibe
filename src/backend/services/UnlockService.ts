@@ -1,6 +1,6 @@
-import { StorageProvider, BatchOp } from '../storage/StorageProvider';
 import { ConfigLoader } from '../config';
 import { u64 } from '../storage/codec';
+import { StorageProvider, BatchOp } from '../storage/StorageProvider';
 
 export type RngRule = { unlockId: string; sourceBoxId: string; chance: number };
 
