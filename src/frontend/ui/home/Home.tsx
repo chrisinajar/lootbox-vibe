@@ -25,6 +25,13 @@ import {
 import { useSfx } from '../sound/Sound';
 // labels and costs come from server via AvailableBoxes query
 
+// Central currency metadata
+const CURRENCY_META: Record<string, { name: string; icon: string }> = {
+  KEYS: { name: 'Keys', icon: '🔑' },
+  SCRAP: { name: 'Scrap', icon: '🛠️' },
+  GLITTER: { name: 'Glitter', icon: '✨' },
+};
+
 function rarityRank(r: Rarity): number {
   const order: Record<Rarity, number> = {
     [Rarity.Common]: 0,
@@ -135,8 +142,14 @@ const RecentRewards: React.FC<{ rows: RowDecor[]; nameById?: Record<string, stri
           exit={{ scale: 0.9, opacity: 0 }}
           layout
           transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+          title={CURRENCY_META[r.typeId] ? 'Currency reward' : undefined}
         >
           <span className={r.rainbow ? 'rainbow-text' : ''}>
+            {CURRENCY_META[r.typeId]?.icon ? (
+              <span className="mr-1" aria-hidden>
+                {CURRENCY_META[r.typeId]!.icon}
+              </span>
+            ) : null}
             {(nameById && nameById[r.typeId]) || r.typeId}
           </span>{' '}
           ({r.rarity}) ×{r.count}
@@ -182,6 +195,11 @@ const VirtualList: React.FC<{
           >
             <span className="text-sm opacity-80 mr-2">{r.rarity}</span>
             <span className={`text-sm ${r.rainbow ? 'rainbow-text' : ''}`}>
+              {CURRENCY_META[r.typeId]?.icon ? (
+                <span className="mr-1" aria-hidden>
+                  {CURRENCY_META[r.typeId]!.icon}
+                </span>
+              ) : null}
               {(nameById && nameById[r.typeId]) || r.typeId}
             </span>
             <span className="ml-auto text-sm">×{r.count}</span>
@@ -377,9 +395,7 @@ export const HomeMain: React.FC = () => {
   const nameById = React.useMemo(() => {
     const map: Record<string, string> = {};
     // currency display names
-    map['KEYS'] = 'Keys';
-    map['SCRAP'] = 'Scrap';
-    map['GLITTER'] = 'Glitter';
+    for (const [id, meta] of Object.entries(CURRENCY_META)) map[id] = meta.name;
     const items = catalog?.collectionLog?.items ?? [];
     for (const it of items) map[it.id] = it.name;
     const boxes = boxesCatalog?.boxCatalog ?? [];
