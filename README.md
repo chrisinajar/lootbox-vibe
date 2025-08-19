@@ -1,5 +1,8 @@
 # Lootbox simulator
 
+[![Verify](actions/workflows/verify.yml/badge.svg?branch=main)](actions/workflows/verify.yml)
+[![Deploy UI](actions/workflows/deploy-ui-pages.yml/badge.svg?branch=main)](actions/workflows/deploy-ui-pages.yml)
+
 Docs‑first repository for a browser‑based lootbox/idle collection game. Primary content lives
 in `docs/` (product spec, architecture, and references). Implementation code will be added under
 `src/` with tests in `tests/` as we begin building features.
