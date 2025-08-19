@@ -38,6 +38,13 @@ module.exports = [
       parser: tsParser,
       ecmaVersion: 2022,
       sourceType: 'module',
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        module: 'readonly',
+        __dirname: 'readonly',
+        require: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
@@ -54,17 +61,16 @@ module.exports = [
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
-      'unused-imports/no-unused-imports': 'warn',
+      'unused-imports/no-unused-imports': 'error',
+      'import/no-unresolved': 'error',
       'import/order': [
-        'warn',
+        'error',
         {
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           'newlines-between': 'always',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
-      // Let TS handle unresolved types; avoid noisy false-positives
-      'import/no-unresolved': 'off',
     },
   },
 ];

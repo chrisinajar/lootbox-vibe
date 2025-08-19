@@ -43,4 +43,3 @@ jobs:
 
       - name: Config validation
         run: yarn config:check
-
