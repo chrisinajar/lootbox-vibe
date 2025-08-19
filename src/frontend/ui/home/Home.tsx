@@ -336,6 +336,25 @@ export const HomeMain: React.FC = () => {
         (s) => ({ typeId: s.typeId, rarity: s.rarity, count: s.count }) as Row,
       );
       if (newStacks.length > 0) setRows((prev) => [...newStacks, ...prev].slice(0, 5000));
+      // Optimistic KEYS update based on mutation result
+      try {
+        const deltaKeys = (payload?.currencies ?? [])
+          .filter((c) => c.currency === 'KEYS')
+          .reduce((a, c) => a + BigInt(c.amount as any), 0n);
+        if (deltaKeys !== 0n) {
+          client.cache.updateQuery<CurrenciesQuery>({ query: CurrenciesDocument }, (data) => {
+            const arr = data?.currencies ?? [];
+            const idx = arr.findIndex((c) => c.currency === 'KEYS');
+            const current = idx >= 0 ? BigInt(arr[idx]!.amount as any) : 0n;
+            const next = current + deltaKeys;
+            const nextArr =
+              idx >= 0
+                ? arr.map((c, i) => (i === idx ? { ...c, amount: next as any } : c))
+                : [{ currency: 'KEYS', amount: next as any }, ...arr];
+            return { currencies: nextArr } as any;
+          });
+        }
+      } catch {}
       const hasRare = (payload?.stacks ?? []).some(
         (s) => rarityRank(s.rarity) >= rarityRank(Rarity.Rare),
       );

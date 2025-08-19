@@ -22,6 +22,7 @@ import {
   SalvageDocument,
   Rarity,
   CurrenciesDocument,
+  type CurrenciesQuery,
   CollectionLogDocument,
   type CollectionLogQuery,
   BoxCatalogDocument,
@@ -147,6 +148,26 @@ export const OpenResultsPanel: React.FC = () => {
         variables: { input: { boxId: 'box_cardboard', count: 10, requestId } },
       });
       setLast(res.data?.openBoxes ?? null);
+      // Optimistically update KEYS based on openBoxes result
+      try {
+        const payload = res.data?.openBoxes;
+        const deltaKeys = (payload?.currencies ?? [])
+          .filter((c: any) => c.currency === 'KEYS')
+          .reduce((a: bigint, c: any) => a + BigInt(c.amount as any), 0n);
+        if (deltaKeys !== 0n) {
+          client.cache.updateQuery<CurrenciesQuery>({ query: CurrenciesDocument }, (data) => {
+            const arr = data?.currencies ?? [];
+            const idx = arr.findIndex((c) => c.currency === 'KEYS');
+            const current = idx >= 0 ? BigInt(arr[idx]!.amount as any) : 0n;
+            const next = current + deltaKeys;
+            const nextArr =
+              idx >= 0
+                ? arr.map((c, i) => (i === idx ? { ...c, amount: next as any } : c))
+                : [{ currency: 'KEYS', amount: next as any }, ...arr];
+            return { currencies: nextArr } as any;
+          });
+        }
+      } catch {}
       try {
         sfx?.open?.();
         if (

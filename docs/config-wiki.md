@@ -1,6 +1,6 @@
 # Game Configuration Reference (Generated)
 
-Generated at: 2025-08-19T00:01:58.646Z
+Generated at: 2025-08-19T01:37:15.232Z
 This document is generated from files in the `config/` directory. Do not edit by hand.
 
 ## Economy

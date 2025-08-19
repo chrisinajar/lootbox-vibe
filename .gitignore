@@ -40,3 +40,7 @@ data/leveldb/
 **/*.sst
 **/LOG
 **/LOG.old
+# LevelDB local data from tests/scripts
+data/debug-db/
+data/test-leveldb-*/
+**/000*.log
