@@ -1,7 +1,7 @@
 # Lootbox simulator
 
-[![Verify](actions/workflows/verify.yml/badge.svg?branch=main)](actions/workflows/verify.yml)
-[![Deploy UI](actions/workflows/deploy-ui-pages.yml/badge.svg?branch=main)](actions/workflows/deploy-ui-pages.yml)
+[![Verify](https://github.com/chrisinajar/lootbox-vibe/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/chrisinajar/lootbox-vibe/actions/workflows/verify.yml)
+[![Deploy UI](https://github.com/chrisinajar/lootbox-vibe/actions/workflows/deploy-ui-pages.yml/badge.svg?branch=main)](https://github.com/chrisinajar/lootbox-vibe/actions/workflows/deploy-ui-pages.yml)
 
 Docs‑first repository for a browser‑based lootbox/idle collection game. Primary content lives
 in `docs/` (product spec, architecture, and references). Implementation code will be added under
