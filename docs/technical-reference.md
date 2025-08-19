@@ -279,6 +279,12 @@ cur:{uid}:{currency}         → balance:u64
   - Evaluated at runtime
   - Example: Greedy (+1% scrap per 100 boxes lifetime)
 
+Bulk opening limits and gating:
+
+- The server enforces a per-request cap (`economy.batchOpenLimits.maxPerRequest`, default 1000).
+- Bulk sizes 10/100/1000 are gated by Shop purchases: `upg_bulk_10`, `upg_bulk_100`, `upg_bulk_1000`.
+- Requests with `count` greater than the highest unlocked bulk size fail with `bulk open locked`.
+
 ### Evaluation Pipeline
 
 ```text

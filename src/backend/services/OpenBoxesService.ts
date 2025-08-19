@@ -59,6 +59,18 @@ export class OpenBoxesService {
     const maxPer = (this.config.economy as any)?.batchOpenLimits?.maxPerRequest ?? 1000;
     if (input.count > Number(maxPer)) throw new Error(`batch too large: max ${maxPer}`);
 
+    // Enforce shop-gated bulk sizes (default: 1 always allowed)
+    let allowedMax = 1;
+    const has10 = await this.storage.get(`pupg:${uid}:upg_bulk_10`);
+    const has100 = await this.storage.get(`pupg:${uid}:upg_bulk_100`);
+    const has1000 = await this.storage.get(`pupg:${uid}:upg_bulk_1000`);
+    if (has10) allowedMax = 10;
+    if (has100) allowedMax = 100;
+    if (has1000) allowedMax = 1000;
+    if (input.count > allowedMax) {
+      throw new Error('bulk open locked: purchase upgrade in shop');
+    }
+
     // basic unlock validation and key cost
     const box = (this.config.boxes as any[]).find((b) => String((b as any).id) === input.boxId);
     if (!box) throw new Error('unknown box');

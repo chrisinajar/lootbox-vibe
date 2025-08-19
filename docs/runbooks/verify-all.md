@@ -21,6 +21,7 @@
 
 - Node types: TS scripts that import `node:fs`/`node:path` require `@types/node` and `"node"` in `tsconfig.json` `types`.
 - GraphQL codegen concurrency: in sandboxes, set `CODEGEN_CONCURRENCY=1` (already in script). If still failing, check for filesystem/network restrictions.
+- Sandbox restrictions: When running in a restricted environment, request elevated permissions for `yarn verify-all` so codegen/tests can access the filesystem and subprocesses. If the run fails due to sandboxing, re-run with approval.
 - Markdown lint rules: Headings and tables must have blank lines above and below. Generators should insert spacing; if not, fix the generator rather than the output file.
 - Link check: External links can be flaky; prefer stable references and relative links. If link checks fail, validate the URL or add a more stable source.
 - Long runs/timeouts: `verify-all` aggregates many steps; allow extra time locally/CI. Avoid running separate ad-hoc commands unless debugging a specific failure.

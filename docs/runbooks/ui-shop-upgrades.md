@@ -11,11 +11,17 @@ Shop exposes a simple upgrade tree purchasable with Scrap. Includes a bad-rate S
 
 - Data: Upgrades and exchange rates come from config-backed GraphQL fields; purchases go through `purchaseUpgrade(upgradeId)` which returns updated currency balances.
 - Daily cap: Exposed by backend; UI shows current progress (used/limit), disables exchange when capped, and surfaces helpful tooltip copy.
-- Tree: Render as list or simple tree with prices, lock icons, and short descriptions. Initially ship 2–3 upgrades (auto-opener, bulk opener, shiny chance) as MVP.
+- Tree: Render as list or simple tree with prices, lock icons, and short descriptions. Bulk open sizes are gated via specific upgrades with progressive reveal:
+  - `upg_bulk_10` — Open 10 (≈250 scrap)
+  - `upg_bulk_100` — Open 100 (≈1,000 scrap)
+  - `upg_bulk_1000` — Open 1000 (≈10,000 scrap)
+  - Prereqs: must purchase `10` before `100`, and `100` before `1000`.
+  - Shop UI hides locked tiers until their prerequisite is purchased (initially only Open 10 is visible). These permanently unlock the corresponding CTA options in Home.
 
 ## Checklist
 
 - [ ] Query available upgrades and player-owned statuses.
+- [ ] Hide bulk tiers until prereqs are purchased (10 → 100 → 1000).
 - [ ] Show prices in Scrap and disabled state if unaffordable.
 - [ ] Wire `purchaseUpgrade(upgradeId)` with idempotent `requestId` and optimistic UI for balances.
 - [ ] Implement Scrap→Keys exchange with visible daily cap progress and disable logic.

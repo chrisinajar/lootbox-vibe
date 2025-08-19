@@ -22,8 +22,10 @@ describe('OpenBoxesService key consumption', () => {
   it('deducts keys according to keyCost * count', async () => {
     const storage = new LevelStorage(tmpDir);
     await storage.open();
-    // seed balances
+    // unlock bulk 10 for this user
     await storage.put(kv.cur(uid, 'KEYS'), u64.encodeBE(100n));
+    await storage.put(`pupg:${uid}:upg_bulk_10`, '1');
+    // seed balances
     // sanity: lifetime opened starts at 0
     // construct service with seeded RNG to avoid bonus
     const svc = new OpenBoxesService(storage, undefined as any, new SeededRng(1));

@@ -19,6 +19,8 @@ import {
   type BoxCatalogQuery,
   MaterialsCatalogDocument,
   type MaterialsCatalogQuery,
+  ShopDocument,
+  type ShopQuery,
 } from '../../graphql/graphql';
 import { useSfx } from '../sound/Sound';
 // labels and costs come from server via AvailableBoxes query
@@ -325,24 +327,7 @@ export const HomeMain: React.FC = () => {
     () => available.find((b) => b.id === selected)?.cost ?? 0,
     [available, selected],
   );
-  const costTooHigh = React.useMemo(
-    () => BigInt(selectedCost ?? 0) > keysBal,
-    [selectedCost, keysBal],
-  );
   const [busy, setBusy] = React.useState(false);
-  const disabledReason = React.useCallback(
-    (n: number): string | null => {
-      if (!selected) return 'Select a box';
-      if (busy) return 'Action in progress';
-      const cost = Number(selectedCost ?? 0);
-      if (cost > 0) {
-        const need = BigInt(cost) * BigInt(n);
-        if (keysBal < need) return `Not enough keys (need ${String(need - keysBal)} more)`;
-      }
-      return null;
-    },
-    [selected, busy, selectedCost, keysBal],
-  );
   const [openBoxes] = useMutation<OpenBoxesMutation, OpenBoxesMutationVariables>(OpenBoxesDocument);
   const [err, setErr] = React.useState<string | null>(null);
   const [rows, setRows] = React.useState<Row[]>([]);
@@ -361,6 +346,7 @@ export const HomeMain: React.FC = () => {
   const { data: matsCatalog } = useQuery<MaterialsCatalogQuery>(MaterialsCatalogDocument, {
     fetchPolicy: 'cache-first',
   });
+  const { data: shop } = useQuery<ShopQuery>(ShopDocument);
   const nameById = React.useMemo(() => {
     const map: Record<string, string> = {};
     const items = catalog?.collectionLog?.items ?? [];
@@ -483,42 +469,59 @@ export const HomeMain: React.FC = () => {
             >
               {(ub?.availableBoxes ?? []).map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.name} ({(b as any).cost} key{((b as any).cost ?? 0) === 1 ? '' : 's'})
+                  {b.name}
+                  {(b as any).cost > 0
+                    ? ` (${(b as any).cost} key${((b as any).cost ?? 0) === 1 ? '' : 's'})`
+                    : ''}
                 </option>
               ))}
             </select>
           </div>
-          <div className={`text-sm ${BigInt(selectedCost ?? 0) > keysBal ? 'text-red-500' : 'opacity-80'}`}>
-            Cost per open: {selectedCost} key{selectedCost === 1 ? '' : 's'} · You have {String(keysBal)}
-          </div>
+          {selectedCost > 0 && (
+            <div
+              className={`text-sm ${BigInt(selectedCost ?? 0) > keysBal ? 'text-red-500' : 'opacity-80'}`}
+            >
+              Cost per open: {selectedCost} key{selectedCost === 1 ? '' : 's'} · You have{' '}
+              {String(keysBal)}
+            </div>
+          )}
           <div className="flex gap-2">
-            {[1, 10, 100, 1000].map((n) => {
-              const dr = !selected
-                ? 'Select a box'
-                : busy
-                  ? 'Action in progress'
-                  : typeof selectedCost === 'number' && selectedCost > 0 &&
-                      keysBal < BigInt(selectedCost) * BigInt(n)
-                    ? `Not enough keys (need ${String(
-                        BigInt(selectedCost) * BigInt(n) - keysBal,
-                      )} more)`
-                    : null;
-              const isDisabled = Boolean(dr);
-              return (
-                <button
-                  key={n}
-                  disabled={isDisabled}
-                  title={dr ?? ''}
-                  className={`btn-primary ${
-                    isDisabled ? 'text-red-500 border-red-500 cursor-not-allowed' : ''
-                  }`}
-                  onClick={() => doOpen(n)}
-                >
-                  Open {n}
-                  {isDisabled ? <span className="ml-2" aria-hidden>⚠️</span> : null}
-                </button>
+            {(() => {
+              const purchasedIds = new Set(
+                (shop?.shop?.upgrades ?? []).filter((u) => u.purchased).map((u) => u.id),
               );
-            })}
+              const unlocked: number[] = [1];
+              if (purchasedIds.has('upg_bulk_10')) unlocked.push(10);
+              if (purchasedIds.has('upg_bulk_100')) unlocked.push(100);
+              if (purchasedIds.has('upg_bulk_1000')) unlocked.push(1000);
+              const showLabel = (n: number) =>
+                unlocked.length === 1 && n === 1 ? 'Open' : `Open ${n}`;
+              return unlocked.map((n) => {
+                const dr = !selected
+                  ? 'Select a box'
+                  : busy
+                    ? 'Action in progress'
+                    : typeof selectedCost === 'number' &&
+                        selectedCost > 0 &&
+                        keysBal < BigInt(selectedCost) * BigInt(n)
+                      ? `Not enough keys (need ${String(
+                          BigInt(selectedCost) * BigInt(n) - keysBal,
+                        )} more)`
+                      : null;
+                const isDisabled = Boolean(dr);
+                return (
+                  <button
+                    key={n}
+                    disabled={isDisabled}
+                    title={dr ?? ''}
+                    className={`btn-primary ${isDisabled ? 'cursor-not-allowed' : ''}`}
+                    onClick={() => doOpen(n)}
+                  >
+                    {showLabel(n)}
+                  </button>
+                );
+              });
+            })()}
           </div>
           {err && (
             <div className="text-sm" style={{ color: 'var(--muted-text)' }}>

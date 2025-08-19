@@ -61,6 +61,8 @@ describe('Economy & Unlock logic', () => {
     const uid = 'u2';
     await store.put(keys.cur(uid, 'KEYS'), u64.encodeBE(100n));
     await store.put(`pstat:${uid}.lifetimeBoxesOpened`, u64.encodeBE(0n));
+    // unlock bulk 10 to allow count=3
+    await store.put(`pupg:${uid}:upg_bulk_10`, Buffer.from('1'));
     const res = await svc.open(uid, { boxId: 'box_cardboard', count: 3, requestId: 'r2' } as any);
     // Cardboard keyCost = 0 in v1, lucky=0 with fixed rng
     const bal = u64.decodeBE(await store.get(keys.cur(uid, 'KEYS')));

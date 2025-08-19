@@ -21,6 +21,16 @@ export const ShopView: React.FC = () => {
   const shop = data?.shop;
   if (!shop) return null;
 
+  // Progressive reveal: only show bulk tiers when prereqs purchased
+  const purchased = new Set(shop.upgrades.filter((u) => u.purchased).map((u) => u.id));
+  const isVisible = (id: string, purchasedSelf: boolean) => {
+    if (id === 'upg_bulk_10') return true;
+    if (id === 'upg_bulk_100') return purchasedSelf || purchased.has('upg_bulk_10');
+    if (id === 'upg_bulk_1000') return purchasedSelf || purchased.has('upg_bulk_100');
+    return true;
+  };
+  const visibleUpgrades = shop.upgrades.filter((u) => isVisible(u.id, u.purchased));
+
   const doBuy = async (id: string) => {
     setBusy(true);
     try {
@@ -48,7 +58,7 @@ export const ShopView: React.FC = () => {
       <section className="rounded border panel p-4">
         <h2 className="text-lg font-semibold mb-2">Upgrades</h2>
         <div className="grid grid-cols-3 gap-3">
-          {shop.upgrades.map((u) => {
+          {visibleUpgrades.map((u) => {
             const locked = u.purchased;
             return (
               <div key={u.id} className="rounded border panel p-3">

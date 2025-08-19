@@ -24,8 +24,9 @@ describe('openBoxes idempotency', () => {
     const db = new LevelStorage(dir);
     await db.open();
     const uid = 'u1';
-    // seed KEYS=10
+    // seed KEYS=10 and unlock bulk 10
     await db.put(`cur:${uid}:KEYS`, u64be(10n));
+    await db.put(`pupg:${uid}:upg_bulk_10`, '1');
 
     const svc = new OpenBoxesService(db, undefined as any, new SeededRng(42));
     const input = { boxId: 'box_cardboard', count: 3, requestId: 'req-abc' } as any;

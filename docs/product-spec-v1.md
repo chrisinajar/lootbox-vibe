@@ -116,10 +116,11 @@ The game is about **clicking buttons, watching numbers go up, and always chasing
    - Time-based auto-openers.
    - Catch-up calculation when a player logs in.
 
-7. **Frontend Requirements**
-   - Must feel **juicy** (animations, sound, confetti).
-   - Support bulk openings (e.g. “Open 100 Boxes”).
-   - Collection log and upgrade menus.
+### Frontend requirements
+
+- Must feel **juicy** (animations, sound, confetti).
+- Support bulk openings with shop-gated sizes. Default CTA is “Open 1”. Additional bulk options are unlocked via Shop upgrades: Open 10 (≈250 scrap), Open 100 (≈1,000 scrap), Open 1000 (≈10,000 scrap). Once purchased, options are permanently available.
+- Collection log and upgrade menus.
 
 ---
 

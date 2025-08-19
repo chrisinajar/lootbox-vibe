@@ -7,12 +7,12 @@ import { CurrencyService } from './CurrencyService';
 type UpgradeDef = { id: string; name: string; desc: string; costScrap: number };
 
 const UPGRADES: UpgradeDef[] = [
-  {
-    id: 'upg_bulk_opener',
-    name: 'Bulk Opener',
-    desc: 'Open boxes faster in batches.',
-    costScrap: 100,
-  },
+  // Bulk open gating — unlock additional CTA sizes in Home
+  { id: 'upg_bulk_10', name: 'Open 10', desc: 'Unlock bulk opening ×10.', costScrap: 250 },
+  { id: 'upg_bulk_100', name: 'Open 100', desc: 'Unlock bulk opening ×100.', costScrap: 1000 },
+  { id: 'upg_bulk_1000', name: 'Open 1000', desc: 'Unlock bulk opening ×1000.', costScrap: 10000 },
+
+  // Other upgrades (kept for future use)
   {
     id: 'upg_shiny_chance',
     name: 'Shiny Chance',
@@ -77,6 +77,16 @@ export class ShopService {
     if (!u) throw new Error('unknown upgrade');
     const flag = await this.storage.get(`pupg:${uid}:${u.id}`);
     if (flag) return this.getShop(uid);
+    // prerequisites for bulk open tiers
+    const prereq: Record<string, string | undefined> = {
+      upg_bulk_100: 'upg_bulk_10',
+      upg_bulk_1000: 'upg_bulk_100',
+    };
+    const need = prereq[u.id];
+    if (need) {
+      const has = await this.storage.get(`pupg:${uid}:${need}`);
+      if (!has) throw new Error('prerequisite not purchased');
+    }
     // cost
     await this.currency.debit(uid, 'SCRAP', BigInt(u.costScrap));
     await this.storage.put(`pupg:${uid}:${u.id}`, '1');

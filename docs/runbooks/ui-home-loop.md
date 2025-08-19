@@ -16,7 +16,7 @@ Home screen shows a big Open action for the last used box (fallback to highest u
 - Grouping: client-side toggles for rarity grouping and collapsing duplicates.
 - Juice: placeholder Framer Motion animations per box type; confetti on rare (≥ Rare).
 
-- Batch opening: preset counts 1/10/100/1000. Client calls `openBoxes({ count, requestId })`. Handle response in summary mode (server returns full payload once). Stage UI reveal in chunks (e.g., 50 at a time) with a visible "Skip" to finish instantly.
+- Batch opening: preset counts 1/10/100/1000. Bulk sizes 10/100/1000 are gated by Shop upgrades (`upg_bulk_10`, `upg_bulk_100`, `upg_bulk_1000`). On Home, hide higher bulk CTAs until unlocked; when only 1 is unlocked, the button label is just “Open”. Client calls `openBoxes({ count, requestId })` and the backend enforces gating.
 
 ## Checklist
 
@@ -24,7 +24,7 @@ Home screen shows a big Open action for the last used box (fallback to highest u
 - [ ] After adding open behavior, refetch `InventorySummary` and `Currencies`.
 - [ ] Avoid functional React state updaters due to shim; compute next state directly.
 - [ ] Ensure `VITE_ENABLE_DEV_UI` is respected; Home remains non-dev.
-- [ ] Implement batch presets (1/10/100/1000) and staged reveal with skip.
+- [ ] Implement batch presets (1/10/100/1000), hide locked tiers on Home, and staged reveal with skip.
 - [ ] Result panel supports recent (3–5) and expandable full batch with virtualization.
 
 ## Gotchas

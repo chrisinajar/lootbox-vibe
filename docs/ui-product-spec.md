@@ -80,7 +80,7 @@ Every screen should reinforce the loop: **open → process → progress → repe
 
 ### 4. **Upgrades & Shop**
 
-- Scrap-based upgrades (auto-opener, bulk opener, shiny chance).
+- Scrap-based upgrades: auto-opener, shiny chance, and bulk open sizes (Open 10/100/1000) that permanently unlock extra Home CTAs.
 - Scrap → Keys exchange (bad rate, unbrick path). Daily cap from economy config; show progress and disable when capped.
 - Clear upgrade tree with prices & lock icons.
 

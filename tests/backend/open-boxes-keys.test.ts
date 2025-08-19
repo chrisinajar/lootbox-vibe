@@ -20,6 +20,8 @@ describe('OpenBoxesService – key deduction', () => {
   it('deducts KEYS by keyCost * count with no overwrite', async () => {
     const storage = new LevelStorage(tmpDir);
     await storage.open();
+    // unlock bulk 10 for this user
+    await storage.put(`pupg:${uid}:upg_bulk_10`, '1');
     // seed balances
     await storage.put(kv.cur(uid, 'KEYS'), u64.encodeBE(100n));
     // deterministic RNG and no lucky bonus (prev opens < 1000)
