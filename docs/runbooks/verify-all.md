@@ -11,10 +11,11 @@
 2. `yarn config:types` — regenerate config TypeScript types.
 3. `yarn codegen` — regenerate GraphQL client documents and types.
 4. `yarn format` — Prettier format all tracked files.
-5. `yarn config:check` — schema-validate all config JSON against Ajv 2020.
-6. `yarn typecheck` — compile TypeScript (no emit) across repo.
-7. `yarn test` — run Jest suites.
-8. `yarn verify` — Markdown lint and link checks for docs.
+5. `yarn lint` — ESLint across `src`, `scripts`, and `tests` (zero warnings).
+6. `yarn config:check` — schema-validate all config JSON against Ajv 2020.
+7. `yarn typecheck` — compile TypeScript (no emit) across repo.
+8. `yarn test` — run Jest suites.
+9. `yarn verify` — Markdown lint and link checks for docs.
 
 ## Gotchas
 
