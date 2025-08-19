@@ -376,6 +376,10 @@ export const HomeMain: React.FC = () => {
   const { data: shop } = useQuery<ShopQuery>(ShopDocument);
   const nameById = React.useMemo(() => {
     const map: Record<string, string> = {};
+    // currency display names
+    map['KEYS'] = 'Keys';
+    map['SCRAP'] = 'Scrap';
+    map['GLITTER'] = 'Glitter';
     const items = catalog?.collectionLog?.items ?? [];
     for (const it of items) map[it.id] = it.name;
     const boxes = boxesCatalog?.boxCatalog ?? [];
@@ -473,9 +477,30 @@ export const HomeMain: React.FC = () => {
           newDiscovery: discoveredMap.get(String(s.typeId)) === false,
         } as RowDecor;
       });
-      if (newStacks.length > 0) {
+      // Surface currency rewards (e.g., KEYS drops) in the results panel
+      const currencyRows: RowDecor[] = (() => {
+        const sums = new Map<string, bigint>();
+        for (const c of payload?.currencies ?? []) {
+          const cur = String(c.currency);
+          const amt = BigInt(c.amount as any);
+          sums.set(cur, (sums.get(cur) ?? 0n) + amt);
+        }
+        const out: RowDecor[] = [];
+        for (const [cur, amt] of sums.entries()) {
+          if (amt > 0n) {
+            out.push({
+              id: `${Date.now()}-cur-${cur}-${rowSeq.current++}`,
+              typeId: cur,
+              rarity: Rarity.Common,
+              count: Number(amt),
+            });
+          }
+        }
+        return out;
+      })();
+      if (newStacks.length > 0 || currencyRows.length > 0) {
         setRevealQueue((q) => {
-          const next = [...q, ...newStacks];
+          const next = [...q, ...currencyRows, ...newStacks];
           // compute chunk size so total reveal fits in ~1s at ~60 ticks
           // chunk = ceil(total / 60); default to 1 for <=60 items
           const total = next.length;

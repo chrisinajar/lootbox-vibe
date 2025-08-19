@@ -272,7 +272,10 @@ export class OpenBoxesService {
     const luckySteps = Math.floor(Number(prevOpens) / 1000); // per 1000
     const luckyChance = Math.min(luckySteps * 0.001, 0.05);
     const bonusKeys = this.rng.next() < luckyChance ? 1 : 0;
-    let nextBal = keysBal - totalCost + BigInt(bonusKeys);
+    // Track per-currency deltas to persist in one pass
+    const curDelta = new Map<string, bigint>();
+    // start with KEYS: cost + lucky bonus
+    curDelta.set('KEYS', (curDelta.get('KEYS') ?? 0n) - totalCost + BigInt(bonusKeys));
 
     // stack ops
     const stackAdjs = Array.from(rolls.values()).map((r) => ({
@@ -298,10 +301,23 @@ export class OpenBoxesService {
       .filter((r) => r.currency === 'KEYS')
       .reduce((a, r) => a + r.amount, 0n);
     if (rewardKeys !== 0n) {
-      nextBal = nextBal + rewardKeys;
+      curDelta.set('KEYS', (curDelta.get('KEYS') ?? 0n) + rewardKeys);
     }
-    // finally persist keys balance once
-    ops.push({ type: 'put', key: curKey, value: u64.encodeBE(nextBal) });
+
+    // fold in any currency drops from rolls (including KEYS if present)
+    for (const [c, amt] of currencies.entries()) {
+      curDelta.set(c, (curDelta.get(c) ?? 0n) + amt);
+    }
+
+    // persist currency balances atomically in this batch
+    for (const [c, delta] of curDelta.entries()) {
+      if (delta === 0n) continue;
+      const k = keys.cur(uid, c);
+      const cur = u64.decodeBE(await this.storage.get(k));
+      const next = cur + delta;
+      if (next < 0n) throw new Error(`currency underflow: ${c}`);
+      ops.push({ type: 'put', key: k, value: u64.encodeBE(next) });
+    }
 
     const result = {
       stacks: Array.from(rolls.entries()).map(([stackId, r]) => ({

@@ -39,13 +39,17 @@ describe('openBoxes idempotency', () => {
       r2.currencies.map((c: any) => ({ ...c, amount: String(c.amount) })),
     );
 
-    // KEYS reduced only once (cardboard keyCost = 0 in v1)
+    // KEYS adjusted only once: apply cost (0 for cardboard) and any KEYS rewards from r1
+    const initial = 10n;
+    const keysDelta = (r1.currencies as any[])
+      .filter((c: any) => c.currency === 'KEYS')
+      .reduce((a: bigint, c: any) => a + BigInt(c.amount), 0n);
     const keysAfter = await db.get(`cur:${uid}:KEYS`);
     let bal = 0n;
     if (keysAfter) {
       for (const by of (keysAfter as Buffer).values()) bal = (bal << 8n) | BigInt(by);
     }
-    expect(bal).toBe(10n);
+    expect(bal).toBe(initial + keysDelta);
 
     await db.close();
     fs.rmSync(dir, { recursive: true, force: true });
