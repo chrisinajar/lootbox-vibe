@@ -109,8 +109,16 @@ export const InventoryView: React.FC = () => {
   const applySort = (list: Row[]): Row[] => {
     if (sort === 'RARITY')
       return [...list].sort((a, b) => rarityOrder(b.rarity) - rarityOrder(a.rarity));
-    if (sort === 'ALPHA')
-      return [...list].sort((a, b) => a.typeId.toLowerCase().localeCompare(b.typeId.toLowerCase()));
+    if (sort === 'ALPHA') {
+      // ASCII A–Z, case-insensitive, locale-independent
+      return [...list].sort((a, b) => {
+        const A = a.typeId.toLowerCase();
+        const B = b.typeId.toLowerCase();
+        if (A < B) return -1;
+        if (A > B) return 1;
+        return 0;
+      });
+    }
     // VALUE pending backend metadata exposure
     return list; // NEWEST uses server cursor ordering
   };
@@ -164,12 +172,18 @@ export const InventoryView: React.FC = () => {
           </div>
           <div>
             <label className="text-xs opacity-70">Source Box</label>
-            <input
+            <select
               className="rounded px-2 py-1 block"
-              placeholder="box.id"
               value={filter?.sourceBoxId ?? ''}
-              onChange={(e) => set({ sourceBoxId: e.target.value || undefined })}
-            />
+              onChange={(e) => set({ sourceBoxId: (e.target.value || undefined) as any })}
+            >
+              <option value="">All</option>
+              {(boxCatalog?.boxCatalog ?? []).map((b: any) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="text-xs opacity-70">Sort</label>

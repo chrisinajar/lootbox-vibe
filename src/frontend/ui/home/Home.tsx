@@ -297,6 +297,9 @@ export const HomeMain: React.FC = () => {
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
   const [rows, setRows] = React.useState<Row[]>([]);
+  const [revealQueue, setRevealQueue] = React.useState<Row[]>([]);
+  const [revealing, setRevealing] = React.useState(false);
+  const revealTimer = React.useRef<number | null>(null);
   const [fxKey, setFxKey] = React.useState(0);
   const [rare, setRare] = React.useState(false);
   const sfx = useSfx();
@@ -324,6 +327,38 @@ export const HomeMain: React.FC = () => {
     [ub?.availableBoxes, selected],
   );
 
+  const flushRevealChunk = React.useCallback(() => {
+    setRevealQueue((queue) => {
+      if (queue.length === 0) {
+        setRevealing(false);
+        revealTimer.current && clearTimeout(revealTimer.current);
+        revealTimer.current = null;
+        return queue;
+      }
+      const chunk = queue.slice(0, 50);
+      const rest = queue.slice(50);
+      setRows((prev) => [...chunk, ...prev].slice(0, 5000));
+      revealTimer.current = window.setTimeout(flushRevealChunk, 50);
+      return rest;
+    });
+  }, []);
+
+  const startReveal = React.useCallback(() => {
+    if (revealing) return;
+    setRevealing(true);
+    revealTimer.current = window.setTimeout(flushRevealChunk, 0);
+  }, [revealing, flushRevealChunk]);
+
+  const skipReveal = React.useCallback(() => {
+    revealTimer.current && clearTimeout(revealTimer.current);
+    revealTimer.current = null;
+    setRevealing(false);
+    setRevealQueue((queue) => {
+      if (queue.length > 0) setRows((prev) => [...queue, ...prev].slice(0, 5000));
+      return [];
+    });
+  }, []);
+
   const doOpen = async (count: number) => {
     if (!selected) return;
     setBusy(true);
@@ -335,7 +370,10 @@ export const HomeMain: React.FC = () => {
       const newStacks = (payload?.stacks ?? []).map(
         (s) => ({ typeId: s.typeId, rarity: s.rarity, count: s.count }) as Row,
       );
-      if (newStacks.length > 0) setRows((prev) => [...newStacks, ...prev].slice(0, 5000));
+      if (newStacks.length > 0) {
+        setRevealQueue((q) => [...q, ...newStacks]);
+        startReveal();
+      }
       // Optimistic KEYS update based on mutation result
       try {
         const deltaKeys = (payload?.currencies ?? [])
@@ -397,9 +435,18 @@ export const HomeMain: React.FC = () => {
               ))}
             </select>
           </div>
-          <button disabled={!selected || busy} className="btn-primary" onClick={() => doOpen(10)}>
-            Open 10
-          </button>
+          <div className="flex gap-2">
+            {[1, 10, 100, 1000].map((n) => (
+              <button
+                key={n}
+                disabled={!selected || busy}
+                className="btn-primary"
+                onClick={() => doOpen(n)}
+              >
+                Open {n}
+              </button>
+            ))}
+          </div>
           {err && (
             <div className="text-sm" style={{ color: 'var(--muted-text)' }}>
               {err}
@@ -416,6 +463,13 @@ export const HomeMain: React.FC = () => {
       </div>
       <div className="rounded border p-4 panel">
         <div className="font-medium mb-2">Results</div>
+        <div className="mb-2 flex items-center gap-2">
+          {revealing && (
+            <button className="btn-accent" onClick={skipReveal}>
+              Skip reveal
+            </button>
+          )}
+        </div>
         <ResultPanel rows={rows} nameById={nameById} />
       </div>
     </div>

@@ -29,5 +29,8 @@ Runbooks:
 - boxes-self-drop-rules: Configure and enforce self-drop behavior — when adding/changing box drop rules.
 - ui-home-loop: Home loop UI (open CTA, currencies, results) — when changing box selection, currencies, or results panel.
 - ui-inventory: Inventory view (infinite scroll, filters, salvage) — when adding filters/sorts, bulk salvage, or list perf.
+- ui-collection-log: Collection Log grid (silhouettes, hints, completion) — when adding discovery logic or adjusting catalog views.
+- ui-shop-upgrades: Upgrades & Shop (tree, purchases, scrap→keys cap) — when adding upgrades or wiring purchase flows.
+- ui-progression-unlocks: Progression screen (milestones, RNG ???, idle modal) — when changing unlocks display or idle claim UX.
 - verify-all: Full project verification across code, docs, schema, codegen — run before PRs and after major changes.
 - ui-juice-settings: Animations, SFX, and settings — when adjusting juice, audio, or global toggles.

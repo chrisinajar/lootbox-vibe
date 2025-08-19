@@ -82,7 +82,7 @@ export const ProgressionView: React.FC = () => {
         <ul className="grid grid-cols-2 gap-2">
           {rng.map((r) => (
             <li key={r.id} className="rounded px-3 py-2 chip">
-              {r.label}
+              {r.discovered ? r.label : '???'}
             </li>
           ))}
         </ul>

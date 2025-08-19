@@ -13,7 +13,7 @@
 
 - Audio policy: Use WebAudio to avoid shipping assets; gate playback behind user interaction and a global toggle.
 - Accessibility: Respect future reduced-motion—current animations are brief and low amplitude; extendable via a user setting.
-- Error UX: Salvage and idle claim show friendly copy on failure and auto-retry once silently.
+- Error UX: Show user-friendly error copy for failed ops (open, salvage, upgrades, idle). Auto-retry once silently for transient issues; surface error only on repeated failure.
 
 ## Gotchas
 
