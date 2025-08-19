@@ -8,6 +8,7 @@ import {
   type ShopQuery,
 } from '../../graphql/graphql';
 import { CurrenciesDocument } from '../../graphql/graphql';
+import { currencyIcon, currencyName } from '../currency/meta';
 
 export const ShopView: React.FC = () => {
   const client = useApolloClient();
@@ -78,7 +79,13 @@ export const ShopView: React.FC = () => {
                   disabled={locked || busy}
                   onClick={() => doBuy(u.id)}
                 >
-                  {locked ? 'Purchased' : `Buy for ${u.costScrap} SCRAP`}
+                  {locked ? (
+                    'Purchased'
+                  ) : (
+                    <span title="Costs Scrap">
+                      Buy for {currencyIcon('SCRAP')} {u.costScrap} {currencyName('SCRAP')}
+                    </span>
+                  )}
                 </button>
               </div>
             );
@@ -87,12 +94,13 @@ export const ShopView: React.FC = () => {
       </section>
       <section className="rounded border panel p-4">
         <h2 className="text-lg font-semibold mb-2">Exchange</h2>
-        <div className="text-sm mb-2">
-          {shop.exchange.from} → {shop.exchange.to} at {shop.exchange.rateFrom}:
-          {shop.exchange.rateTo}
+        <div className="text-sm mb-2" title="Exchange rate">
+          {currencyIcon(shop.exchange.from)} {currencyName(shop.exchange.from)} →{' '}
+          {currencyIcon(shop.exchange.to)} {currencyName(shop.exchange.to)} at{' '}
+          {shop.exchange.rateFrom}:{shop.exchange.rateTo}
         </div>
-        <div className="text-sm mb-2">
-          Daily cap: {shop.exchange.dailyCapTo} {shop.exchange.to} — Used today:{' '}
+        <div className="text-sm mb-2" title="Daily mint cap for target currency">
+          Daily cap: {shop.exchange.dailyCapTo} {currencyName(shop.exchange.to)} — Used today:{' '}
           {shop.exchange.mintedToday} — Left: {capLeft}
         </div>
         <div className="flex gap-2">
@@ -103,7 +111,7 @@ export const ShopView: React.FC = () => {
               disabled={busy || capLeft <= 0}
               onClick={() => doExchange(n)}
             >
-              Convert +{n} {shop.exchange.to}
+              Convert +{n} {currencyIcon(shop.exchange.to)} {currencyName(shop.exchange.to)}
             </button>
           ))}
         </div>

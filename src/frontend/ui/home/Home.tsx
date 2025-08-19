@@ -22,15 +22,9 @@ import {
   ShopDocument,
   type ShopQuery,
 } from '../../graphql/graphql';
-import { useSfx } from '../sound/Sound';
 // labels and costs come from server via AvailableBoxes query
-
-// Central currency metadata
-const CURRENCY_META: Record<string, { name: string; icon: string }> = {
-  KEYS: { name: 'Keys', icon: '🔑' },
-  SCRAP: { name: 'Scrap', icon: '🛠️' },
-  GLITTER: { name: 'Glitter', icon: '✨' },
-};
+import { CURRENCY_META, currencyIcon, currencyName } from '../currency/meta';
+import { useSfx } from '../sound/Sound';
 
 function rarityRank(r: Rarity): number {
   const order: Record<Rarity, number> = {
@@ -109,17 +103,22 @@ export const CurrenciesBar: React.FC = () => {
   const Item: React.FC<{ label: string; value: bigint }> = ({ label, value }) => {
     const n = Number(value);
     return (
-      <div className="rounded px-3 py-2 chip min-w-28 flex items-center justify-between">
-        <span className="opacity-80 mr-2">{label}</span>
+      <div className="rounded px-3 py-2 chip min-w-32 flex items-center justify-between">
+        <span className="opacity-80 mr-2 flex items-center gap-1">
+          <span aria-hidden>
+            {label === 'Keys' ? '🔑' : label === 'Scrap' ? '🛠️' : label === 'Glitter' ? '✨' : ''}
+          </span>
+          {label}
+        </span>
         <AnimatedNumber value={isFinite(n) ? n : 0} />
       </div>
     );
   };
   return (
     <div className="flex gap-3">
-      <Item label="Keys" value={keys} />
-      <Item label="Scrap" value={scrap} />
-      <Item label="Glitter" value={glitter} />
+      <Item label={currencyName('KEYS')} value={keys} />
+      <Item label={currencyName('SCRAP')} value={scrap} />
+      <Item label={currencyName('GLITTER')} value={glitter} />
     </div>
   );
 };
@@ -145,9 +144,9 @@ const RecentRewards: React.FC<{ rows: RowDecor[]; nameById?: Record<string, stri
           title={CURRENCY_META[r.typeId] ? 'Currency reward' : undefined}
         >
           <span className={r.rainbow ? 'rainbow-text' : ''}>
-            {CURRENCY_META[r.typeId]?.icon ? (
+            {currencyIcon(r.typeId) ? (
               <span className="mr-1" aria-hidden>
-                {CURRENCY_META[r.typeId]!.icon}
+                {currencyIcon(r.typeId)}
               </span>
             ) : null}
             {(nameById && nameById[r.typeId]) || r.typeId}
@@ -195,9 +194,9 @@ const VirtualList: React.FC<{
           >
             <span className="text-sm opacity-80 mr-2">{r.rarity}</span>
             <span className={`text-sm ${r.rainbow ? 'rainbow-text' : ''}`}>
-              {CURRENCY_META[r.typeId]?.icon ? (
+              {currencyIcon(r.typeId) ? (
                 <span className="mr-1" aria-hidden>
-                  {CURRENCY_META[r.typeId]!.icon}
+                  {currencyIcon(r.typeId)}
                 </span>
               ) : null}
               {(nameById && nameById[r.typeId]) || r.typeId}
