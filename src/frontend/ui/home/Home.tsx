@@ -118,7 +118,7 @@ export const CurrenciesBar: React.FC = () => {
 };
 
 type Row = { typeId: string; rarity: Rarity; count: number };
-type RowDecor = Row & { id: string; shiny?: boolean; rainbow?: boolean };
+type RowDecor = Row & { id: string; shiny?: boolean; rainbow?: boolean; newDiscovery?: boolean };
 
 const RecentRewards: React.FC<{ rows: RowDecor[]; nameById?: Record<string, string> }> = ({
   rows,
@@ -129,7 +129,7 @@ const RecentRewards: React.FC<{ rows: RowDecor[]; nameById?: Record<string, stri
       {rows.slice(0, 5).map((r) => (
         <motion.li
           key={r.id}
-          className={`rounded px-2 py-1 chip text-sm ${r.shiny ? 'shiny-sparkle' : ''}`}
+          className={`rounded px-2 py-1 chip text-sm ${r.shiny ? 'shiny-sparkle' : ''} ${r.newDiscovery ? 'glow-gold' : ''}`}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -165,7 +165,7 @@ const VirtualList: React.FC<{
     >
       <div style={{ height: total * rowHeight, position: 'relative' }}>
         {visible.map((r, i) => (
-          <div
+          <motion.div
             key={start + i}
             style={{
               position: 'absolute',
@@ -174,14 +174,18 @@ const VirtualList: React.FC<{
               right: 0,
               height: rowHeight,
             }}
-            className={`px-3 flex items-center ${r.shiny ? 'shiny-sparkle' : ''}`}
+            className={`px-3 flex items-center ${r.shiny ? 'shiny-sparkle' : ''} ${r.newDiscovery ? 'glow-gold' : ''}`}
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 22 }}
           >
             <span className="text-sm opacity-80 mr-2">{r.rarity}</span>
             <span className={`text-sm ${r.rainbow ? 'rainbow-text' : ''}`}>
               {(nameById && nameById[r.typeId]) || r.typeId}
             </span>
             <span className="ml-auto text-sm">×{r.count}</span>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -355,6 +359,7 @@ export const HomeMain: React.FC = () => {
   const [toasts, setToasts] = React.useState<Array<{ id: string; text: string }>>([]);
   const [revealing, setRevealing] = React.useState(false);
   const revealTimer = React.useRef<number | null>(null);
+  const revealChunkSize = React.useRef<number>(1);
   const [shakeKey, setShakeKey] = React.useState(0);
   const [rare, setRare] = React.useState(false);
   const rowSeq = React.useRef(0);
@@ -392,10 +397,13 @@ export const HomeMain: React.FC = () => {
         revealTimer.current = null;
         return queue;
       }
-      const chunk = queue.slice(0, 50);
-      const rest = queue.slice(50);
+      // reveal N items this tick, where N scales so total duration ~1s
+      const n = Math.max(1, revealChunkSize.current | 0);
+      const chunk = queue.slice(0, n);
+      const rest = queue.slice(n);
       setRows((prev) => [...chunk, ...prev].slice(0, 5000));
-      revealTimer.current = window.setTimeout(flushRevealChunk, 50);
+      // Aim for ~60fps tick until exhausted
+      revealTimer.current = window.setTimeout(flushRevealChunk, 16);
       return rest;
     });
   }, []);
@@ -448,6 +456,11 @@ export const HomeMain: React.FC = () => {
       const rainbowSet = new Set<string>(
         (cos ?? []).filter((c) => c.modId === 'm_rainbow_text').map((c) => String(c.typeId)),
       );
+      // Precompute discovery state (first time seen in Collection)
+      const discoveredMap = new Map<string, boolean>();
+      for (const it of catalog?.collectionLog?.items ?? []) {
+        discoveredMap.set(String(it.typeId), Boolean(it.discovered));
+      }
       const newStacks = (payload?.stacks ?? []).map((s) => {
         const id = `${Date.now()}-${rowSeq.current++}`;
         return {
@@ -457,10 +470,18 @@ export const HomeMain: React.FC = () => {
           count: s.count,
           shiny: shinySet.has(String(s.typeId)),
           rainbow: rainbowSet.has(String(s.typeId)),
+          newDiscovery: discoveredMap.get(String(s.typeId)) === false,
         } as RowDecor;
       });
       if (newStacks.length > 0) {
-        setRevealQueue((q) => [...q, ...newStacks]);
+        setRevealQueue((q) => {
+          const next = [...q, ...newStacks];
+          // compute chunk size so total reveal fits in ~1s at ~60 ticks
+          // chunk = ceil(total / 60); default to 1 for <=60 items
+          const total = next.length;
+          revealChunkSize.current = Math.max(1, Math.ceil(total / 60));
+          return next;
+        });
         startReveal();
       }
       // Cosmetic toasts + sfx
