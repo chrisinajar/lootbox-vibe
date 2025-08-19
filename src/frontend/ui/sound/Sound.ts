@@ -72,10 +72,94 @@ export function useSfx() {
     },
     [sfxEnabled],
   );
+  // Box-type specific placeholder SFX
+  const boxCardboard = React.useCallback(() => {
+    const ac = ensureCtx();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + 0.12);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+    osc.connect(gain).connect(ac.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  }, []);
+
+  const boxWooden = React.useCallback(() => {
+    const ac = ensureCtx();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.linearRampToValueAtTime(160, now + 0.2);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+    osc.connect(gain).connect(ac.destination);
+    osc.start(now);
+    osc.stop(now + 0.32);
+  }, []);
+
+  const boxIron = React.useCallback(() => {
+    const ac = ensureCtx();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const hit = (f: number, t: number) => {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(f, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + t);
+      osc.connect(gain).connect(ac.destination);
+      osc.start(now);
+      osc.stop(now + t + 0.05);
+    };
+    hit(700, 0.09);
+    hit(350, 0.18);
+  }, []);
+
+  const boxUnstable = React.useCallback(() => {
+    const ac = ensureCtx();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'sawtooth';
+    // three quick pitch steps like a zap
+    osc.frequency.setValueAtTime(900, now);
+    osc.frequency.setValueAtTime(1200, now + 0.05);
+    osc.frequency.setValueAtTime(600, now + 0.1);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.2, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+    osc.connect(gain).connect(ac.destination);
+    osc.start(now);
+    osc.stop(now + 0.22);
+  }, []);
+
   return {
     open: () => tryPlay(playOpen),
     rare: () => tryPlay(playRare),
     salvage: () => tryPlay(playSalvage),
     cosmetic: () => tryPlay(playCosmetic),
+    box: (kind: 'cardboard' | 'wooden' | 'iron' | 'unstable') =>
+      tryPlay(
+        kind === 'wooden'
+          ? boxWooden
+          : kind === 'iron'
+            ? boxIron
+            : kind === 'unstable'
+              ? boxUnstable
+              : boxCardboard,
+      ),
   };
 }

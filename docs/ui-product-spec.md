@@ -32,6 +32,7 @@ Every screen should reinforce the loop: **open → process → progress → repe
   - Confetti, shake, screen flash on rare pulls.
   - Distinct FX per rarity tier.
   - **Box Preview FX:** Use placeholder animations now (plain cardboard pop, metallic clang, glitch flicker). Upgrade to themed art assets once available.
+  - On open, run a brief pre-open stage: shake the box (~0.5s; bulk capped at ~1s) and play box-type sfx before revealing results.
 
 ### 2. **Inventory Screen**
 

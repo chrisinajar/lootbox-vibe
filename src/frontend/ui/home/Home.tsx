@@ -118,28 +118,32 @@ export const CurrenciesBar: React.FC = () => {
 };
 
 type Row = { typeId: string; rarity: Rarity; count: number };
-type RowDecor = Row & { shiny?: boolean; rainbow?: boolean };
+type RowDecor = Row & { id: string; shiny?: boolean; rainbow?: boolean };
 
 const RecentRewards: React.FC<{ rows: RowDecor[]; nameById?: Record<string, string> }> = ({
   rows,
   nameById,
 }) => (
-  <ul className="flex gap-2 flex-wrap">
-    {rows.slice(0, 5).map((r, i) => (
-      <motion.li
-        key={i}
-        className={`rounded px-2 py-1 chip text-sm ${r.shiny ? 'shiny-sparkle' : ''}`}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      >
-        <span className={r.rainbow ? 'rainbow-text' : ''}>
-          {(nameById && nameById[r.typeId]) || r.typeId}
-        </span>{' '}
-        ({r.rarity}) ×{r.count}
-      </motion.li>
-    ))}
-  </ul>
+  <motion.ul className="flex gap-2 flex-wrap" layout>
+    <AnimatePresence initial={false} mode="popLayout">
+      {rows.slice(0, 5).map((r) => (
+        <motion.li
+          key={r.id}
+          className={`rounded px-2 py-1 chip text-sm ${r.shiny ? 'shiny-sparkle' : ''}`}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          layout
+          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+        >
+          <span className={r.rainbow ? 'rainbow-text' : ''}>
+            {(nameById && nameById[r.typeId]) || r.typeId}
+          </span>{' '}
+          ({r.rarity}) ×{r.count}
+        </motion.li>
+      ))}
+    </AnimatePresence>
+  </motion.ul>
 );
 
 const VirtualList: React.FC<{
@@ -208,28 +212,30 @@ const ResultPanel: React.FC<{ rows: RowDecor[]; nameById?: Record<string, string
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <div className="mr-auto">
+        <div className="flex-1 min-h-6">
           <RecentRewards rows={rows} nameById={nameById} />
         </div>
-        <label className="text-sm flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={groupByRarity}
-            onChange={(e: any) => setGroupByRarity(e.target.checked)}
-          />{' '}
-          group by rarity
-        </label>
-        <label className="text-sm flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={collapseDupes}
-            onChange={(e: any) => setCollapseDupes(e.target.checked)}
-          />{' '}
-          collapse duplicates
-        </label>
-        <button className="btn-accent" onClick={() => setExpanded((v) => !v)}>
-          {expanded ? 'Hide' : 'Show'} full
-        </button>
+        <div className="flex items-center gap-2 ml-auto">
+          <label className="text-sm flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={groupByRarity}
+              onChange={(e: any) => setGroupByRarity(e.target.checked)}
+            />{' '}
+            group by rarity
+          </label>
+          <label className="text-sm flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={collapseDupes}
+              onChange={(e: any) => setCollapseDupes(e.target.checked)}
+            />{' '}
+            collapse duplicates
+          </label>
+          <button className="btn-accent" onClick={() => setExpanded((v) => !v)}>
+            {expanded ? 'Hide' : 'Show'} full
+          </button>
+        </div>
       </div>
       <AnimatePresence>
         {expanded && (
@@ -246,22 +252,30 @@ const ResultPanel: React.FC<{ rows: RowDecor[]; nameById?: Record<string, string
   );
 };
 
-const BoxFX: React.FC<{ boxId?: string; boxName?: string; trigger: number; rare: boolean }> = ({
-  boxId,
-  boxName,
-  trigger,
-  rare,
-}) => {
+const BoxFX: React.FC<{
+  boxId?: string;
+  boxName?: string;
+  shakeKey: number;
+  rare: boolean;
+}> = ({ boxId, boxName, shakeKey, rare }) => {
   // simple placeholder animations
   const base = { scale: 1 };
   const variants: any = {
-    cardboard: { rotate: [0, -5, 5, -3, 3, 0], scale: [1, 1.05, 1], transition: { duration: 0.6 } },
-    wooden: { scale: [1, 0.95, 1.05, 1], transition: { duration: 0.4 } },
-    iron: { scale: [1, 0.9, 1.1, 1], transition: { duration: 0.5 } },
+    cardboard: {
+      rotate: [0, -6, 6, -4, 4, 0],
+      scale: [1, 1.05, 1],
+      transition: { duration: 0.5 },
+    },
+    wooden: { rotate: [0, 2, -2, 2, 0], scale: [1, 0.96, 1.04, 1], transition: { duration: 0.5 } },
+    iron: {
+      rotate: [0, -2, 2, -1, 1, 0],
+      scale: [1, 0.92, 1.06, 1],
+      transition: { duration: 0.5 },
+    },
     unstable: {
       opacity: [1, 0.6, 1],
       filter: ['none', 'hue-rotate(30deg)', 'none'],
-      transition: { duration: 0.6 },
+      transition: { duration: 0.5 },
     },
   };
   const key = boxId?.includes('unstable')
@@ -274,7 +288,7 @@ const BoxFX: React.FC<{ boxId?: string; boxName?: string; trigger: number; rare:
   return (
     <div className="h-40 flex items-center justify-center">
       <motion.div
-        key={trigger}
+        key={shakeKey}
         initial={base}
         animate={variants[key]}
         className="rounded px-10 py-8"
@@ -285,7 +299,7 @@ const BoxFX: React.FC<{ boxId?: string; boxName?: string; trigger: number; rare:
       <AnimatePresence>
         {rare && (
           <motion.div
-            key={`confetti-${trigger}`}
+            key={`confetti-${shakeKey}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -341,8 +355,9 @@ export const HomeMain: React.FC = () => {
   const [toasts, setToasts] = React.useState<Array<{ id: string; text: string }>>([]);
   const [revealing, setRevealing] = React.useState(false);
   const revealTimer = React.useRef<number | null>(null);
-  const [fxKey, setFxKey] = React.useState(0);
+  const [shakeKey, setShakeKey] = React.useState(0);
   const [rare, setRare] = React.useState(false);
+  const rowSeq = React.useRef(0);
   const sfx = useSfx();
   const { data: catalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
     fetchPolicy: 'cache-first',
@@ -402,12 +417,29 @@ export const HomeMain: React.FC = () => {
   }, []);
 
   const doOpen = async (count: number) => {
-    if (!selected) return;
+    const boxId = selected; // snapshot to avoid mid-staging selection changes
+    if (!boxId) return;
     setBusy(true);
     setErr(null);
+    // Pre-open staging: shake + box-type SFX, then proceed
+    const kind = boxId.includes('unstable')
+      ? 'unstable'
+      : boxId.includes('iron')
+        ? 'iron'
+        : boxId.includes('wood')
+          ? 'wooden'
+          : 'cardboard';
+    try {
+      sfx.box(kind as any);
+    } catch {
+      /* optional sfx */
+    }
+    setShakeKey((k) => k + 1);
+    const stageDelay = count > 1 ? 1000 : 500; // cap ~1s for bulk; ~0.5s for single
+    await new Promise((r) => setTimeout(r, stageDelay));
     const requestId = uuidv4();
     try {
-      const res = await openBoxes({ variables: { input: { boxId: selected, count, requestId } } });
+      const res = await openBoxes({ variables: { input: { boxId, count, requestId } } });
       const payload = res.data?.openBoxes;
       const cos = (payload?.cosmetics ?? []) as any[];
       const shinySet = new Set<string>(
@@ -416,16 +448,17 @@ export const HomeMain: React.FC = () => {
       const rainbowSet = new Set<string>(
         (cos ?? []).filter((c) => c.modId === 'm_rainbow_text').map((c) => String(c.typeId)),
       );
-      const newStacks = (payload?.stacks ?? []).map(
-        (s) =>
-          ({
-            typeId: s.typeId,
-            rarity: s.rarity,
-            count: s.count,
-            shiny: shinySet.has(String(s.typeId)),
-            rainbow: rainbowSet.has(String(s.typeId)),
-          }) as RowDecor,
-      );
+      const newStacks = (payload?.stacks ?? []).map((s) => {
+        const id = `${Date.now()}-${rowSeq.current++}`;
+        return {
+          id,
+          typeId: s.typeId,
+          rarity: s.rarity,
+          count: s.count,
+          shiny: shinySet.has(String(s.typeId)),
+          rainbow: rainbowSet.has(String(s.typeId)),
+        } as RowDecor;
+      });
       if (newStacks.length > 0) {
         setRevealQueue((q) => [...q, ...newStacks]);
         startReveal();
@@ -475,8 +508,8 @@ export const HomeMain: React.FC = () => {
         (s) => rarityRank(s.rarity) >= rarityRank(Rarity.Rare),
       );
       setRare(hasRare);
-      setFxKey((k) => k + 1);
       try {
+        // legacy open ping; keep as subtle additional cue
         sfx.open();
         if (hasRare) sfx.rare();
       } catch {
@@ -527,6 +560,7 @@ export const HomeMain: React.FC = () => {
               className="rounded px-2 py-1"
               value={selected ?? ''}
               onChange={(e: any) => setSelected(e.target.value)}
+              disabled={busy}
             >
               {(ub?.availableBoxes ?? []).map((b) => (
                 <option key={b.id} value={b.id}>
@@ -596,16 +630,21 @@ export const HomeMain: React.FC = () => {
               : '-'}
           </div>
         </div>
-        <BoxFX boxId={selected} boxName={selectedName} trigger={fxKey} rare={rare} />
+        <BoxFX boxId={selected} boxName={selectedName} shakeKey={shakeKey} rare={rare} />
       </div>
       <div className="rounded border p-4 panel">
         <div className="font-medium mb-2">Results</div>
-        <div className="mb-2 flex items-center gap-2">
-          {revealing && (
-            <button className="btn-accent" onClick={skipReveal}>
-              Skip reveal
-            </button>
-          )}
+        <div className="mb-2 flex items-center gap-2 justify-end min-h-8">
+          <button
+            className="btn-accent"
+            onClick={skipReveal}
+            disabled={!revealing}
+            aria-hidden={!revealing}
+            tabIndex={revealing ? 0 : -1}
+            style={{ visibility: revealing ? 'visible' : 'hidden' }}
+          >
+            Skip reveal
+          </button>
         </div>
         <ResultPanel rows={rows} nameById={nameById} />
       </div>
