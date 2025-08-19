@@ -194,8 +194,7 @@ export class OpenBoxesService {
     const luckySteps = Math.floor(Number(prevOpens) / 1000); // per 1000
     const luckyChance = Math.min(luckySteps * 0.001, 0.05);
     const bonusKeys = this.rng.next() < luckyChance ? 1 : 0;
-    const nextBal = keysBal - totalCost + BigInt(bonusKeys);
-    ops.push({ type: 'put', key: curKey, value: u64.encodeBE(nextBal) });
+    let nextBal = keysBal - totalCost + BigInt(bonusKeys);
 
     // stack ops
     const stackAdjs = Array.from(rolls.values()).map((r) => ({
@@ -216,6 +215,15 @@ export class OpenBoxesService {
     // unlocks: milestone + rng
     const unlock = await this.unlocks.prepareUnlockOps(uid, nextOpened, input.boxId);
     ops.push(...unlock.ops);
+    // apply any milestone reward currencies (e.g., KEYS) once here to avoid overwrites
+    const rewardKeys = unlock.rewardCurrencies
+      .filter((r) => r.currency === 'KEYS')
+      .reduce((a, r) => a + r.amount, 0n);
+    if (rewardKeys !== 0n) {
+      nextBal = nextBal + rewardKeys;
+    }
+    // finally persist keys balance once
+    ops.push({ type: 'put', key: curKey, value: u64.encodeBE(nextBal) });
 
     const result = {
       stacks: Array.from(rolls.entries()).map(([stackId, r]) => ({
@@ -227,6 +235,7 @@ export class OpenBoxesService {
       currencies: [
         { currency: 'KEYS', amount: -totalCost },
         ...(bonusKeys > 0 ? [{ currency: 'KEYS', amount: BigInt(bonusKeys) }] : []),
+        ...(rewardKeys > 0n ? [{ currency: 'KEYS', amount: rewardKeys }] : []),
         ...Array.from(currencies.entries()).map(([c, amt]) => ({ currency: c, amount: amt })),
       ],
       unlocks: unlock.unlocked,

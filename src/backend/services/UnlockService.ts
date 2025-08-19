@@ -38,11 +38,16 @@ export class UnlockService {
     uid: string,
     nextBoxesOpened: bigint,
     sourceBoxId?: string,
-  ): Promise<{ ops: BatchOp[]; unlocked: string[] }> {
+  ): Promise<{
+    ops: BatchOp[];
+    unlocked: string[];
+    rewardCurrencies: Array<{ currency: string; amount: bigint }>;
+  }> {
     const ops: BatchOp[] = [];
     const profile = await this.loadProfile(uid);
     const unlockedSet = new Set(profile.unlockedBoxIds);
     const newly: string[] = [];
+    const rewardsOut: Array<{ currency: string; amount: bigint }> = [];
 
     if (this.v1) {
       // Milestones: when requirements satisfied, unlock and grant rewards
@@ -59,22 +64,26 @@ export class UnlockService {
         }
         if (ok) {
           const targets: any[] = Array.isArray(m.unlocks) ? m.unlocks : [];
+          let unlockedNew = false;
           for (const t of targets) {
             if (t.kind === 'BOX_TYPE') {
               const bid = String(t.boxId);
               if (!unlockedSet.has(bid)) {
                 unlockedSet.add(bid);
                 newly.push(bid);
+                unlockedNew = true;
               }
             }
           }
-          const rewards: any[] = Array.isArray(m.rewards) ? m.rewards : [];
-          for (const rw of rewards) {
-            if (rw.type === 'CURRENCY') {
-              const curKey = `cur:${uid}:${rw.currency}`;
-              const bal = u64.decodeBE(await this.storage.get(curKey));
-              const next = bal + BigInt(Number(rw.amount ?? 0));
-              ops.push({ type: 'put', key: curKey, value: u64.encodeBE(next) });
+          // Only grant rewards once, when the milestone is newly unlocked
+          if (unlockedNew) {
+            const rewards: any[] = Array.isArray(m.rewards) ? m.rewards : [];
+            for (const rw of rewards) {
+              if (rw.type === 'CURRENCY') {
+                const amt = BigInt(Number(rw.amount ?? 0));
+                const cur = String(rw.currency);
+                rewardsOut.push({ currency: cur, amount: amt });
+              }
             }
           }
         }
@@ -150,6 +159,6 @@ export class UnlockService {
 
     const updated: Profile = { unlockedBoxIds: Array.from(unlockedSet) };
     ops.push({ type: 'put', key: `ppro:${uid}`, value: JSON.stringify(updated) });
-    return { ops, unlocked: newly };
+    return { ops, unlocked: newly, rewardCurrencies: rewardsOut };
   }
 }

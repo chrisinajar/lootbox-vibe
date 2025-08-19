@@ -295,6 +295,7 @@ export const HomeMain: React.FC = () => {
   const [selected, setSelected] = useLastBox(unlocked);
   const [openBoxes] = useMutation<OpenBoxesMutation, OpenBoxesMutationVariables>(OpenBoxesDocument);
   const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState<string | null>(null);
   const [rows, setRows] = React.useState<Row[]>([]);
   const [fxKey, setFxKey] = React.useState(0);
   const [rare, setRare] = React.useState(false);
@@ -326,6 +327,7 @@ export const HomeMain: React.FC = () => {
   const doOpen = async (count: number) => {
     if (!selected) return;
     setBusy(true);
+    setErr(null);
     const requestId = uuidv4();
     try {
       const res = await openBoxes({ variables: { input: { boxId: selected, count, requestId } } });
@@ -344,6 +346,13 @@ export const HomeMain: React.FC = () => {
         if (hasRare) sfx.rare();
       } catch {}
       await client.refetchQueries({ include: [InventorySummaryDocument, CurrenciesDocument] });
+    } catch (e: any) {
+      const msg = String(e?.message ?? '');
+      if (msg.toLowerCase().includes('insufficient') && msg.toLowerCase().includes('keys')) {
+        setErr('Not enough keys to open this box.');
+      } else {
+        setErr('Something went wrong opening boxes. Please try again.');
+      }
     } finally {
       setBusy(false);
       setTimeout(() => setRare(false), 1200);
@@ -372,6 +381,11 @@ export const HomeMain: React.FC = () => {
           <button disabled={!selected || busy} className="btn-primary" onClick={() => doOpen(10)}>
             Open 10
           </button>
+          {err && (
+            <div className="text-sm" style={{ color: 'var(--muted-text)' }}>
+              {err}
+            </div>
+          )}
           <div className="text-sm opacity-80">
             Last used:{' '}
             {selected

@@ -21,6 +21,7 @@ import {
   OpenBoxesDocument,
   SalvageDocument,
   Rarity,
+  CurrenciesDocument,
   CollectionLogDocument,
   type CollectionLogQuery,
   BoxCatalogDocument,
@@ -139,6 +140,7 @@ export const OpenResultsPanel: React.FC = () => {
 
   const doOpen = async () => {
     setBusy(true);
+    setErr(null);
     const requestId = uuidv4();
     try {
       const res = await openBoxes({
@@ -154,7 +156,16 @@ export const OpenResultsPanel: React.FC = () => {
         )
           sfx?.rare?.();
       } catch {}
-      await client.refetchQueries({ include: [InventorySummaryDocument] });
+      await client.refetchQueries({ include: [InventorySummaryDocument, CurrenciesDocument] });
+      // ensure currencies bar reflects deducted keys in dev panel as well
+      await client.refetchQueries({ include: ['Currencies'] as any });
+    } catch (e: any) {
+      const msg = String(e?.message ?? '');
+      if (msg.toLowerCase().includes('insufficient') && msg.toLowerCase().includes('keys')) {
+        setErr('Not enough keys to open boxes.');
+      } else {
+        setErr('Something went wrong opening boxes. Please try again.');
+      }
     } finally {
       setBusy(false);
     }

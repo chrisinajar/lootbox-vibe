@@ -18,6 +18,8 @@
 - Node setup: `nvm use` (respects `.nvmrc`).
 - Docs lint: `yarn lint:md` (Markdown style) and `yarn lint:links` (broken links). Run both: `yarn verify`.
 - No build step exists yet; wire tooling into CI as it’s introduced.
+- When finalizing changes, use `yarn verify-all` to generate all assets and run all checks.
+  - `yarn verify-all` runs every test and check on the system, so there's no need to run it in conjunction with other commands
 
 ## Coding Style & Naming Conventions
 
@@ -53,3 +55,9 @@
 
 - Do not commit secrets or tokens. When code is added, store local config in env files excluded by `.gitignore`.
 - Prefer internal references; vet external links in `docs/` for accuracy and longevity.
+
+## Maintain Documentation
+
+- Always keep documentation up to date with changes.
+- Use the `docs/` directory for all documentation.
+- When adding new features or making changes, update the relevant documentation files.
