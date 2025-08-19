@@ -13,7 +13,7 @@
     "build:web": "vite build",
     "start:backend": "node dist/src/backend/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
-    "lint": "eslint src scripts tests --ext .ts,.tsx,.js,.jsx --max-warnings=0 --format json",
+    "lint": "eslint src scripts tests --ext .ts,.tsx,.js,.jsx --max-warnings=0 --format stylish",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "test": "jest --passWithNoTests",
     "config:types": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/generate-types.ts",

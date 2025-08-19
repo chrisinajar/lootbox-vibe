@@ -430,15 +430,22 @@ export const HomeMain: React.FC = () => {
         setRevealQueue((q) => [...q, ...newStacks]);
         startReveal();
       }
-      // Cosmetic toasts
+      // Cosmetic toasts + sfx
       try {
+        if ((cos ?? []).length > 0) {
+          try {
+            sfx.cosmetic();
+          } catch {
+            /* ignore sfx errors */
+          }
+        }
         for (const c of cos ?? []) {
           const n = nameById[String(c.typeId)] ?? String(c.typeId);
           const label = String(c.modName ?? c.modId ?? 'Cosmetic');
           const msg = `✨ ${label} ${n} acquired!`;
           const id = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
           setToasts((prev) => [...prev, { id, text: msg }]);
-          window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 2800);
+          window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 6000);
         }
       } catch {
         /* noop */
@@ -494,8 +501,20 @@ export const HomeMain: React.FC = () => {
       {/* Toasts */}
       <div className="toast-container">
         {toasts.map((t) => (
-          <div key={t.id} className="toast text-sm">
-            {t.text}
+          <div key={t.id} className="toast toast-cosmetic">
+            <div className="toast-icon">✨</div>
+            <div className="toast-body">
+              <div className="toast-title">Cosmetic acquired!</div>
+              <div className="toast-msg">{t.text}</div>
+            </div>
+            <button
+              className="toast-close"
+              onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
+              aria-label="Dismiss"
+              title="Dismiss"
+            >
+              ×
+            </button>
           </div>
         ))}
       </div>

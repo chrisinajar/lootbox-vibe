@@ -154,17 +154,24 @@ export const OpenResultsPanel: React.FC = () => {
         variables: { input: { boxId: 'box_cardboard', count: 10, requestId } },
       });
       setLast(res.data?.openBoxes ?? null);
-      // Cosmetic toasts
+      // Cosmetic toasts + sfx
       try {
         const cos = (res.data?.openBoxes?.cosmetics ?? []) as any[];
         if (Array.isArray(cos)) {
+          if (cos.length > 0) {
+            try {
+              sfx?.cosmetic?.();
+            } catch {
+              /* ignore sfx errors */
+            }
+          }
           for (const c of cos) {
             const name = nameById[c.typeId] ?? c.typeId;
             const label = String(c.modName ?? c.modId ?? 'Cosmetic');
             const msg = `✨ ${label} ${name} acquired!`;
             const id = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
             setToasts((prev) => [...prev, { id, text: msg }]);
-            setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 2800);
+            setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 6000);
           }
         }
       } catch {
@@ -248,8 +255,20 @@ export const OpenResultsPanel: React.FC = () => {
       {/* Toasts */}
       <div className="toast-container">
         {toasts.map((t) => (
-          <div key={t.id} className="toast text-sm">
-            {t.text}
+          <div key={t.id} className="toast toast-cosmetic">
+            <div className="toast-icon">✨</div>
+            <div className="toast-body">
+              <div className="toast-title">Cosmetic acquired!</div>
+              <div className="toast-msg">{t.text}</div>
+            </div>
+            <button
+              className="toast-close"
+              onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
+              aria-label="Dismiss"
+              title="Dismiss"
+            >
+              ×
+            </button>
           </div>
         ))}
       </div>
