@@ -3,5 +3,6 @@ mutation OpenBoxes($input: OpenBoxesInput!) {
     stacks { stackId typeId rarity count }
     currencies { currency amount }
     unlocks
+    cosmetics { typeId modId modName }
   }
 }

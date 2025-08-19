@@ -118,8 +118,9 @@ export const CurrenciesBar: React.FC = () => {
 };
 
 type Row = { typeId: string; rarity: Rarity; count: number };
+type RowDecor = Row & { shiny?: boolean; rainbow?: boolean };
 
-const RecentRewards: React.FC<{ rows: Row[]; nameById?: Record<string, string> }> = ({
+const RecentRewards: React.FC<{ rows: RowDecor[]; nameById?: Record<string, string> }> = ({
   rows,
   nameById,
 }) => (
@@ -127,19 +128,22 @@ const RecentRewards: React.FC<{ rows: Row[]; nameById?: Record<string, string> }
     {rows.slice(0, 5).map((r, i) => (
       <motion.li
         key={i}
-        className="rounded px-2 py-1 chip text-sm"
+        className={`rounded px-2 py-1 chip text-sm ${r.shiny ? 'shiny-sparkle' : ''}`}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
-        {(nameById && nameById[r.typeId]) || r.typeId} ({r.rarity}) ×{r.count}
+        <span className={r.rainbow ? 'rainbow-text' : ''}>
+          {(nameById && nameById[r.typeId]) || r.typeId}
+        </span>{' '}
+        ({r.rarity}) ×{r.count}
       </motion.li>
     ))}
   </ul>
 );
 
 const VirtualList: React.FC<{
-  rows: Row[];
+  rows: RowDecor[];
   height?: number;
   rowHeight?: number;
   nameById?: Record<string, string>;
@@ -166,10 +170,12 @@ const VirtualList: React.FC<{
               right: 0,
               height: rowHeight,
             }}
-            className="px-3 flex items-center"
+            className={`px-3 flex items-center ${r.shiny ? 'shiny-sparkle' : ''}`}
           >
             <span className="text-sm opacity-80 mr-2">{r.rarity}</span>
-            <span className="text-sm">{(nameById && nameById[r.typeId]) || r.typeId}</span>
+            <span className={`text-sm ${r.rainbow ? 'rainbow-text' : ''}`}>
+              {(nameById && nameById[r.typeId]) || r.typeId}
+            </span>
             <span className="ml-auto text-sm">×{r.count}</span>
           </div>
         ))}
@@ -178,7 +184,7 @@ const VirtualList: React.FC<{
   );
 };
 
-const ResultPanel: React.FC<{ rows: Row[]; nameById?: Record<string, string> }> = ({
+const ResultPanel: React.FC<{ rows: RowDecor[]; nameById?: Record<string, string> }> = ({
   rows,
   nameById,
 }) => {
@@ -187,7 +193,7 @@ const ResultPanel: React.FC<{ rows: Row[]; nameById?: Record<string, string> }> 
   const [collapseDupes, setCollapseDupes] = React.useState(true);
   let list = rows;
   if (collapseDupes) {
-    const agg = new Map<string, Row>();
+    const agg = new Map<string, RowDecor>();
     for (const r of rows) {
       const k = `${r.typeId}|${r.rarity}`;
       const prev = agg.get(k);
@@ -330,8 +336,9 @@ export const HomeMain: React.FC = () => {
   const [busy, setBusy] = React.useState(false);
   const [openBoxes] = useMutation<OpenBoxesMutation, OpenBoxesMutationVariables>(OpenBoxesDocument);
   const [err, setErr] = React.useState<string | null>(null);
-  const [rows, setRows] = React.useState<Row[]>([]);
-  const [, setRevealQueue] = React.useState<Row[]>([]);
+  const [rows, setRows] = React.useState<RowDecor[]>([]);
+  const [, setRevealQueue] = React.useState<RowDecor[]>([]);
+  const [toasts, setToasts] = React.useState<Array<{ id: string; text: string }>>([]);
   const [revealing, setRevealing] = React.useState(false);
   const revealTimer = React.useRef<number | null>(null);
   const [fxKey, setFxKey] = React.useState(0);
@@ -402,12 +409,39 @@ export const HomeMain: React.FC = () => {
     try {
       const res = await openBoxes({ variables: { input: { boxId: selected, count, requestId } } });
       const payload = res.data?.openBoxes;
+      const cos = (payload?.cosmetics ?? []) as any[];
+      const shinySet = new Set<string>(
+        (cos ?? []).filter((c) => c.modId === 'm_shiny').map((c) => String(c.typeId)),
+      );
+      const rainbowSet = new Set<string>(
+        (cos ?? []).filter((c) => c.modId === 'm_rainbow_text').map((c) => String(c.typeId)),
+      );
       const newStacks = (payload?.stacks ?? []).map(
-        (s) => ({ typeId: s.typeId, rarity: s.rarity, count: s.count }) as Row,
+        (s) =>
+          ({
+            typeId: s.typeId,
+            rarity: s.rarity,
+            count: s.count,
+            shiny: shinySet.has(String(s.typeId)),
+            rainbow: rainbowSet.has(String(s.typeId)),
+          }) as RowDecor,
       );
       if (newStacks.length > 0) {
         setRevealQueue((q) => [...q, ...newStacks]);
         startReveal();
+      }
+      // Cosmetic toasts
+      try {
+        for (const c of cos ?? []) {
+          const n = nameById[String(c.typeId)] ?? String(c.typeId);
+          const label = String(c.modName ?? c.modId ?? 'Cosmetic');
+          const msg = `✨ ${label} ${n} acquired!`;
+          const id = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+          setToasts((prev) => [...prev, { id, text: msg }]);
+          window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 2800);
+        }
+      } catch {
+        /* noop */
       }
       // Optimistic KEYS update based on mutation result
       try {
@@ -457,6 +491,14 @@ export const HomeMain: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Toasts */}
+      <div className="toast-container">
+        {toasts.map((t) => (
+          <div key={t.id} className="toast text-sm">
+            {t.text}
+          </div>
+        ))}
+      </div>
       <CurrenciesBar />
       <div className="rounded border p-4 panel">
         <div className="flex items-center gap-3">

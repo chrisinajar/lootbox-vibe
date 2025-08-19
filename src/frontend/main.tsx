@@ -127,6 +127,7 @@ export const OpenResultsPanel: React.FC = () => {
   const [last, setLast] = React.useState<any | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
+  const [toasts, setToasts] = React.useState<Array<{ id: string; text: string }>>([]);
   const sfx = useSfx();
   const { data: catalog } = useQuery<CollectionLogQuery>(CollectionLogDocument, {
     fetchPolicy: 'cache-first',
@@ -153,6 +154,22 @@ export const OpenResultsPanel: React.FC = () => {
         variables: { input: { boxId: 'box_cardboard', count: 10, requestId } },
       });
       setLast(res.data?.openBoxes ?? null);
+      // Cosmetic toasts
+      try {
+        const cos = (res.data?.openBoxes?.cosmetics ?? []) as any[];
+        if (Array.isArray(cos)) {
+          for (const c of cos) {
+            const name = nameById[c.typeId] ?? c.typeId;
+            const label = String(c.modName ?? c.modId ?? 'Cosmetic');
+            const msg = `✨ ${label} ${name} acquired!`;
+            const id = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+            setToasts((prev) => [...prev, { id, text: msg }]);
+            setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 2800);
+          }
+        }
+      } catch {
+        /* best-effort toasts */
+      }
       // Optimistically update KEYS based on openBoxes result
       try {
         const payload = res.data?.openBoxes;
@@ -228,6 +245,14 @@ export const OpenResultsPanel: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      {/* Toasts */}
+      <div className="toast-container">
+        {toasts.map((t) => (
+          <div key={t.id} className="toast text-sm">
+            {t.text}
+          </div>
+        ))}
+      </div>
       <div className="flex gap-2">
         <button disabled={busy} onClick={doOpen} className="btn-primary">
           Open 10 boxes
@@ -247,11 +272,32 @@ export const OpenResultsPanel: React.FC = () => {
             <div>
               <div className="font-medium">Stacks</div>
               <ul className="grid grid-cols-2 gap-1">
-                {last.stacks.map((s: any) => (
-                  <li key={s.stackId} className="rounded px-2 py-1 chip">
-                    {nameById[s.typeId] ?? s.typeId} ({s.rarity}): +{s.count}
-                  </li>
-                ))}
+                {(() => {
+                  const cos: any[] = Array.isArray(last.cosmetics) ? last.cosmetics : [];
+                  const shiny = new Set<string>(
+                    cos.filter((c: any) => c.modId === 'm_shiny').map((c: any) => String(c.typeId)),
+                  );
+                  const rainbow = new Set<string>(
+                    cos
+                      .filter((c: any) => c.modId === 'm_rainbow_text')
+                      .map((c: any) => String(c.typeId)),
+                  );
+                  return last.stacks.map((s: any) => {
+                    const isShiny = shiny.has(String(s.typeId));
+                    const isRainbow = rainbow.has(String(s.typeId));
+                    return (
+                      <li
+                        key={s.stackId}
+                        className={`rounded px-2 py-1 chip ${isShiny ? 'shiny-sparkle' : ''}`}
+                      >
+                        <span className={isRainbow ? 'rainbow-text' : ''}>
+                          {nameById[s.typeId] ?? s.typeId}
+                        </span>{' '}
+                        ({s.rarity}): +{s.count}
+                      </li>
+                    );
+                  });
+                })()}
               </ul>
             </div>
           )}

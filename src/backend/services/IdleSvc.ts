@@ -5,6 +5,7 @@ export type IdleReport = {
     stacks: { stackId: string; typeId: string; rarity: string; count: number }[];
     currencies: { currency: string; amount: bigint }[];
     unlocks: string[];
+    cosmetics?: { typeId: string; modId: string; modName: string }[];
   };
 };
 
@@ -14,7 +15,7 @@ export class IdleSvc {
     return {
       message: 'Nothing to claim right now. Your cat is napping.',
       boxesOpened: 0,
-      rewards: { stacks: [], currencies: [], unlocks: [] },
+      rewards: { stacks: [], currencies: [], unlocks: [], cosmetics: [] },
     };
   }
 }

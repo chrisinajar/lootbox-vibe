@@ -98,6 +98,52 @@ export class OpenBoxesService {
     const currencies = new Map<string, bigint>();
     let selfCount = 0;
     const configVersion = Number(this.config.configVersion ?? 1);
+    // Pre-compute cosmetic eligibility and per-item chance to ensure ≥1% combined chance per box
+    const modsStatic: any[] = Array.isArray((this.config as any)?.modifiers?.static)
+      ? ((this.config as any).modifiers!.static as any[])
+      : [];
+    const cosmeticModIds = new Set<string>(
+      modsStatic.filter((m: any) => m?.category === 'COSMETIC').map((m: any) => String(m.id)),
+    );
+    const modNameById = new Map<string, string>(
+      modsStatic.map((m: any) => [String(m.id), String(m.name ?? m.id)] as const),
+    );
+    const itemsCatalog: any[] = Array.isArray((this.config as any)?.items)
+      ? ((this.config as any).items as any[])
+      : [];
+    const allowedModsByItem = new Map<string, Set<string>>();
+    for (const it of itemsCatalog) {
+      const allow: string[] = Array.isArray((it as any).allowedStaticMods)
+        ? ((it as any).allowedStaticMods as string[])
+        : [];
+      allowedModsByItem.set(String((it as any).id), new Set(allow.map(String)));
+    }
+
+    const cosmetics: Array<{ typeId: string; modId: string; modName: string }> = [];
+
+    // Compute eligible item-pick probability for this box
+    const dropTable = (box as any).dropTable as any;
+    let eligibleWeight = 0;
+    let totalWeight = 0;
+    if (dropTable && Array.isArray(dropTable.entries)) {
+      for (const e of dropTable.entries) {
+        const w = Number((e as any).weight ?? 0) || 0;
+        totalWeight += w;
+        if ((e as any).type === 'ITEM') {
+          const itemId = String((e as any).itemId);
+          const pool: string[] = Array.isArray((e as any).staticModsPool)
+            ? ((e as any).staticModsPool as string[])
+            : [];
+          const allow = allowedModsByItem.get(itemId) ?? new Set<string>();
+          const eligible = pool.map(String).filter((id) => cosmeticModIds.has(id) && allow.has(id));
+          if (eligible.length > 0) eligibleWeight += w;
+        }
+      }
+    }
+    const eligibleProb = totalWeight > 0 ? eligibleWeight / totalWeight : 0;
+    // choose per-item cosmetic application chance so that eligibleProb * p >= 1%
+    const perItemCosmeticChance = eligibleProb > 0 ? Math.min(0.1, 0.01 / eligibleProb) : 0; // cap at 10%
+
     const performRoll = () => {
       // v1 drop table
       const dt = (box as any).dropTable as any;
@@ -137,6 +183,25 @@ export class OpenBoxesService {
             const cur = rolls.get(stackId) ?? { count: 0, itemId, rarity };
             cur.count += 1;
             rolls.set(stackId, cur);
+            // Cosmetic roll: intersect pool ∩ item.allowedStaticMods ∩ COSMETIC
+            try {
+              const pool: string[] = Array.isArray(pick.staticModsPool)
+                ? (pick.staticModsPool as string[])
+                : [];
+              const allow = allowedModsByItem.get(itemId) ?? new Set<string>();
+              const eligible = pool
+                .map(String)
+                .filter((id) => cosmeticModIds.has(id) && allow.has(id));
+              if (eligible.length > 0 && this.rng.next() < perItemCosmeticChance) {
+                // pick one eligible cosmetic uniformly
+                const idx = Math.floor(this.rng.next() * eligible.length);
+                const modId = eligible[Math.max(0, Math.min(idx, eligible.length - 1))]!;
+                const modName = modNameById.get(modId) ?? modId;
+                cosmetics.push({ typeId: itemId, modId, modName });
+              }
+            } catch {
+              /* cosmetic roll best-effort */
+            }
             break;
           }
           case 'CURRENCY': {
@@ -252,11 +317,13 @@ export class OpenBoxesService {
         ...Array.from(currencies.entries()).map(([c, amt]) => ({ currency: c, amount: amt })),
       ],
       unlocks: unlock.unlocked,
+      cosmetics,
     };
     const persistable = {
       stacks: result.stacks,
       currencies: result.currencies.map((c) => ({ ...c, amount: String(c.amount) })),
       unlocks: result.unlocks,
+      cosmetics: result.cosmetics,
     };
     ops.push({ type: 'put', key: reqKey, value: JSON.stringify(persistable) });
 
