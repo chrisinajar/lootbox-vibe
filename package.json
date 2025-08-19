@@ -10,6 +10,7 @@
     "dev": "concurrently -n api,web -c blue,magenta \"yarn dev:api\" \"vite\"",
     "dev:api": "tsx watch --tsconfig tsconfig.backend.json src/backend/index.ts",
     "build:backend": "tsc -p tsconfig.backend.json",
+    "build:web": "vite build",
     "start:backend": "node dist/src/backend/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
