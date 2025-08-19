@@ -64,6 +64,11 @@ body {
 .btn-primary:hover {
   background: var(--primary-hover);
 }
+/* Disable hover color change when button is disabled */
+.btn-primary:disabled:hover,
+.btn-primary[disabled]:hover {
+  background: var(--primary);
+}
 .btn-accent {
   @apply rounded px-4 py-2 text-sm font-medium;
   background: var(--accent);

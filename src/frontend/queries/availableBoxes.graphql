@@ -1,4 +1,3 @@
 query AvailableBoxes {
-  availableBoxes { id name }
+  availableBoxes { id name cost }
 }
-

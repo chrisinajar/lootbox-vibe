@@ -113,6 +113,32 @@ export async function initializeServer(options: InitOptions = {}) {
         const set = new Set<string>(boxes);
         set.add('box_cardboard');
         boxes = Array.from(set);
+        // sort by economy cost (ascending) for a stable order
+        try {
+          const cfg = cfgLoader.load();
+          const boxesArr: any[] = Array.isArray((cfg as any).boxes)
+            ? ((cfg as any).boxes as any[])
+            : [];
+          const meta = new Map<string, number | undefined>();
+          for (const b of boxesArr)
+            meta.set(
+              String(b.id),
+              typeof (b as any).keyCost === 'number' ? Number((b as any).keyCost) : undefined,
+            );
+          const costs: Record<string, number> = (((cfg as any)?.economy as any)?.boxCosts ??
+            {}) as any;
+          const costOf = (id: string) =>
+            typeof costs[id] === 'number'
+              ? Number(costs[id])
+              : typeof meta.get(id) === 'number'
+                ? (meta.get(id) as number)
+                : id === 'box_cardboard'
+                  ? 0
+                  : Number.MAX_SAFE_INTEGER;
+          boxes.sort((a, b) => costOf(a) - costOf(b) || (a < b ? -1 : a > b ? 1 : 0));
+        } catch {
+          // best-effort ordering only
+        }
         const entry = telemetry.buildEntry(
           'unlockedBoxes',
           uid,
@@ -145,13 +171,33 @@ export async function initializeServer(options: InitOptions = {}) {
         const boxesArr: any[] = Array.isArray((cfg as any).boxes)
           ? ((cfg as any).boxes as any[])
           : [];
-        const byId = new Map<string, string>();
-        for (const b of boxesArr) byId.set(String(b.id), String(b.name ?? b.id));
+        const byId = new Map<string, { name: string; keyCost?: number }>();
+        for (const b of boxesArr) {
+          byId.set(String(b.id), {
+            name: String(b.name ?? b.id),
+            keyCost:
+              typeof (b as any).keyCost === 'number' ? Number((b as any).keyCost) : undefined,
+          });
+        }
+        const economy = (cfg as any)?.economy ?? {};
+        const boxCosts: Record<string, number> = (economy?.boxCosts ?? {}) as any;
+        const costOf = (id: string): number => {
+          if (typeof boxCosts[id] === 'number') return Number(boxCosts[id]);
+          const meta = byId.get(id);
+          if (typeof meta?.keyCost === 'number') return Number(meta.keyCost);
+          // Default: put unknowns at the end; keep cardboard first
+          return id === 'box_cardboard' ? 0 : Number.MAX_SAFE_INTEGER;
+        };
         const out = unlocked
           .filter((id) => byId.has(id))
-          .map((id) => ({ id, name: byId.get(id)! }));
+          .sort((a, b) => costOf(a) - costOf(b) || (a < b ? -1 : a > b ? 1 : 0))
+          .map((id) => ({ id, name: byId.get(id)!.name, cost: costOf(id) }));
         if (out.length === 0 && byId.has('box_cardboard')) {
-          out.push({ id: 'box_cardboard', name: byId.get('box_cardboard')! });
+          out.push({
+            id: 'box_cardboard',
+            name: byId.get('box_cardboard')!.name,
+            cost: costOf('box_cardboard'),
+          });
         }
         return out;
       },
@@ -160,7 +206,18 @@ export async function initializeServer(options: InitOptions = {}) {
         const boxesArr: any[] = Array.isArray((cfg as any).boxes)
           ? ((cfg as any).boxes as any[])
           : [];
-        return boxesArr.map((b: any) => ({ id: String(b.id), name: String(b.name ?? b.id) }));
+        const boxCosts: Record<string, number> = (((cfg as any)?.economy as any)?.boxCosts ??
+          {}) as any;
+        return boxesArr.map((b: any) => ({
+          id: String(b.id),
+          name: String(b.name ?? b.id),
+          cost:
+            typeof boxCosts[String(b.id)] === 'number'
+              ? Number(boxCosts[String(b.id)])
+              : typeof (b as any).keyCost === 'number'
+                ? Number((b as any).keyCost)
+                : 0,
+        }));
       },
       materialsCatalog: async () => {
         const cfg = cfgLoader.load();

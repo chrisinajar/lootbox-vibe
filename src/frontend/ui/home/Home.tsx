@@ -21,9 +21,7 @@ import {
   type MaterialsCatalogQuery,
 } from '../../graphql/graphql';
 import { useSfx } from '../sound/Sound';
-// labels come from server via AvailableBoxes query
-
-const BOX_ORDER = ['box_cardboard', 'box_wooden', 'box_iron', 'box_unstable'];
+// labels and costs come from server via AvailableBoxes query
 
 function rarityRank(r: Rarity): number {
   const order: Record<Rarity, number> = {
@@ -37,28 +35,43 @@ function rarityRank(r: Rarity): number {
   return order[r] ?? 0;
 }
 
-function useLastBox(unlocked: string[]): [string | undefined, (id: string) => void] {
+type BoxAvail = { id: string; cost: number };
+function useBestBoxSelection(
+  available: BoxAvail[],
+  keys: bigint,
+): [string | undefined, (id: string) => void] {
   const [val, setVal] = React.useState<string | undefined>(undefined);
   React.useEffect(() => {
-    let box = undefined as string | undefined;
+    const unlocked = available.map((b) => b.id);
+    const affordable = available.filter((b) => b.cost <= Number(keys));
+    let saved: string | undefined;
     try {
-      box = window.localStorage.getItem('lastBoxId') ?? undefined;
+      saved = window.localStorage.getItem('lastBoxId') ?? undefined;
     } catch {
-      /* noop: storage read failed */
+      /* noop */
     }
-    if (box && unlocked.includes(box)) {
-      setVal(box);
-    } else if (unlocked.length > 0) {
-      const ordered = BOX_ORDER.filter((b) => unlocked.includes(b));
-      setVal(ordered[ordered.length - 1] ?? unlocked[0]);
+    if (saved && unlocked.includes(saved)) {
+      const savedCost = available.find((b) => b.id === saved)?.cost ?? Number.MAX_SAFE_INTEGER;
+      if (savedCost <= Number(keys)) {
+        setVal(saved);
+        return;
+      }
     }
-  }, [unlocked.join('|')]);
+    if (affordable.length > 0) {
+      // available is already sorted by ascending cost from the server; pick the most expensive affordable
+      const pick = affordable[affordable.length - 1]!.id;
+      setVal(pick);
+      return;
+    }
+    // fallback: pick the cheapest available if nothing is affordable (e.g., zero keys but cardboard is free)
+    if (available.length > 0) setVal(available[0]!.id);
+  }, [available.map((b) => `${b.id}:${b.cost}`).join('|'), String(keys)]);
   const update = (id: string) => {
     setVal(id);
     try {
       window.localStorage.setItem('lastBoxId', id);
     } catch {
-      /* noop: storage write failed */
+      /* noop */
     }
   };
   return [val, update];
@@ -297,10 +310,40 @@ export const HomeMain: React.FC = () => {
   const client = useApolloClient();
   useQuery<CurrenciesQuery>(CurrenciesDocument);
   const { data: ub } = useQuery<AvailableBoxesQuery>(AvailableBoxesDocument);
-  const unlocked = (ub?.availableBoxes ?? []).map((b) => b.id);
-  const [selected, setSelected] = useLastBox(unlocked);
-  const [openBoxes] = useMutation<OpenBoxesMutation, OpenBoxesMutationVariables>(OpenBoxesDocument);
+  const { data: currencies } = useQuery<CurrenciesQuery>(CurrenciesDocument);
+  const keysBal = React.useMemo(() => {
+    const arr = currencies?.currencies ?? [];
+    const idx = arr.findIndex((c) => c.currency === 'KEYS');
+    return idx >= 0 ? BigInt(arr[idx]!.amount as any) : 0n;
+  }, [currencies?.currencies]);
+  const available: BoxAvail[] = React.useMemo(
+    () => (ub?.availableBoxes ?? []).map((b) => ({ id: b.id, cost: (b as any).cost ?? 0 })),
+    [ub?.availableBoxes],
+  );
+  const [selected, setSelected] = useBestBoxSelection(available, keysBal);
+  const selectedCost = React.useMemo(
+    () => available.find((b) => b.id === selected)?.cost ?? 0,
+    [available, selected],
+  );
+  const costTooHigh = React.useMemo(
+    () => BigInt(selectedCost ?? 0) > keysBal,
+    [selectedCost, keysBal],
+  );
   const [busy, setBusy] = React.useState(false);
+  const disabledReason = React.useCallback(
+    (n: number): string | null => {
+      if (!selected) return 'Select a box';
+      if (busy) return 'Action in progress';
+      const cost = Number(selectedCost ?? 0);
+      if (cost > 0) {
+        const need = BigInt(cost) * BigInt(n);
+        if (keysBal < need) return `Not enough keys (need ${String(need - keysBal)} more)`;
+      }
+      return null;
+    },
+    [selected, busy, selectedCost, keysBal],
+  );
+  const [openBoxes] = useMutation<OpenBoxesMutation, OpenBoxesMutationVariables>(OpenBoxesDocument);
   const [err, setErr] = React.useState<string | null>(null);
   const [rows, setRows] = React.useState<Row[]>([]);
   const [, setRevealQueue] = React.useState<Row[]>([]);
@@ -440,22 +483,42 @@ export const HomeMain: React.FC = () => {
             >
               {(ub?.availableBoxes ?? []).map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.name}
+                  {b.name} ({(b as any).cost} key{((b as any).cost ?? 0) === 1 ? '' : 's'})
                 </option>
               ))}
             </select>
           </div>
+          <div className={`text-sm ${BigInt(selectedCost ?? 0) > keysBal ? 'text-red-500' : 'opacity-80'}`}>
+            Cost per open: {selectedCost} key{selectedCost === 1 ? '' : 's'} · You have {String(keysBal)}
+          </div>
           <div className="flex gap-2">
-            {[1, 10, 100, 1000].map((n) => (
-              <button
-                key={n}
-                disabled={!selected || busy}
-                className="btn-primary"
-                onClick={() => doOpen(n)}
-              >
-                Open {n}
-              </button>
-            ))}
+            {[1, 10, 100, 1000].map((n) => {
+              const dr = !selected
+                ? 'Select a box'
+                : busy
+                  ? 'Action in progress'
+                  : typeof selectedCost === 'number' && selectedCost > 0 &&
+                      keysBal < BigInt(selectedCost) * BigInt(n)
+                    ? `Not enough keys (need ${String(
+                        BigInt(selectedCost) * BigInt(n) - keysBal,
+                      )} more)`
+                    : null;
+              const isDisabled = Boolean(dr);
+              return (
+                <button
+                  key={n}
+                  disabled={isDisabled}
+                  title={dr ?? ''}
+                  className={`btn-primary ${
+                    isDisabled ? 'text-red-500 border-red-500 cursor-not-allowed' : ''
+                  }`}
+                  onClick={() => doOpen(n)}
+                >
+                  Open {n}
+                  {isDisabled ? <span className="ml-2" aria-hidden>⚠️</span> : null}
+                </button>
+              );
+            })}
           </div>
           {err && (
             <div className="text-sm" style={{ color: 'var(--muted-text)' }}>

@@ -1,4 +1,3 @@
-query BoxCatalog {
-  boxCatalog { id name }
+query BoxCatalog { 
+  boxCatalog { id name cost }
 }
-

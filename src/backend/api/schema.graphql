@@ -68,7 +68,7 @@ type CountProgress { key: ID!, discovered: Int!, total: Int! }
 type CollectionLog { items: [CollectionItem!]!, byRarity: [CountProgress!]!, byType: [CountProgress!]! }
 
 # Box info for selection UI
-type BoxInfo { id: ID!, name: String! }
+type BoxInfo { id: ID!, name: String!, cost: Int! }
 type MaterialInfo { id: ID!, name: String! }
 
 # Shop & upgrades
