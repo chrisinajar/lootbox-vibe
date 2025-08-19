@@ -27,7 +27,7 @@ export const ProgressionView: React.FC = () => {
       const res = await claimIdle({ variables: { input: {} } });
       const msg = res.data?.claimIdle?.message ?? 'All caught up!';
       setModal({ open: true, msg });
-    } catch (_e) {
+    } catch {
       setModal({
         open: true,
         err: 'Something went wrong claiming your idle rewards. We will retry silently.',
@@ -35,7 +35,9 @@ export const ProgressionView: React.FC = () => {
       setTimeout(async () => {
         try {
           await claimIdle({ variables: { input: {} } });
-        } catch {}
+        } catch {
+          /* noop: silent retry */
+        }
       }, 1500);
     }
   };

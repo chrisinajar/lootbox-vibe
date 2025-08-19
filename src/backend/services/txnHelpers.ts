@@ -59,7 +59,9 @@ export async function prepareStackOps(
         try {
           const arr = JSON.parse(tbuf.toString('utf8')) as string[];
           for (const t of arr) ops.push({ type: 'del', key: keys.idxTag(a.uid, t, a.stackId) });
-        } catch {}
+        } catch {
+          /* noop: ignore malformed tag map */
+        }
         ops.push({ type: 'del', key: tagMapKey });
       }
       if (existingSrc) {

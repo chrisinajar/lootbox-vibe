@@ -14,7 +14,9 @@ function readInitial(): boolean {
     const v = window.localStorage.getItem(KEY);
     if (v === '0') return false;
     if (v === '1') return true;
-  } catch {}
+  } catch {
+    /* noop: storage read failed */
+  }
   return true;
 }
 
@@ -24,7 +26,9 @@ export const SettingsProvider: React.FC<React.PropsWithChildren> = ({ children }
     setSfxEnabledState(v);
     try {
       window.localStorage.setItem(KEY, v ? '1' : '0');
-    } catch {}
+    } catch {
+      /* noop: storage write failed */
+    }
   };
   const value = React.useMemo(() => ({ sfxEnabled, setSfxEnabled }), [sfxEnabled]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

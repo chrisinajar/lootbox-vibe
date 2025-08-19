@@ -18,7 +18,8 @@ export const ShopView: React.FC = () => {
 
   if (loading && !data) return <div className="px-3 py-2 text-sm opacity-70">Loading…</div>;
   if (error) return <div className="px-3 py-2 text-sm opacity-70">Error: {error.message}</div>;
-  const shop = data?.shop!;
+  const shop = data?.shop;
+  if (!shop) return null;
 
   const doBuy = async (id: string) => {
     setBusy(true);

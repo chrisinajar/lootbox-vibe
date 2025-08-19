@@ -10,7 +10,9 @@ const setUid = (uid?: string) => {
     } else {
       window.sessionStorage.setItem('X-User-Id', uid);
     }
-  } catch {}
+  } catch {
+    /* noop: storage write failed */
+  }
   // notify listeners to refetch
   window.dispatchEvent(new Event('user-id-changed'));
 };

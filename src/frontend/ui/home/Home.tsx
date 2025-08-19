@@ -43,7 +43,9 @@ function useLastBox(unlocked: string[]): [string | undefined, (id: string) => vo
     let box = undefined as string | undefined;
     try {
       box = window.localStorage.getItem('lastBoxId') ?? undefined;
-    } catch {}
+    } catch {
+      /* noop: storage read failed */
+    }
     if (box && unlocked.includes(box)) {
       setVal(box);
     } else if (unlocked.length > 0) {
@@ -55,7 +57,9 @@ function useLastBox(unlocked: string[]): [string | undefined, (id: string) => vo
     setVal(id);
     try {
       window.localStorage.setItem('lastBoxId', id);
-    } catch {}
+    } catch {
+      /* noop: storage write failed */
+    }
   };
   return [val, update];
 }
@@ -291,7 +295,7 @@ const BoxFX: React.FC<{ boxId?: string; boxName?: string; trigger: number; rare:
 
 export const HomeMain: React.FC = () => {
   const client = useApolloClient();
-  const { data: curData } = useQuery<CurrenciesQuery>(CurrenciesDocument);
+  useQuery<CurrenciesQuery>(CurrenciesDocument);
   const { data: ub } = useQuery<AvailableBoxesQuery>(AvailableBoxesDocument);
   const unlocked = (ub?.availableBoxes ?? []).map((b) => b.id);
   const [selected, setSelected] = useLastBox(unlocked);

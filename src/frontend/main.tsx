@@ -36,11 +36,15 @@ export function getTestUserId(): string | undefined {
     const ss =
       window.sessionStorage?.getItem('X-User-Id') || window.sessionStorage?.getItem('userId');
     if (ss) return ss;
-  } catch {}
+  } catch {
+    /* noop: storage read failed */
+  }
   try {
     const ls = window.localStorage?.getItem('X-User-Id') || window.localStorage?.getItem('userId');
     if (ls) return ls;
-  } catch {}
+  } catch {
+    /* noop: storage read failed */
+  }
   return undefined;
 }
 
@@ -168,7 +172,9 @@ export const OpenResultsPanel: React.FC = () => {
             return { currencies: nextArr } as any;
           });
         }
-      } catch {}
+      } catch {
+        /* noop: cache update best-effort */
+      }
       try {
         sfx?.open?.();
         if (
@@ -177,7 +183,9 @@ export const OpenResultsPanel: React.FC = () => {
           )
         )
           sfx?.rare?.();
-      } catch {}
+      } catch {
+        /* noop: sfx optional */
+      }
       await client.refetchQueries({ include: [InventorySummaryDocument, CurrenciesDocument] });
       // ensure currencies bar reflects deducted keys in dev panel as well
       await client.refetchQueries({ include: ['Currencies'] as any });
@@ -201,14 +209,18 @@ export const OpenResultsPanel: React.FC = () => {
       setLast(res.data?.salvage ?? null);
       try {
         sfx?.salvage?.();
-      } catch {}
+      } catch {
+        /* noop: sfx optional */
+      }
       await client.refetchQueries({ include: [InventorySummaryDocument] });
     } catch (e: any) {
       setErr('Something went wrong salvaging your items. Please try again.');
       // silent retry once
       try {
         await salvage({ variables: { input: { maxRarity: Rarity.Uncommon } } });
-      } catch {}
+      } catch {
+        /* noop: silent retry */
+      }
     } finally {
       setBusy(false);
     }

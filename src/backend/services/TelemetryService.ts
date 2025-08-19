@@ -71,6 +71,7 @@ export class TelemetryService {
       try {
         return Buffer.byteLength(JSON.stringify(result));
       } catch {
+        /* noop: best-effort size */
         return 0;
       }
     })();
@@ -100,14 +101,18 @@ export class TelemetryService {
             if (!isNaN(d.getTime()) && d.getTime() < cutoff) {
               try {
                 fs.unlinkSync(path.join(dir, f));
-              } catch {}
+              } catch {
+                /* noop: file may already be gone */
+              }
             }
           }
         }
       } else {
         await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
       }
-    } catch {}
+    } catch {
+      /* noop: directory prep best-effort */
+    }
     const line = JSON.stringify(entry) + '\n';
     await fs.promises.appendFile(filePath, line, 'utf8');
   }

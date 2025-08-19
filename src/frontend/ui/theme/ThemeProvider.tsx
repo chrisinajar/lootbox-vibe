@@ -14,7 +14,9 @@ function getInitialTheme(): ThemeName {
   try {
     const stored = window.localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') return stored;
-  } catch {}
+  } catch {
+    /* noop: storage read failed */
+  }
   if (typeof window !== 'undefined' && window.matchMedia) {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
@@ -28,7 +30,9 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     setThemeState(t);
     try {
       window.localStorage.setItem('theme', t);
-    } catch {}
+    } catch {
+      /* noop: storage write failed */
+    }
     document.documentElement.setAttribute('data-theme', t);
   }, []);
 

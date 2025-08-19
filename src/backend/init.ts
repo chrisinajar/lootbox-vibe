@@ -9,6 +9,7 @@ import express from 'express';
 import { BigIntResolver } from 'graphql-scalars';
 
 import { buildContext } from './api/context';
+import { ConfigLoader } from './config';
 import { ConfigService } from './services/ConfigService';
 import { CurrencyService } from './services/CurrencyService';
 import { IdleSvc } from './services/IdleSvc';
@@ -54,7 +55,7 @@ export async function initializeServer(options: InitOptions = {}) {
 
   const configSvc = new ConfigService();
   const currencySvc = new CurrencyService(storage);
-  const cfgLoader = new (require('./config').ConfigLoader)();
+  const cfgLoader = new ConfigLoader();
 
   const resolvers = {
     BigInt: BigIntResolver,
@@ -104,7 +105,9 @@ export async function initializeServer(options: InitOptions = {}) {
           try {
             const parsed = JSON.parse(String(buf));
             if (Array.isArray(parsed.unlockedBoxIds)) boxes = parsed.unlockedBoxIds.map(String);
-          } catch {}
+          } catch {
+            /* ignore malformed profile blob */
+          }
         }
         // Ensure baseline cardboard is always available (append, not replace)
         const set = new Set<string>(boxes);
@@ -129,7 +132,9 @@ export async function initializeServer(options: InitOptions = {}) {
           try {
             const parsed = JSON.parse(String(buf));
             if (Array.isArray(parsed.unlockedBoxIds)) unlocked = parsed.unlockedBoxIds.map(String);
-          } catch {}
+          } catch {
+            /* ignore malformed profile blob */
+          }
         }
         // Ensure baseline cardboard is always present
         const uSet = new Set<string>(unlocked);
@@ -283,7 +288,9 @@ export async function initializeServer(options: InitOptions = {}) {
           try {
             const p = JSON.parse(String(pbuf));
             if (Array.isArray(p.unlockedBoxIds)) unlocked = p.unlockedBoxIds;
-          } catch {}
+          } catch {
+            /* ignore malformed profile blob */
+          }
         }
         const boxesArr: any[] = Array.isArray((cfg as any).boxes)
           ? ((cfg as any).boxes as any[])
@@ -351,7 +358,7 @@ export async function initializeServer(options: InitOptions = {}) {
         await telemetry.write(entry);
         return res;
       },
-      claimIdle: async (_: any, { input }: any, ctx: any) => {
+      claimIdle: async (_: any, __: any, ctx: any) => {
         const uid: string = ctx?.uid ?? 'anonymous';
         const started = Date.now();
         const res = await idleSvc.claim(uid);

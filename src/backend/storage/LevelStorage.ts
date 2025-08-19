@@ -8,7 +8,7 @@ export class LevelStorage implements StorageProvider {
   constructor(private location: string) {}
 
   async open(): Promise<void> {
-    // @ts-ignore level types are relaxed; minimal stub here
+    // @ts-expect-error level types are relaxed; minimal stub here
     this.db = new Level(this.location, { valueEncoding: 'buffer' });
   }
 
@@ -45,7 +45,7 @@ export class LevelStorage implements StorageProvider {
   }
 
   async scanPrefix(prefix: string, onItem: (key: string, value: Buffer) => void): Promise<void> {
-    // @ts-ignore minimal iteration stub
+    // @ts-expect-error minimal iteration stub
     for await (const [key, value] of this.db!.iterator({ gte: prefix, lt: prefix + '\uFFFF' })) {
       onItem(String(key), value as Buffer);
     }

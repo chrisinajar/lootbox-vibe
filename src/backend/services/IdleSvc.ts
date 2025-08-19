@@ -9,7 +9,7 @@ export type IdleReport = {
 };
 
 export class IdleSvc {
-  async claim(uid: string): Promise<IdleReport> {
+  async claim(_uid: string): Promise<IdleReport> {
     // MVP stub: no idle processing yet
     return {
       message: 'Nothing to claim right now. Your cat is napping.',

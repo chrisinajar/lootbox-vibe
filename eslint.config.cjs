@@ -23,6 +23,7 @@ module.exports = [
       '.eslintrc.cjs',
       'eslint.config.cjs',
       'postcss.config.cjs',
+      'src/backend/jest.config.cjs',
     ],
   },
   // Bring in recommended legacy configs via compat

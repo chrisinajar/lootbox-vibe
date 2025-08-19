@@ -7,7 +7,9 @@ function ensureCtx() {
   if (!ctx) {
     try {
       ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    } catch {}
+    } catch {
+      /* noop: audio context optional */
+    }
   }
   return ctx;
 }
