@@ -44,7 +44,6 @@ describe('Transaction invariants', () => {
     }
 
     // recompute totals from inv and idx
-    let computedItems = 0n;
     const rarityTotals = new Map<string, bigint>();
     const typeTotals = new Map<string, bigint>();
     // Build maps stackId -> rarity/type via idx
@@ -68,7 +67,6 @@ describe('Transaction invariants', () => {
     await db.scanPrefix(`inv:${uid}:`, async (k, v) => {
       const count = BigInt(v.readUInt32BE(0));
       if (count > 0n) {
-        computedItems += count;
         const sid = k.split(':').pop() as string;
         const r = stackRarity.get(sid) || 'COMMON';
         const ty = stackType.get(sid) || 'Apple';

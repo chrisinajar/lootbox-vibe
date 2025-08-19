@@ -213,7 +213,7 @@ export const OpenResultsPanel: React.FC = () => {
         /* noop: sfx optional */
       }
       await client.refetchQueries({ include: [InventorySummaryDocument] });
-    } catch (e: any) {
+    } catch {
       setErr('Something went wrong salvaging your items. Please try again.');
       // silent retry once
       try {

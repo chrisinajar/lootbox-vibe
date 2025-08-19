@@ -303,7 +303,7 @@ export const HomeMain: React.FC = () => {
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
   const [rows, setRows] = React.useState<Row[]>([]);
-  const [revealQueue, setRevealQueue] = React.useState<Row[]>([]);
+  const [, setRevealQueue] = React.useState<Row[]>([]);
   const [revealing, setRevealing] = React.useState(false);
   const revealTimer = React.useRef<number | null>(null);
   const [fxKey, setFxKey] = React.useState(0);
@@ -337,7 +337,7 @@ export const HomeMain: React.FC = () => {
     setRevealQueue((queue) => {
       if (queue.length === 0) {
         setRevealing(false);
-        revealTimer.current && clearTimeout(revealTimer.current);
+        if (revealTimer.current) clearTimeout(revealTimer.current);
         revealTimer.current = null;
         return queue;
       }
@@ -356,7 +356,7 @@ export const HomeMain: React.FC = () => {
   }, [revealing, flushRevealChunk]);
 
   const skipReveal = React.useCallback(() => {
-    revealTimer.current && clearTimeout(revealTimer.current);
+    if (revealTimer.current) clearTimeout(revealTimer.current);
     revealTimer.current = null;
     setRevealing(false);
     setRevealQueue((queue) => {
@@ -398,7 +398,9 @@ export const HomeMain: React.FC = () => {
             return { currencies: nextArr } as any;
           });
         }
-      } catch {}
+      } catch {
+        /* noop: cache update best-effort */
+      }
       const hasRare = (payload?.stacks ?? []).some(
         (s) => rarityRank(s.rarity) >= rarityRank(Rarity.Rare),
       );
@@ -407,7 +409,9 @@ export const HomeMain: React.FC = () => {
       try {
         sfx.open();
         if (hasRare) sfx.rare();
-      } catch {}
+      } catch {
+        /* noop: sfx optional */
+      }
       await client.refetchQueries({ include: [InventorySummaryDocument, CurrenciesDocument] });
     } catch (e: any) {
       const msg = String(e?.message ?? '');

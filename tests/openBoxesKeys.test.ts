@@ -14,7 +14,9 @@ describe('OpenBoxesService key consumption', () => {
   beforeAll(async () => {
     try {
       fs.rmSync(tmpDir, { recursive: true, force: true });
-    } catch {}
+    } catch {
+      /* noop: ensure clean tmp */
+    }
   });
 
   it('deducts keys according to keyCost * count', async () => {
