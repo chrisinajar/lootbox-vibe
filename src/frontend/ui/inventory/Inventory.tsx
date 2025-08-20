@@ -123,14 +123,14 @@ export const InventoryView: React.FC = () => {
     [JSON.stringify(filter?.curatedTags ?? [])],
   );
 
-  const ensureExpanded = async (seed?: Row[]) => {
+  const ensureExpanded = async (seed?: Row[], force = false) => {
     const list = seed ?? rows;
     const unique = new Map<string, Row>();
     for (const r of list) unique.set(expandKey(r), r);
     for (const r of unique.values()) {
       const key = expandKey(r);
       const state = expanded[key];
-      if (state && state.sig === currentSig && state.rows.length > 0) continue;
+      if (!force && state && state.sig === currentSig && state.rows.length > 0) continue;
       setExpanded((prev) => ({
         ...prev,
         [key]: { loading: true, rows: state?.rows ?? [], sig: currentSig },
@@ -272,9 +272,13 @@ export const InventoryView: React.FC = () => {
     setBusy(true);
     try {
       await salvage({ variables: { input: { maxRarity: Rarity.Uncommon } } });
-      await client.refetchQueries({ include: [InventoryListDocument] });
-      // reset list from top
-      await refetch({ filter, limit: 100, cursor: undefined });
+      // Refetch and refresh expansion to reflect updated base-only stacks
+      const d = await refetch({ filter, limit: 100, cursor: undefined });
+      const rs = (d.data?.inventoryList?.rows ?? []).map((r) => ({ ...r }) as Row);
+      setRows(rs);
+      setCursor(d.data?.inventoryList?.nextCursor ?? null);
+      setExpanded({});
+      await ensureExpanded(rs, true);
     } finally {
       setBusy(false);
     }
