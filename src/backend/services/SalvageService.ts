@@ -61,6 +61,10 @@ export class SalvageService {
     const scrapped: Array<{ stackId: string; typeId: string; rarity: string; count: number }> = [];
 
     for (const stackId of allowedStacks) {
+      // Skip stacks that have any modifiers/tags (do not salvage variants)
+      const tagMapKey = keys.tagMap(uid, stackId);
+      const tagBuf = await this.storage.get(tagMapKey);
+      if (tagBuf) continue;
       const invKey = keys.inv(uid, stackId);
       const invBuf = await this.storage.get(invKey);
       const count = u32.decodeBE(invBuf as Buffer);
@@ -92,6 +96,17 @@ export class SalvageService {
       ops.push({ type: 'put', key: invKey, value: u32.encodeBE(0) });
       ops.push({ type: 'del', key: keys.idxRarity(uid, foundTier, stackId) });
       if (foundType) ops.push({ type: 'del', key: keys.idxType(uid, foundType, stackId) });
+      // Clean up tag indexes if present
+      const tbuf = await this.storage.get(tagMapKey);
+      if (tbuf) {
+        try {
+          const arr = JSON.parse(tbuf.toString('utf8')) as string[];
+          for (const t of arr) ops.push({ type: 'del', key: keys.idxTag(uid, t, stackId) });
+        } catch {
+          /* ignore malformed tag map */
+        }
+        ops.push({ type: 'del', key: tagMapKey });
+      }
       // source index/map cleanup + sum src delta
       const srcMapKey = keys.srcMap(uid, stackId);
       const srcBuf = await this.storage.get(srcMapKey);

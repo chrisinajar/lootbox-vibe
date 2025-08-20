@@ -346,7 +346,13 @@ export const InventoryView: React.FC = () => {
             </select>
           </div>
           <div className="ml-auto">
-            <button className="btn-accent" disabled={busy} onClick={doBulkSalvage}>
+            <button
+              className="btn-accent"
+              disabled={busy}
+              onClick={doBulkSalvage}
+              title="Preserves special variants (Shiny, Rainbow Text, Useless, etc.)"
+              aria-label="Salvage all junk; preserves special variants"
+            >
               Salvage All Junk
             </button>
           </div>
