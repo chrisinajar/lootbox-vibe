@@ -6,12 +6,21 @@ export class InventoryListService {
   constructor(private storage: StorageProvider) {}
 
   private parseStackMeta(stackId: string): { typeId: string; rarity: string } {
-    // Current stackId pattern: `${typeId}_${rarity}_...`
-    const parts = stackId.split('_');
-    if (parts.length >= 3) {
-      const r = parts[parts.length - 2] || 'COMMON';
-      const t = parts.slice(0, parts.length - 2).join('_') || 'Unknown';
-      return { typeId: t, rarity: r };
+    // Supported patterns:
+    // - `${typeId}_${rarity}_v{n}`
+    // - `${typeId}_${rarity}_t:{tag}_v{n}`
+    // Extract by stripping `_v{n}` and optional `_t:{tag}` suffixes
+    let base = stackId;
+    const vIdx = base.lastIndexOf('_v');
+    if (vIdx > 0) base = base.slice(0, vIdx);
+    const tIdx = base.lastIndexOf('_t:');
+    if (tIdx > 0) base = base.slice(0, tIdx);
+    if (base.endsWith('_base')) base = base.slice(0, -'_base'.length);
+    const parts = base.split('_');
+    if (parts.length >= 2) {
+      const rarity = parts[parts.length - 1] || 'COMMON';
+      const typeId = parts.slice(0, parts.length - 1).join('_') || 'Unknown';
+      return { typeId, rarity };
     }
     return { typeId: 'Unknown', rarity: 'COMMON' };
   }
@@ -52,14 +61,8 @@ export class InventoryListService {
     // Scan and collect candidates
     const candidates: string[] = [];
     await this.storage.scanPrefix(prefix, (key, _val) => {
-      let sid = '';
-      if (mode === 'inv') {
-        const parts = key.split(':');
-        sid = parts[parts.length - 1] || '';
-      } else {
-        const parts = key.split(':');
-        sid = parts[parts.length - 1] || '';
-      }
+      // Extract stackId by slicing off the known prefix to preserve any ':' within stackId
+      const sid = key.slice(prefix.length);
       if (!sid) return;
       if (cursor && sid <= cursor) return; // cursor by stackId
       candidates.push(sid);

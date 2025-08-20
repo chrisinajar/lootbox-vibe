@@ -120,6 +120,31 @@ export class OpenBoxesService {
     }
 
     const cosmetics: Array<{ typeId: string; modId: string; modName: string }> = [];
+    // Track curated tags per stackId (may include tag in stackId)
+    const tagsByStack = new Map<string, Set<string>>();
+
+    const toCuratedTag = (modId: string): string | undefined => {
+      switch (modId) {
+        case 'm_shiny':
+          return 'shiny';
+        case 'm_rainbow_text':
+          return 'rainbow_text';
+        case 'm_confetti_burst':
+          return 'confetti_burst';
+        case 'm_glitter_border':
+          return 'glitter_border';
+        case 'm_meme_text':
+          return 'meme_text';
+        case 'm_annoying_popup':
+          return 'annoying_popup';
+        case 'm_screams':
+          return 'screams';
+        case 'm_useless':
+          return 'useless';
+        default:
+          return undefined;
+      }
+    };
 
     // Compute eligible item-pick probability for this box
     const dropTable = (box as any).dropTable as any;
@@ -179,11 +204,8 @@ export class OpenBoxesService {
           case 'ITEM': {
             const itemId = String(pick.itemId);
             const rarity = String(pick.rarity ?? 'COMMON');
-            const stackId = `${itemId}_${rarity}_v${configVersion}`;
-            const cur = rolls.get(stackId) ?? { count: 0, itemId, rarity };
-            cur.count += 1;
-            rolls.set(stackId, cur);
             // Cosmetic roll: intersect pool ∩ item.allowedStaticMods ∩ COSMETIC
+            let appliedTag: string | undefined;
             try {
               const pool: string[] = Array.isArray(pick.staticModsPool)
                 ? (pick.staticModsPool as string[])
@@ -198,9 +220,25 @@ export class OpenBoxesService {
                 const modId = eligible[Math.max(0, Math.min(idx, eligible.length - 1))]!;
                 const modName = modNameById.get(modId) ?? modId;
                 cosmetics.push({ typeId: itemId, modId, modName });
+                // Capture curated tag for this stack for inventory filtering
+                const tag = toCuratedTag(modId);
+                if (tag) appliedTag = tag;
               }
             } catch {
               /* cosmetic roll best-effort */
+            }
+            // Choose stackId including tag signature if present
+            const stackId =
+              appliedTag && appliedTag.length > 0
+                ? `${itemId}_${rarity}_t:${appliedTag}_v${configVersion}`
+                : `${itemId}_${rarity}_v${configVersion}`;
+            const cur = rolls.get(stackId) ?? { count: 0, itemId, rarity };
+            cur.count += 1;
+            rolls.set(stackId, cur);
+            if (appliedTag) {
+              const set = tagsByStack.get(stackId) ?? new Set<string>();
+              set.add(appliedTag);
+              tagsByStack.set(stackId, set);
             }
             break;
           }
@@ -277,14 +315,16 @@ export class OpenBoxesService {
     // start with KEYS: cost + lucky bonus
     curDelta.set('KEYS', (curDelta.get('KEYS') ?? 0n) - totalCost + BigInt(bonusKeys));
 
-    // stack ops
-    const stackAdjs = Array.from(rolls.values()).map((r) => ({
+    // stack ops (preserve exact stackId, including tag signature if present)
+    const stackAdjs = Array.from(rolls.entries()).map(([stackId, r]) => ({
       uid,
-      stackId: `${r.itemId}_${r.rarity}_v${configVersion}`,
+      stackId,
       rarity: r.rarity,
       typeId: r.itemId,
       delta: r.count,
       source: input.boxId,
+      // Pass through any curated tags we observed for this stack in this request
+      tags: Array.from(tagsByStack.get(stackId) ?? []),
     }));
     ops.push(...(await prepareStackOps(this.storage, stackAdjs)));
 

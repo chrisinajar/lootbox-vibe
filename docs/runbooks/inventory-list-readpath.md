@@ -26,7 +26,7 @@ checking index membership, then read counts from `inv:` and return `nextCursor`.
 
 - Service: `src/backend/services/InventoryListService.ts`.
 - Resolver: wires telemetry and timing in `src/backend/init.ts`.
-- Deriving metadata: current stackId pattern is `{typeId}_{rarity}_...`; update parser if pattern evolves.
+- Deriving metadata: current stackId pattern is `{typeId}_{rarity}[_t:{tag}]_v{n}`; parser strips optional tag and version to recover `typeId` and `rarity`.
 
 ## Performance
 

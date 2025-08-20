@@ -31,9 +31,9 @@ export class SalvageService {
     if (input.typeIds && input.typeIds.length > 0) {
       typeFilter = new Set<string>();
       for (const t of input.typeIds) {
-        await this.storage.scanPrefix(keys.idxType(uid, t, ''), (k) => {
-          const parts = k.split(':');
-          const stackId = parts[parts.length - 1];
+        const pfx = keys.idxType(uid, t, '');
+        await this.storage.scanPrefix(pfx, (k) => {
+          const stackId = k.slice(pfx.length);
           if (stackId) typeFilter!.add(stackId);
         });
       }
@@ -43,7 +43,7 @@ export class SalvageService {
     for (const tier of tiers) {
       const prefix = keys.idxRarity(uid, tier, '');
       await this.storage.scanPrefix(prefix, (k) => {
-        const sid = k.split(':').pop();
+        const sid = k.slice(prefix.length);
         if (!sid) return;
         if (typeFilter && !typeFilter.has(sid)) return;
         allowedStacks.add(sid);
@@ -80,12 +80,13 @@ export class SalvageService {
       let foundType = '';
       const typePrefix = `idx:type:${uid}:`;
       await this.storage.scanPrefix(typePrefix, (k) => {
-        const parts = k.split(':');
-        const typeId = parts[3];
-        const sid = parts[4];
-        if (sid === stackId && typeId) {
-          foundType = typeId;
-        }
+        // idx:type:{uid}:{typeId}:{stackId}
+        const rest = k.slice(typePrefix.length); // becomes {typeId}:{stackId}
+        const idx = rest.indexOf(':');
+        if (idx <= 0) return;
+        const typeId = rest.slice(0, idx);
+        const sid = rest.slice(idx + 1);
+        if (sid === stackId && typeId) foundType = typeId;
       });
 
       ops.push({ type: 'put', key: invKey, value: u32.encodeBE(0) });

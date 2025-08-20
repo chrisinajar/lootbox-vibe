@@ -98,11 +98,14 @@ export class SummariesRepo {
     // Fallback: scan index and aggregate
     const totals = new Map<string, bigint>();
     const pairs: Array<{ typeId: string; stackId: string }> = [];
-    await this.storage.scanPrefix(`idx:type:${uid}:`, (key) => {
+    const typePrefix = `idx:type:${uid}:`;
+    await this.storage.scanPrefix(typePrefix, (key) => {
       // idx:type:{uid}:{typeId}:{stackId}
-      const parts = key.split(':');
-      const typeId = parts[3];
-      const stackId = parts[4];
+      const rest = key.slice(typePrefix.length);
+      const idx = rest.indexOf(':');
+      if (idx <= 0) return;
+      const typeId = rest.slice(0, idx);
+      const stackId = rest.slice(idx + 1);
       if (typeId && stackId) pairs.push({ typeId, stackId });
     });
     for (const { typeId, stackId } of pairs) {
@@ -126,11 +129,14 @@ export class SummariesRepo {
     // Fallback: aggregate via idx:src and inv counts
     const totals = new Map<string, bigint>();
     const pairs: Array<{ source: string; stackId: string }> = [];
-    await this.storage.scanPrefix(`idx:src:${uid}:`, (k) => {
+    const srcPrefix = `idx:src:${uid}:`;
+    await this.storage.scanPrefix(srcPrefix, (k) => {
       // idx:src:{uid}:{source}:{stackId}
-      const parts = k.split(':');
-      const source = parts[3];
-      const stackId = parts[4];
+      const rest = k.slice(srcPrefix.length);
+      const idx = rest.indexOf(':');
+      if (idx <= 0) return;
+      const source = rest.slice(0, idx);
+      const stackId = rest.slice(idx + 1);
       if (source && stackId) pairs.push({ source, stackId });
     });
     for (const { source, stackId } of pairs) {

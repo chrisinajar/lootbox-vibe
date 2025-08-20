@@ -25,6 +25,7 @@ coverage/
 *.tsbuildinfo
 tmp/
 temp/
+lint.out
 
 # Env / secrets
 .env

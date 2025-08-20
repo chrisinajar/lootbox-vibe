@@ -1,4 +1,3 @@
-import { ConfigLoader } from '../config';
 import { u32, u64 } from '../storage/codec';
 import { keys } from '../storage/keys';
 import { StorageProvider, BatchOp } from '../storage/StorageProvider';
@@ -14,11 +13,8 @@ export async function prepareStackOps(
   const rarityDelta = new Map<string, bigint>();
   const typeDelta = new Map<string, bigint>();
   const srcDelta = new Map<string, bigint>();
-  const cfg = new ConfigLoader().load();
-  const filterable = new Set<string>();
-  for (const m of (cfg.modifiers?.static as any[]) || []) {
-    if ((m as any)?.filterable) filterable.add(String((m as any).id));
-  }
+  // Curated tags are already provided by upstream services (e.g., 'shiny').
+  // We accept them as-is and index them for filtering.
   let totalItemsDelta = 0n;
   let totalStacksDelta = 0n;
   const uid = adjs[0]!.uid;
@@ -39,10 +35,10 @@ export async function prepareStackOps(
       ops.push({ type: 'put', key: idxTKey, value: '1' });
       const tagMapKey = keys.tagMap(a.uid, a.stackId);
       const tags = Array.isArray((a as any).tags) ? ((a as any).tags as string[]) : [];
-      const filtTags = tags.filter((t) => filterable.has(t));
-      if (filtTags.length > 0) {
-        ops.push({ type: 'put', key: tagMapKey, value: JSON.stringify(filtTags) });
-        for (const t of filtTags)
+      if (tags.length > 0) {
+        const unique = Array.from(new Set(tags.map(String)));
+        ops.push({ type: 'put', key: tagMapKey, value: JSON.stringify(unique) });
+        for (const t of unique)
           ops.push({ type: 'put', key: keys.idxTag(a.uid, t, a.stackId), value: '1' });
       }
       if (srcForStack) {
@@ -69,6 +65,26 @@ export async function prepareStackOps(
         ops.push({ type: 'del', key: srcMapKey });
       }
       totalStacksDelta -= 1n;
+    } else if (prev > 0n && next > 0n) {
+      // Update tag indexes for existing stacks if new tags are provided
+      const newTags = Array.isArray((a as any).tags) ? ((a as any).tags as string[]) : [];
+      if (newTags.length > 0) {
+        const tagMapKey = keys.tagMap(a.uid, a.stackId);
+        const tbuf = await storage.get(tagMapKey);
+        const existing: Set<string> = new Set<string>(
+          tbuf ? (JSON.parse(tbuf.toString('utf8')) as string[]).map(String) : [],
+        );
+        let changed = false;
+        for (const t of newTags.map(String)) {
+          if (!existing.has(t)) {
+            existing.add(t);
+            ops.push({ type: 'put', key: keys.idxTag(a.uid, t, a.stackId), value: '1' });
+            changed = true;
+          }
+        }
+        if (changed)
+          ops.push({ type: 'put', key: tagMapKey, value: JSON.stringify(Array.from(existing)) });
+      }
     }
     rarityDelta.set(a.rarity, (rarityDelta.get(a.rarity) ?? 0n) + BigInt(a.delta));
     typeDelta.set(a.typeId, (typeDelta.get(a.typeId) ?? 0n) + BigInt(a.delta));
